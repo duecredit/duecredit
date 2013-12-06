@@ -29,7 +29,7 @@ try:
     if git.wait() != 0:
         raise OSError
     line = git.stdout.readlines()[0]
-    __version__ = line.strip()[1:].decode('ascii')
+    __version__ = line.strip().decode('ascii')
     __release_date__ = datetime.now().strftime('%b %d %Y, %H:%M:%S')
     with open(VERSION_FILE, 'w') as version_file:
         version_file.write("__version__ = '{}'\n".format(__version__))
