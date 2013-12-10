@@ -1,0 +1,6 @@
+__pycache__
+*.pyc
+/build
+/dist
+/MANIFEST
+/pubtrace/version.py
