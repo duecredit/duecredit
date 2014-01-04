@@ -1,8 +1,8 @@
 ========
-pubtrace
+duecredit
 ========
 
-pubtrace is being conceived to address the problem of inadequate
+duecredit is being conceived to address the problem of inadequate
 citation of scientific software and methods.
 
 It provides a simple framework (at the moment for Python only) to
@@ -62,9 +62,9 @@ HOWTO
 Interaction
 -----------
 
-In default pubtrace should not impact any running computation, but
+In default duecredit should not impact any running computation, but
 with easy switch (e.g. via exporting environment variable
-PUBTRACE_ENABLE=1) upon exit (or via an explicit call) it would
+DUECREDIT_ENABLE=1) upon exit (or via an explicit call) it would
 provide a list of references collected for the runtime.
 
 
@@ -73,7 +73,7 @@ Interface
 
 Interface should be minimalistic, so it should be possible to provide
 a tiny stub for people to add to their code in case when the full
-mighty pubtrace is N/A.
+mighty duecredit is N/A.
 
 
 # TODO -- actually think it would be benefitial/feasible
@@ -85,10 +85,10 @@ mighty pubtrace is N/A.
 # could carry along?
 
 try:
-  import pubtrace
+  import duecredit
 except ImportError:
   # oopsy daisy
-  class pubtrace(object):
+  class duecredit(object):
     def add(*args, **kwargs):  pass
     # TODO: would not work as a decorator
 	def cite(*args, **kwargs): pass
@@ -101,15 +101,15 @@ Specification
 
 Module level
 ~~~~~~~~~~~~
-import pubtrace
+import duecredit
 
 # Add reference
-pubtrace.add(bib="""{XXX00, ...}""")
+duecredit.add(bib="""{XXX00, ...}""")
 
 # and/or load multiple from a file
-pubtrace.load('/home/soul/deep/good_intentions.bib')
+duecredit.load('/home/soul/deep/good_intentions.bib')
 
-pubtrace.cite('XXX00', use="") # Cite entire module
+duecredit.cite('XXX00', use="") # Cite entire module
 
 
 Function/Method level
@@ -118,7 +118,7 @@ Function/Method level
 # Could provide additional description for the particular
 # functionality
 
-@pubtrace.dcite('XXX00', use="Provides an answer for meaningless existence")
+@duecredit.dcite('XXX00', use="Provides an answer for meaningless existence")
 def purpose_of_life():
     return None
 
@@ -127,7 +127,7 @@ class Children(object):
      def __init__(self):
 	     pass
 
-     @pubtrace.dcite('BirthCertificate')
+     @duecredit.dcite('BirthCertificate')
      def birth(self, gender):
 	     pass
 

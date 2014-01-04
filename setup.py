@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-pubtrace -- trace software for the publications
+duecredit -- trace software for the publications
 """
 
 import os
@@ -15,7 +15,7 @@ from subprocess import Popen, PIPE
 #  License: BSD-2
 #  Copyright 2011-2013 Brecht Machiels
 
-PACKAGE = 'pubtrace'
+PACKAGE = 'duecredit'
 PACKAGE_ABSPATH = os.path.abspath(PACKAGE)
 VERSION_FILE = PACKAGE + '/version.py'
 
@@ -54,7 +54,7 @@ def find_packages(path, prefix):
 
 
 setup(
-    name='pubtrace',
+    name='duecredit',
     version=__version__,
     packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
     package_data={PACKAGE: []},
@@ -67,7 +67,7 @@ setup(
     author_email='yoh@onerussian.com',
     description='Publications tracer',
     long_description=README,
-    url='https://github.com/yarikoptic/pubtrace',
+    url='https://github.com/yarikoptic/duecredit',
     keywords='citation tracing', 
     license='2-clause BSD License',
     classifiers = [
