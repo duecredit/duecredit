@@ -13,6 +13,16 @@ level of reference detail, i.e. only references for actually used
 functionality will be presented back if software provides multiple
 citeable implementations.
 
+Warning/Disclaimer
+------------------
+
+There is nothing working yet -- it is just beign conceived in spare
+moments.  I hope to keep pushing it whenever I have a moment.
+
+But if you found idea interesting and want to provide feedback, join, or
+even take over -- you are most welcome.  I would be delighted to hear any
+feedback.
+
 
 Ultimate goals
 ==============
