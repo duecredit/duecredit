@@ -1,59 +1,61 @@
-========
+=========
 duecredit
-========
+=========
 
 duecredit is being conceived to address the problem of inadequate
-citation of scientific software and methods.
+citation of scientific software and methods, and limited visibility of
+donation requests for open-source software.
 
 It provides a simple framework (at the moment for Python only) to
-embed references in the original code so they would be automatically
-collected and reported to the user at the necessary level of reference
-detail, i.e. only references for actually used functionality will be
-presented back if software provides multiple citeable implementations.
+embed publication or other references in the original code so they are
+automatically collected and reported to the user at the necessary
+level of reference detail, i.e. only references for actually used
+functionality will be presented back if software provides multiple
+citeable implementations.
 
 
-Ultimate vision(s)
-=================
+Ultimate goals
+==============
 
-No need for prima ballerina projects
-------------------------------------
+Reduce demand for prima ballerina projects
+------------------------------------------
 
-Problem: Scientific software is developed often to gain citations for
+Problem: Scientific software is often developed to gain citations for
 original publication through the use of the software implementing it.
-Unfortunately such established procedure discourages contributions to
-the existing projects and favors establishing new projects developed
-from scratch.
+Unfortunately such an established procedure discourages contributions
+to the existing projects and fosters new projects to be developed from
+scratch.
 
 Solution: With easy ways to provide all-and-only relevant references
 for used functionality within a large(r) framework scientific
 developers would prefer to contribute to already existing projects.
 
-Benefits: As a result, they would immediately benefit from adhering to
-proper development procedures (codebase and data structuring, testing,
-etc) and already established delivery and deployment channels those
-projects already have.  This will increase efficiency and
+Benefits: As a result, scientific developers would immediately benefit
+from adhering to proper development procedures (codebase structuring,
+testing, etc) and already established delivery and deployment channels
+existing projects already have.  This will increase efficiency and
 standardization of scientific software development, thus addressing
-many (if not all) of the core problems with scientific software
-everyone likes to bash about (reproducibility, longevity, etc).
+many (if not all) core problems with scientific software development
+everyone likes to bash about (reproducibility, longevity, etc.).
 
-Core libraries adequately referenced
-------------------------------------
+Adequately reference core libraries
+-----------------------------------
 
 Problem: Scientific software often if not always uses 3rd party
-libraries (e.g. NumPy, SciPy, atlas) which might not even be visible
+libraries (e.g., NumPy, SciPy, atlas) which might not even be visible
 at the user level.  Therefore they are rarely referenced in the
-publications despite providing fundamental core for solving a
+publications despite providing the fundamental core for solving a
 scientific problem at hands.
 
 Solution: With automated bibliography compilation for all used
-libraries, such core libraries would get a chance to receive adequate
-citability.
+libraries, such projects and their authors would get a chance to
+receive adequate citability.
 
 Benefits: Adequate appreciation of the scientific software
 developments.  Coupled with a solution for "prima ballerina" problem,
-more contributions would flow into the core/foundational projects
+more contributions will flow into the core/foundational projects
 making new methodological developments readily available to even wider
-audiences.
+audiences without proliferation of the low quality scientific software.
 
 
 HOWTO
@@ -62,17 +64,17 @@ HOWTO
 Interaction
 -----------
 
-In default duecredit should not impact any running computation, but
-with easy switch (e.g. via exporting environment variable
-DUECREDIT_ENABLE=1) upon exit (or via an explicit call) it would
-provide a list of references collected for the runtime.
-
+By default, duecredit should not have any notable impact on any
+computation, but with easy switch (e.g. via exporting environment
+variable DUECREDIT_ENABLE=1) upon exit (or via an explicit call) it
+should collect any related references at runtime and export such a
+list of references.
 
 Interface
 ---------
 
 Interface should be minimalistic, so it should be possible to provide
-a tiny stub for people to add to their code in case when the full
+a small stub for projects to add to their code in case when the full
 mighty duecredit is N/A.
 
 
@@ -101,15 +103,20 @@ Specification
 
 Module level
 ~~~~~~~~~~~~
-import duecredit
 
-# Add reference
-duecredit.add(bib="""{XXX00, ...}""")
-
-# and/or load multiple from a file
-duecredit.load('/home/soul/deep/good_intentions.bib')
-
-duecredit.cite('XXX00', use="") # Cite entire module
+>>> from duecredit import due, BibTeX, Donate
+>>>
+>>> # Add XXX00 reference
+>>> due.add(BibTeX("""{XXX00, ...}"""))
+>>>
+>>> # and/or load multiple from a file
+>>> due.load('/home/soul/deep/good_intentions.bib')
+>>>
+>>> # Reference XXX00 entry.  If not pre-loaded
+>>> # a complete BibTeX or some other entry could be
+>>> # provided in place of the key
+>>> due('XXX00', use="")   # Cite entire module
+>>> due(Donate(url="http://alimony.money/kid#1"))
 
 
 Function/Method level
@@ -118,17 +125,22 @@ Function/Method level
 # Could provide additional description for the particular
 # functionality
 
-@duecredit.dcite('XXX00', use="Provides an answer for meaningless existence")
+@due.dec('XXX00', use="Provides an answer for meaningless existence")
 def purpose_of_life():
     return None
 
 class Children(object):
-     # Conception is usually way too easy to be referenced
+     # Conception is usually way too easy and is just for pleasure,
+	 # thus not worth referencing
      def __init__(self):
 	     pass
 
-     @duecredit.dcite('BirthCertificate')
+     @due.dec(Donate("http://social.support"))
      def birth(self, gender):
+	     pass
+
+     @due.dec(BibTeX("""{YYY00, title='Memoir of ...', ...}"""))
+	 def tough_life(self, reincarnations=1, ...):
 	     pass
 
 
