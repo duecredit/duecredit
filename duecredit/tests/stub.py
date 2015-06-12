@@ -1,37 +1,43 @@
 def bleh_():
     try:
-        import duecredit
+        from duecredit import due
     except ImportError:
         # oopsy daisy
-         class duecredit(object):
-              @staticmethod
-              def add(*args, **kwargs):  pass
-              # TODO: would not work as a decorator
-              @staticmethod
-              def dcite(f, *args, **kwargs):
-                  def decorator(func):
-                       return func
-                  return decorator
-              cite = load = add
+        class due(object):
+             @classmethod
+             def _donothing(*args, **kwargs):  pass
+             # TODO: would not work as a decorator
+             @classmethod
+             def dcite(*args, **kwargs):
+                 def nondecorating_decorator(func):
+                      return func
+                 return nondecorating_decorator
+             cite = load = add = _donothing
 
-    # add reference
-    duecredit.add(bib="""{XXX00, ...}""")
+    # add references
+    due.add(bib="""{XXX00, ...}""")
+    # could even be by DOI -- we need to fetch and cache those
+    due.add(doi="xxx.yyy/zzz.1", id_="XXX01")
 
     # and/or load multiple from a file
-    duecredit.load('/home/soul/deep/good_intentions.bib')
+    due.load('/home/soul/deep/good_intentions.bib')
 
-    duecredit.cite('XXX00', use="") # Cite entire module
+    # Cite entire module
+    due.cite('XXX00', use="Answers to existential questions", level="module")
 
-    @duecredit.dcite('XXX00', use="Provides an answer for meaningless existence")
+    # dcite  for decorator cite
+    # cite specific functionality if/when it gets called up
+    @due.dcite('XXX00', use="Provides an answer for meaningless existence")
     def purpose_of_life():
         return None
 
     class Children(object):
-         # Conception is usually way too easy to be referenced
+         # Conception process is usually way too easy to be referenced
          def __init__(self):
              pass
 
-         @duecredit.cite('BirthCertificate')
+         # including functionality within/by the methods
+         @due.dcite('BirthCertificate')
          def birth(self, gender):
              pass
 
