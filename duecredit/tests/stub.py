@@ -1,19 +1,15 @@
-def bleh_():
-    try:
-        from duecredit import due
-    except ImportError:
-        # oopsy daisy
-        class due(object):
-             @classmethod
-             def _donothing(*args, **kwargs):  pass
-             # TODO: would not work as a decorator
-             @classmethod
-             def dcite(*args, **kwargs):
-                 def nondecorating_decorator(func):
-                      return func
-                 return nondecorating_decorator
-             cite = load = add = _donothing
+# emacs: -*- mode: python; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil -*-
+# ex: set sts=4 ts=4 sw=4 noet:
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+#
+#   See COPYING file distributed along with the duecredit package for the
+#   copyright and license terms.
+#
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
+from ..collector import DueCreditCollector, InactiveDueCreditCollector
+
+def _test_api(due):
     # add references
     due.add(bib="""{XXX00, ...}""")
     # could even be by DOI -- we need to fetch and cache those
@@ -42,10 +38,15 @@ def bleh_():
              pass
 
 
-import inspect
-import traceback
+def test_api():
+    yield _test_api, DueCreditCollector()
+    yield _test_api, InactiveDueCreditCollector()
 
-if True:
+
+if False:
+    import inspect
+    import traceback
+
     from mvpa2.support.fff import fff
     def fff_(*args, **kwargs):
         """Forget about smarness -- everything will be explicit
