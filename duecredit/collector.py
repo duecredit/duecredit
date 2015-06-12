@@ -43,7 +43,7 @@ class DueCreditCollector(object):
         """Decorator for references
         """
         # raise NotImplementedError
-        @wraps
+        #@wraps
         pass
 
     def __del__(self):

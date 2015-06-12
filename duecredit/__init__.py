@@ -14,7 +14,7 @@ import os
 from .entries import *
 from .version import __version__, __release_date__
 
-lgr = logging.get('duecredit')
+lgr = logging.getLogger('duecredit')
 lgr.setLevel(logging.DEBUG)
 
 
@@ -29,6 +29,10 @@ if is_active():
     from .collector import DueCreditCollector
     due = DueCreditCollector()
 else:
+    # keeping duplicate but separate so later we could even place it into a separate
+    # submodule to possibly minimize startup time impact even more
+    #
     # provide stubs which would do nothing
-    raise NotImplementedError()
-    pass
+    from .collector import InactiveDueCreditCollector
+    due = InactiveDueCreditCollector
+
