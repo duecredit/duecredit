@@ -14,7 +14,7 @@ def _test_api(due):
     # add references
     due.add(BibTeX('{XXX00, ...}'))
     # could even be by DOI -- we need to fetch and cache those
-    due.add(Doi("xxx.yyy/zzz.1", id_="XXX01"))
+    due.add(Doi("xxx.yyy/zzz.1", key="XXX01"))
 
     # and/or load multiple from a file
     due.load('/home/siiioul/deep/good_intentions.bib')
