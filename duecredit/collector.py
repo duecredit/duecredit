@@ -1,4 +1,7 @@
 from functools import wraps
+
+from .entries import DueCreditEntry
+
 import logging
 lgr = logging.getLogger('lgr')
 
@@ -35,18 +38,40 @@ class DueCreditCollector(object):
         #         implementations
         pass # raise NotImplementedError
 
-    def cite(self, *args, **kwargs):
+    def cite(self, key_entry, *args, **kwargs):
         """Decorator for references
+
+        Parameters
+        ----------
+        key_entry: str or DueCreditEntry
+          The entry to use, either identified by its id or a new one (to be added)
         """
+        if isinstance(key_entry, DueCreditEntry):
+            self.add(key_entry)
+            key_entry = key_entry.key()
+
+        # self._citations.add(key_entry)
         # raise NotImplementedError
         pass
 
     def dcite(self, *args, **kwargs):
-        """Decorator for references
+        """Decorator for references.  Wrap a function or
+
+        Examples
+        --------
+
+        @due.dcite('XXX00', use="Provides an answer for meaningless existence")
+        def purpose_of_life():
+            return None
+
         """
-        # raise NotImplementedError
-        #@wraps
-        pass
+        def func_wrapper(func):
+            @wraps(func)
+            def cite_wrapper(*fargs, **fkwargs):
+                self.cite(*args, **kwargs)
+                func(*fargs, **fkwargs)
+            return cite_wrapper
+        return func_wrapper
 
     def __del__(self):
         lgr.info("EXPORTING")
