@@ -1,4 +1,6 @@
 from functools import wraps
+import logging
+lgr = logging.getLogger('lgr')
 
 class DueCreditCollector(object):
     """Collect the references
@@ -18,7 +20,7 @@ class DueCreditCollector(object):
         - .bib files
         """
         # raise NotImplementedError
-        if isinstance(src, basestr):
+        if isinstance(src, str):
             if src.endswith('.bib'):
                 self._load_bib(src)
 

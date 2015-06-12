@@ -37,6 +37,13 @@ class DueCreditEntry(object):
 class BibTeX(DueCreditEntry):
     pass
 
+class Doi(DueCreditEntry):
+    def __init__(self, doi, load=None, id_=None):
+        super(Doi, self).__init__()
+        self._doi = doi
+        self._id = id_
+    pass
+
 class Donate(DueCreditEntry):
     def __init__(self, url):
         self.url = url

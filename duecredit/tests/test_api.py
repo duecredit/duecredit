@@ -8,22 +8,23 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 from ..collector import DueCreditCollector, InactiveDueCreditCollector
+from ..entries import BibTeX, Doi
 
 def _test_api(due):
     # add references
-    due.add(bib="""{XXX00, ...}""")
+    due.add(BibTeX('{XXX00, ...}'))
     # could even be by DOI -- we need to fetch and cache those
-    due.add(doi="xxx.yyy/zzz.1", id_="XXX01")
+    due.add(Doi("xxx.yyy/zzz.1", id_="XXX01"))
 
     # and/or load multiple from a file
-    due.load('/home/soul/deep/good_intentions.bib')
+    due.load('/home/siiioul/deep/good_intentions.bib')
 
     # Cite entire module
     due.cite('XXX00', use="Answers to existential questions", level="module")
 
     # dcite  for decorator cite
     # cite specific functionality if/when it gets called up
-    @due.dcite('XXX00', use="Provides an answer for meaningless existence")
+    #@due.dcite('XXX00', use="Provides an answer for meaningless existence")
     def purpose_of_life():
         return None
 
@@ -33,7 +34,7 @@ def _test_api(due):
              pass
 
          # including functionality within/by the methods
-         @due.dcite('BirthCertificate')
+         #@due.dcite('BirthCertificate')
          def birth(self, gender):
              pass
 
