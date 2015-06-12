@@ -31,19 +31,33 @@ __copyright__ = 'Copyright (c) 2014 Yaroslav Halchenko'
 __license__ = 'MIT'
 
 class DueCreditEntry(object):
-    def __init__(self, load=None):
+    def __init__(self, rawentry, load=None):
         self._load = load
+        self._rawentry = rawentry
+        self._key = None
+        self._reference = None
+
+    def get_key(self):
+        return self._key
+
+    def get_reference(self):
+        return self._reference
 
 class BibTeX(DueCreditEntry):
-    def __call__(self):
-        return None, None
+    def __init__(self, bibtex):
+        super(BibTeX, self).__init__(bibtex)
+        # TODO
+        self._key = None
+        self._reference = None
+
 
 class Doi(DueCreditEntry):
     def __init__(self, doi, load=None, id_=None):
-        super(Doi, self).__init__()
-        self._doi = doi
+        super(Doi, self).__init__(doi)
         self._id = id_
-    pass
+        # TODO
+        self._key = None
+        self._reference = None
 
 class Donate(DueCreditEntry):
     def __init__(self, url):
