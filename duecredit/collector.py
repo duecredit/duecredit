@@ -77,7 +77,7 @@ class DueCreditCollector(object):
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
                 self.cite(*args, **kwargs)
-                func(*fargs, **fkwargs)
+                return func(*fargs, **fkwargs)
             return cite_wrapper
         return func_wrapper
 

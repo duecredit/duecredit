@@ -1,4 +1,4 @@
-from ..collector import DueCreditCollector
+from ..collector import DueCreditCollector, InactiveDueCreditCollector
 from ..entries import BibTeX, Doi
 
 from nose.tools import assert_equal
@@ -15,29 +15,36 @@ def test_entry():
     yield _test_entry, DueCreditCollector(), entries
 
 
-def test_dcite_function():
-    # Test basic wrapping that we don't mask out the arguments
-    # TODO: create a decorator to sweep both active and inactive one
-    due = DueCreditCollector()
+def _test_dcite_basic(due, callable):
 
-    @due.dcite("XXX0")
-    def method(arg1, kwarg2="blah"):
-        assert_equal(arg1, "magical")
-        assert_equal(kwarg2, 1)
+    assert_equal(callable("magical", 1), "load")
+    # verify that @wraps correctly passes all the docstrings etc
+    assert_equal(callable.__name__, "method")
+    assert_equal(callable.__doc__, "docstring")
 
-    method("magical", 1)
 
 
 def test_dcite_method():
     # Test basic wrapping that we don't mask out the arguments
-    # TODO: create a decorator to sweep both active and inactive one
-    due = DueCreditCollector()
+    for due in [DueCreditCollector(), InactiveDueCreditCollector()]:
 
-    class SomeClass(object):
         @due.dcite("XXX0")
-        def method(self, arg1, kwarg2="blah"):
+        def method(arg1, kwarg2="blah"):
+            """docstring"""
             assert_equal(arg1, "magical")
             assert_equal(kwarg2, 1)
+            return "load"
 
-    instance = SomeClass()
-    instance.method("magical", 1)
+        class SomeClass(object):
+            @due.dcite("XXX0")
+            def method(self, arg1, kwarg2="blah"):
+                """docstring"""
+                assert_equal(arg1, "magical")
+                assert_equal(kwarg2, 1)
+                return "load"
+
+        yield _test_dcite_basic, due, method
+
+        instance = SomeClass()
+        yield _test_dcite_basic, due, instance.method
+
