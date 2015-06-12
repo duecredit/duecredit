@@ -1,4 +1,5 @@
 from ..collector import DueCreditCollector
+from ..entries import BibTeX, Doi
 
 from nose.tools import assert_equal
 
@@ -7,12 +8,10 @@ def _test_entry(due, entry):
 
 
 def test_entry():
-    entry = ('thisismykey', 'thisismyreference')
+    entry = BibTeX("myentry")
     yield _test_entry, DueCreditCollector(), entry
 
-    entries = [('thisismykey', 'thisismyreference'),
-               ('thisisanothermykey', 'thisismyreference'),
-               ('thisismykey', 'thisismyreference')]
+    entries = [BibTeX("myentry"), BibTeX("myentry"), Doi("myentry")]
     yield _test_entry, DueCreditCollector(), entries
 
 
