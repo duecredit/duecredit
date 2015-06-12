@@ -34,6 +34,10 @@ class DueCreditCollector(object):
         if isinstance(src, str):
             if src.endswith('.bib'):
                 self._load_bib(src)
+            else:
+                raise NotImplementedError('Format not yet supported')
+        else:
+            raise ValueError('Must be a string')
 
     def _load_bib(self, src):
         lgr.debug("Loading %s" % src)
@@ -46,7 +50,7 @@ class DueCreditCollector(object):
         #         implementations
         pass # raise NotImplementedError
 
-    def cite(self, key_entry, *args, **kwargs):
+    def cite(self, entry, *args, **kwargs):
         """Decorator for references
 
         Parameters
@@ -54,9 +58,8 @@ class DueCreditCollector(object):
         key_entry: str or DueCreditEntry
           The entry to use, either identified by its id or a new one (to be added)
         """
-        if isinstance(key_entry, DueCreditEntry):
-            self.add(key_entry)
-            key_entry = key_entry.key()
+        self.add(entry)
+        key_entry = entry.get_key()
 
         # self._citations.add(key_entry)
         # raise NotImplementedError
