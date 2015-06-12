@@ -11,10 +11,18 @@ class DueCreditCollector(object):
     The mighty beast which will might become later a proxy on the way to
     talk to a real collector
     """
+    def __init__(self):
+        self._entries = {}
 
     def add(self, entry):
-        # raise NotImplementedError
-        pass
+        """entry should be a DueCreditEntry object"""
+        if isinstance(entry, list):
+            for e in entry:
+                self.add(e)
+        else:
+            key = entry.get_key()
+            reference = entry.get_reference()
+            self._entries[key] = reference
 
     def load(self, src):
         """Loads references from a file or other recognizable source

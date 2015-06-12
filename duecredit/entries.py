@@ -35,7 +35,8 @@ class DueCreditEntry(object):
         self._load = load
 
 class BibTeX(DueCreditEntry):
-    pass
+    def __call__(self):
+        return None, None
 
 class Doi(DueCreditEntry):
     def __init__(self, doi, load=None, id_=None):
