@@ -3,7 +3,7 @@ from functools import wraps
 from .entries import DueCreditEntry
 
 import logging
-lgr = logging.getLogger('lgr')
+lgr = logging.getLogger('duecredit.collector')
 
 class DueCreditCollector(object):
     """Collect the references
