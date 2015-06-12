@@ -16,7 +16,7 @@ citeable implementations.
 Warning/Disclaimer
 ------------------
 
-There is nothing working yet -- it is just beign conceived in spare
+There is nothing working yet -- it is just being conceived in spare
 moments.  I hope to keep pushing it whenever I have a moment.
 
 But if you found idea interesting and want to provide feedback, join, or
