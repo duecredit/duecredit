@@ -31,8 +31,7 @@ __copyright__ = 'Copyright (c) 2014 Yaroslav Halchenko'
 __license__ = 'MIT'
 
 class DueCreditEntry(object):
-    def __init__(self, rawentry, load=None):
-        self._load = load
+    def __init__(self, rawentry):
         self._rawentry = rawentry
         self._key = None
         self._reference = None
@@ -52,11 +51,10 @@ class BibTeX(DueCreditEntry):
 
 
 class Doi(DueCreditEntry):
-    def __init__(self, doi, load=None, id_=None):
+    def __init__(self, doi, key=None):
         super(Doi, self).__init__(doi)
-        self._id = id_
         # TODO
-        self._key = None
+        self._key = key
         self._reference = None
 
 class Donate(DueCreditEntry):
