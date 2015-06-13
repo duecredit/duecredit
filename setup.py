@@ -32,8 +32,8 @@ try:
     __version__ = line.strip().decode('ascii')
     __release_date__ = datetime.now().strftime('%b %d %Y, %H:%M:%S')
     with open(VERSION_FILE, 'w') as version_file:
-        version_file.write("__version__ = '{}'\n".format(__version__))
-        version_file.write("__release_date__ = '{}'\n".format(__release_date__))
+        version_file.write("__version__ = '{0}'\n".format(__version__))
+        version_file.write("__release_date__ = '{0}'\n".format(__release_date__))
 except OSError as e:
     print('Assume we are running from a source distribution.')
     # read version from VERSION_FILE
