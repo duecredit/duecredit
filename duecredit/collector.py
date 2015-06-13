@@ -77,6 +77,12 @@ class DueCreditCollector(object):
     def dcite(self, *args, **kwargs):
         """Decorator for references.  Wrap a function or
 
+        Parameters
+        ----------
+        args, kwargs
+          Arguments to be passed to cite.  If no "level" provided, we deduce it
+          from the wrapped function/method
+
         Examples
         --------
 
@@ -86,9 +92,13 @@ class DueCreditCollector(object):
 
         """
         def func_wrapper(func):
+            if 'level' not in kwargs:
+                # deduce level from the actual function which was decorated
+                kwargs['level'] = 'func %s.%s' % (func.__module__, func.func_name)
+
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
-                self.cite(*args, **kwargs)
+                citation = self.cite(*args, **kwargs)
                 return func(*fargs, **fkwargs)
             return cite_wrapper
         return func_wrapper
@@ -113,11 +123,8 @@ class DueCreditCollector(object):
 
 class InactiveDueCreditCollector(object):
     """A short construct which should serve a stub in the modules were we insert it"""
-    @classmethod
-    def _donothing(*args, **kwargs):  pass
-    # TODO: would not work as a decorator
-    @classmethod
-    def dcite(*args, **kwargs):
+    def _donothing(self, *args, **kwargs):  pass
+    def dcite(self, *args, **kwargs):
         def nondecorating_decorator(func):
              return func
         return nondecorating_decorator
@@ -125,6 +132,8 @@ class InactiveDueCreditCollector(object):
 
 
 class Citation(object):
+    """Encapsulates citations and information on their use"""
+
     def __init__(self, entry, use, level):
         self._entry = entry
         self._use = use
@@ -133,3 +142,7 @@ class Citation(object):
 
     def __repr__(self):
         return self.__class__.__name__
+
+    @property
+    def level(self):
+        return self._level
