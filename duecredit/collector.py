@@ -68,8 +68,11 @@ class DueCreditCollector(object):
 
         if entry_key not in self.citations:
             self.citations[entry_key] = Citation(entry_, use, level)
-        self.citations[entry_key].count += 1
+        citation = self.citations[entry_key]
+        citation.count += 1
         # TODO: update level and use here?
+        
+        return citation
 
     def dcite(self, *args, **kwargs):
         """Decorator for references.  Wrap a function or
