@@ -8,9 +8,10 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """TODO"""
 
-import sys
 import logging
 import os
+import pickle
+import sys
 
 from .entries import *
 from .version import __version__, __release_date__
@@ -30,9 +31,11 @@ def is_active():
 if is_active():
     from .collector import DueCreditCollector, CollectorGrave
 
-    # TODO: see if we have in current directory already something stored
-    # so we could recreate it from previous usage or smth like that
-    due = DueCreditCollector()
+    if os.path.exists('.duecredit.p'):
+        with open('.duecredit.p') as f:
+            due = pickle.load(f)
+    else:
+        due = DueCreditCollector()
     _export_upon_del = CollectorGrave(due)
 
 else:
