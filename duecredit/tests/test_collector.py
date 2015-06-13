@@ -30,7 +30,9 @@ def test_dcite_method():
 
     # Test basic wrapping that we don't mask out the arguments
     for due in [DueCreditCollector(), InactiveDueCreditCollector()]:
+        active = isinstance(due, DueCreditCollector)
         due.add(BibTeX(_sample_bibtex))
+
         @due.dcite("XXX0")
         def method(arg1, kwarg2="blah"):
             """docstring"""
@@ -45,9 +47,22 @@ def test_dcite_method():
                 assert_equal(arg1, "magical")
                 assert_equal(kwarg2, 1)
                 return "load"
+        if active:
+            assert_equal(due.citations, {})
+            assert_equal(len(due._entries), 1)
 
         yield _test_dcite_basic, due, method
 
+        if active:
+            assert_equal(len(due.citations), 1)
+            assert_equal(len(due._entries), 1)
+            assert_equal(due.citations["XXX0"].count, 1)
+
         instance = SomeClass()
         yield _test_dcite_basic, due, instance.method
+
+        if active:
+            assert_equal(len(due.citations), 1)
+            assert_equal(len(due._entries), 1)
+            assert_equal(due.citations["XXX0"].count, 2)
 

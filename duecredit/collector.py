@@ -13,6 +13,7 @@ class DueCreditCollector(object):
     """
     def __init__(self):
         self._entries = {}
+        self.citations = {}
 
     def add(self, entry):
         """entry should be a DueCreditEntry object"""
@@ -21,8 +22,7 @@ class DueCreditCollector(object):
                 self.add(e)
         else:
             key = entry.get_key()
-            reference = entry.get_reference()
-            self._entries[key] = reference
+            self._entries[key] = entry
 
     def load(self, src):
         """Loads references from a file or other recognizable source
@@ -50,7 +50,7 @@ class DueCreditCollector(object):
         #         implementations
         pass # raise NotImplementedError
 
-    def cite(self, entry, *args, **kwargs):
+    def cite(self, entry, use=None, level=None):
         """Decorator for references
 
         Parameters
@@ -61,11 +61,18 @@ class DueCreditCollector(object):
         if isinstance(entry, DueCreditEntry):
             # new one -- add it
             self.add(entry)
-            key_entry = entry.get_key()
-        else:  # get old one
-            key_entry = entry
+            entry_ = entry
+        else:
+            entry_ = self._entries[entry]
+        entry_key = entry_.get_key()
 
-        return self._entries[key_entry]
+        if entry_key not in self.citations:
+            self.citations[entry_key] = Citation(entry_, use, level)
+        citation = self.citations[entry_key]
+        citation.count += 1
+        # TODO: update level and use here?
+        
+        return citation
 
     def dcite(self, *args, **kwargs):
         """Decorator for references.  Wrap a function or
@@ -109,3 +116,14 @@ class InactiveDueCreditCollector(object):
              return func
         return nondecorating_decorator
     cite = load = add = _donothing
+
+
+class Citation(object):
+    """Encapsulates citations and information on their use"""
+
+    def __init__(self, entry, use, level):
+        self._entry = entry
+        self._use = use
+        self._level = level
+        self.count = 0
+
