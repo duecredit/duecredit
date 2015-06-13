@@ -30,11 +30,14 @@ __author__ = 'Yaroslav Halchenko'
 __copyright__ = 'Copyright (c) 2014 Yaroslav Halchenko'
 __license__ = 'MIT'
 
+import re
+
 class DueCreditEntry(object):
-    def __init__(self, rawentry):
+    def __init__(self, rawentry, key=None):
         self._rawentry = rawentry
-        self._key = None
+        self._key = key or rawentry.lower()
         self._reference = None
+        self._process_rawentry(rawentry)
 
     def get_key(self):
         return self._key
@@ -42,24 +45,32 @@ class DueCreditEntry(object):
     def get_reference(self):
         return self._reference
 
+    def _process_rawentry(self):
+        pass
+
+
 class BibTeX(DueCreditEntry):
-    def __init__(self, bibtex):
+    def __init__(self, bibtex, key=None):
         super(BibTeX, self).__init__(bibtex)
-        # TODO
         self._key = None
         self._reference = None
+
+    def _process_rawentry(self):
+        reg = re.match("@(?P<type>\S*)\s*{\s*(?P<key>\S*)\s*,.*",
+                       self._rawentry, flags=re.MULTILINE)
+        assert(reg)
+        matches = reg.groupdict()
+        self._key = matches['key']
 
 
 class Doi(DueCreditEntry):
     def __init__(self, doi, key=None):
-        super(Doi, self).__init__(doi)
+        super(Doi, self).__init__(doi, key)
         # TODO
-        self._key = key
-        self._reference = None
+
 
 class Donate(DueCreditEntry):
-    def __init__(self, url):
+    def __init__(self, url, key=None):
+        super(Donate, self).__init__(url, key)
         self.url = url
 
-class BirthCertificate(DueCreditEntry):
-    pass

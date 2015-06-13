@@ -12,7 +12,7 @@ from ..entries import BibTeX, Doi
 
 def _test_api(due):
     # add references
-    due.add(BibTeX('{XXX00, ...}'))
+    due.add(BibTeX('@article{XXX00, ...}'))
     # could even be by DOI -- we need to fetch and cache those
     due.add(Doi("xxx.yyy/zzz.1", key="XXX01"))
 
