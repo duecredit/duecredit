@@ -6,6 +6,7 @@ from ..export import TextOutput, PickleOutput
 from mock import patch
 from nose.tools import assert_equal, assert_is_instance, assert_raises
 import os
+import tempfile
 
 def _test_entry(due, entry):
     due.add(entry)
@@ -83,13 +84,14 @@ def test_get_output_handler_method():
         collector.add(entry)
         collector.cite(entry)
 
-        grave = CollectorGrave(collector)
-        handlers = [grave._get_output_handler(type_, collector)
-                    for type_ in ['stdout', 'pickle']]
+        with tempfile.NamedTemporaryFile() as f:
+            grave = CollectorGrave(collector, fn=f.name)
+            handlers = [grave._get_output_handler(type_, collector)
+                        for type_ in ['stdout', 'pickle']]
 
-        assert_is_instance(handlers[0], TextOutput)
-        assert_is_instance(handlers[1], PickleOutput)
+            assert_is_instance(handlers[0], TextOutput)
+            assert_is_instance(handlers[1], PickleOutput)
 
-        assert_raises(NotImplementedError, grave._get_output_handler,
-            'nothing', collector)
+            assert_raises(NotImplementedError, grave._get_output_handler,
+                          'nothing', collector)
 

@@ -147,22 +147,23 @@ class InactiveDueCreditCollector(object):
 class CollectorGrave(object):
     """A helper which would take care about exporting citations upon its Death
     """
-    def __init__(self, collector):
+    def __init__(self, collector, fn=None):
         self._due = collector
+        self.fn = fn or '.duecredit.p'
         # for now decide on output "format" right here
         self._outputs = [self._get_output_handler(
-            type_.lower().strip(), collector)
+            type_.lower().strip(), collector, fn=fn)
             for type_ in os.environ.get('DUECREDIT_OUTPUTS',
                                         'stdout').split(',')
             if type_]
 
     @staticmethod
-    def _get_output_handler(type_, collector):
+    def _get_output_handler(type_, collector, fn=None):
         # just a little factory
         if type_ in ("stdout", "stderr"):
             return TextOutput(getattr(sys, type_), collector)
         elif type_ == "pickle":
-            return PickleOutput(collector)
+            return PickleOutput(collector, fn=fn)
         else:
             raise NotImplementedError()
 
