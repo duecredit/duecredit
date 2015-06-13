@@ -13,7 +13,8 @@ def test_entry():
     entry = BibTeX(_sample_bibtex)
     yield _test_entry, DueCreditCollector(), entry
 
-    entries = [BibTeX(_sample_bibtex), BibTeX(_sample_bibtex), Doi(_sample_doi)]
+    entries = [BibTeX(_sample_bibtex), BibTeX(_sample_bibtex),
+               Doi(_sample_doi)]
     yield _test_entry, DueCreditCollector(), entries
 
 
@@ -58,7 +59,8 @@ def test_dcite_method():
             assert_equal(len(due._entries), 1)
             citation = due.citations["XXX0"]
             assert_equal(citation.count, 1)
-            assert_equal(citation.level, "func duecredit.tests.test_collector.method")
+            assert_equal(citation.level, "func duecredit.tests."
+                                         "test_collector.method")
 
         instance = SomeClass()
         yield _test_dcite_basic, due, instance.method
