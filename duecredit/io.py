@@ -1,4 +1,14 @@
 import pickle
+import requests
+
+def import_doi(doi):
+    headers = {'Accept': 'text/bibliography; style=bibtex'}
+    url = 'http://dx.doi.org/' + doi
+    r = requests.get(url, headers=headers)
+    if not r.text.strip().startswith('@'):
+        raise ValueError('wrong doi specified')
+    return r.text.strip()
+
 
 class TextOutput(object):  # TODO some parent class to do what...?
     def __init__(self, fd, collector):
