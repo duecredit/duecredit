@@ -37,7 +37,6 @@ class DueCreditEntry(object):
         self._rawentry = rawentry
         self._key = key or rawentry.lower()
         self._reference = None
-        self._process_rawentry(rawentry)
 
     def get_key(self):
         return self._key
@@ -54,6 +53,7 @@ class BibTeX(DueCreditEntry):
         super(BibTeX, self).__init__(bibtex)
         self._key = None
         self._reference = None
+        self._process_rawentry()
 
     def _process_rawentry(self):
         reg = re.match("@(?P<type>\S*)\s*{\s*(?P<key>\S*)\s*,.*",
