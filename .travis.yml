@@ -16,7 +16,7 @@ install:
   - travis_retry pip install -q coveralls nose
 
 script:
-  - nosetests --with-doctest --with-cov --cov duecredit --cov-config .coveragerc --logging-level=INFO
+  - nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO
 # test installation TODO
 #  - sudo python setup.py install
 
