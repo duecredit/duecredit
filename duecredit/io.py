@@ -1,3 +1,4 @@
+from .entries import BibTeX, Doi
 import pickle
 import requests
 
@@ -24,6 +25,19 @@ DueCredit Report
         # Group by type???? e.g. Donations should have different meaning from regular ones
         # Should we provide some base classes to differentiate between types? probbly not -- tags?
 
+def get_text_rendering(entry):
+    if isinstance(entry, Doi):
+        bibtex_rendering = get_bibtex_rendering(entry)
+        return get_text_rendering(bibtex_rendering)
+    elif isinstance(entry, BibTeX):
+        # TODO: get Text rendering of bibtex
+        return entry._rawentry
+    else:
+        return str(entry)
+
+def get_bibtex_rendering(entry):
+    if isinstance(entry, Doi):
+        return BibTeX(import_doi(entry.doi))
 
 class PickleOutput(object):
     def __init__(self, collector, fn='.duecredit.p'):
