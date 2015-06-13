@@ -127,14 +127,22 @@ class DueCreditCollector(object):
 
 
 class InactiveDueCreditCollector(object):
-    """A short construct which should serve a stub in the modules were we insert it"""
-    def _donothing(self, *args, **kwargs):  pass
+    """
+    A short construct which should serve a stub in the modules were
+    we insert it
+    """
+    def _donothing(self, *args, **kwargs):
+        pass
+
     def dcite(self, *args, **kwargs):
         def nondecorating_decorator(func):
              return func
         return nondecorating_decorator
+
     cite = load = add = _donothing
 
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
 
 class Citation(object):
     """Encapsulates citations and information on their use"""
