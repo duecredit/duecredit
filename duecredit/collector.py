@@ -146,7 +146,17 @@ class Citation(object):
         self.count = 0
 
     def __repr__(self):
-        return self.__class__.__name__
+        args = [repr(self._entry)]
+        if self._use:
+            args.append("use={0}".format(repr(self._use)))
+        if self._level:
+            args.append("level={0}".format(repr(self._level)))
+
+        if args:
+            args = ", ".join(args)
+        else:
+            args = ""
+        return self.__class__.__name__ + '({0})'.format(args)
 
     @property
     def level(self):

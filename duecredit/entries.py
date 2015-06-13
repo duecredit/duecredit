@@ -36,16 +36,18 @@ class DueCreditEntry(object):
     def __init__(self, rawentry, key=None):
         self._rawentry = rawentry
         self._key = key or rawentry.lower()
-        self._reference = None
 
     def get_key(self):
         return self._key
 
-    def get_reference(self):
-        return self._reference
-
     def _process_rawentry(self):
         pass
+
+    def __repr__(self):
+        args = [repr(self._rawentry),
+                "key={0}".format(repr(self._key))]
+        args = ", ".join(args)
+        return self.__class__.__name__ + '({0})'.format(args)
 
 
 class BibTeX(DueCreditEntry):
