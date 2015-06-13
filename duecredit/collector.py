@@ -1,3 +1,5 @@
+import os
+import sys
 from functools import wraps
 
 from .entries import DueCreditEntry
@@ -94,7 +96,7 @@ class DueCreditCollector(object):
         def func_wrapper(func):
             if 'level' not in kwargs:
                 # deduce level from the actual function which was decorated
-                kwargs['level'] = 'func %s.%s' % (func.__module__, func.func_name)
+                kwargs['level'] = 'func %s.%s' % (func.__module__, func.__name__)
 
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
@@ -102,10 +104,6 @@ class DueCreditCollector(object):
                 return func(*fargs, **fkwargs)
             return cite_wrapper
         return func_wrapper
-
-    def __del__(self):
-        # TODO: spit out stuff
-        lgr.info("EXPORTING")
 
 
 class InactiveDueCreditCollector(object):
@@ -116,6 +114,49 @@ class InactiveDueCreditCollector(object):
              return func
         return nondecorating_decorator
     cite = load = add = _donothing
+
+
+class CollectorGrave(object):
+    """A helper which would take care about exporting citations upon its Death
+    """
+    def __init__(self, collector):
+        self._due = collector
+        # for now decide on output "format" right here
+        self._outputs = [self._get_output_handler(type_.lower().strip(), collector)
+                         for type_ in os.environ.get('DUECREDIT_OUTPUTS', '').split(',')
+                         if type_]
+
+    @staticmethod
+    def _get_output_handler(type_, collector):
+        # just a little factory
+        if type_ in ("stdout", "stderr"):
+            return TextOutput(getattr(sys, type_), collector)
+        else:
+            raise NotImplementedError()
+
+    def __del__(self):
+        if self._due.citations:
+            print(self._due.citations)
+        else:
+            print("No cited code was used")
+
+
+# TODO:  provide HTML, MD, RST etc formattings
+
+class TextOutput(object): # TODO some parent class to do what...?
+
+    def __init__(self, fd, collector):
+        self.fd = fd
+        self.collector = collector
+
+    def dump(self):
+        self.fd.write("""
+DueCredit Report
+
+%d pieces were cited:
+        """)
+        # Group by type???? e.g. Donations should have different meaning from regular ones
+        # Should we provide some base classes to differentiate between types? probbly not -- tags?
 
 
 class Citation(object):

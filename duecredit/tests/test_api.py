@@ -7,8 +7,8 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-from ..collector import DueCreditCollector, InactiveDueCreditCollector
-from ..entries import BibTeX, Doi
+from duecredit.collector import DueCreditCollector, InactiveDueCreditCollector
+from duecredit.entries import BibTeX, Doi
 
 def _test_api(due):
     # add references
@@ -24,21 +24,28 @@ def _test_api(due):
 
     # dcite  for decorator cite
     # cite specific functionality if/when it gets called up
-    #@due.dcite('XXX00', use="Provides an answer for meaningless existence")
+    @due.dcite('XXX00', use="Provides an answer for meaningless existence")
     def purpose_of_life():
         return None
 
-    class Children(object):
+    class Child(object):
          # Conception process is usually way too easy to be referenced
          def __init__(self):
              pass
 
          # including functionality within/by the methods
-         #@due.dcite('BirthCertificate')
+         @due.dcite('XXX00')
          def birth(self, gender):
-             pass
+             print("Rachel was born")
+
+    kid = Child()
+    kid.birth("female")
 
 
 def test_api():
     yield _test_api, DueCreditCollector()
     yield _test_api, InactiveDueCreditCollector()
+
+if __name__ == '__main__':
+    from duecredit import due
+    _test_api(due)

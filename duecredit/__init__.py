@@ -8,6 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """TODO"""
 
+import sys
 import logging
 import os
 
@@ -17,6 +18,7 @@ from .version import __version__, __release_date__
 lgr = logging.getLogger('duecredit')
 lgr.setLevel(logging.DEBUG)
 
+lgr.addHandler(logging.StreamHandler(sys.stdout))
 
 def is_active():
     env_enable = os.environ.get('DUECREDIT_ENABLE')
@@ -26,8 +28,13 @@ def is_active():
 
 # Rebind the collector's methods to the module here
 if is_active():
-    from .collector import DueCreditCollector
+    from .collector import DueCreditCollector, CollectorGrave
+
+    # TODO: see if we have in current directory already something stored
+    # so we could recreate it from previous usage or smth like that
     due = DueCreditCollector()
+    _export_upon_del = CollectorGrave(due)
+
 else:
     # keeping duplicate but separate so later we could even place it into a separate
     # submodule to possibly minimize startup time impact even more
