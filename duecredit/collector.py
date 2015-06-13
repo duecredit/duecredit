@@ -123,10 +123,6 @@ class DueCreditCollector(object):
             ' {0:d} entries, {1:d} citations'.format(
                 len(self._entries), len(self.citations))
 
-    def __del__(self):
-        # TODO: spit out stuff
-        lgr.info("EXPORTING")
-
 
 class InactiveDueCreditCollector(object):
     """
@@ -146,6 +142,7 @@ class InactiveDueCreditCollector(object):
     def __repr__(self):
         return self.__class__.__name__ + '()'
 
+
 class CollectorGrave(object):
     """A helper which would take care about exporting citations upon its Death
     """
@@ -153,7 +150,7 @@ class CollectorGrave(object):
         self._due = collector
         # for now decide on output "format" right here
         self._outputs = [self._get_output_handler(type_.lower().strip(), collector)
-                         for type_ in os.environ.get('DUECREDIT_OUTPUTS', '').split(',')
+                         for type_ in os.environ.get('DUECREDIT_OUTPUTS', 'stdout').split(',')
                          if type_]
 
     @staticmethod
@@ -165,11 +162,8 @@ class CollectorGrave(object):
             raise NotImplementedError()
 
     def __del__(self):
-        if self._due.citations:
-            print(self._due.citations)
-        else:
-            print("No cited code was used")
-
+        for output in self._outputs:
+            output.dump()
 
 # TODO:  provide HTML, MD, RST etc formattings
 
@@ -184,7 +178,7 @@ class TextOutput(object): # TODO some parent class to do what...?
 DueCredit Report
 
 %d pieces were cited:
-        """)
+        """ % len(self.collector.citations))
         # Group by type???? e.g. Donations should have different meaning from regular ones
         # Should we provide some base classes to differentiate between types? probbly not -- tags?
 
