@@ -116,6 +116,11 @@ class DueCreditCollector(object):
             args = ""
         return self.__class__.__name__ + '({0})'.format(args)
 
+    def __str__(self):
+        return self.__class__.__name__ + \
+            ' {0:d} entries, {1:d} citations'.format(
+                len(self._entries), len(self.citations))
+
     def __del__(self):
         # TODO: spit out stuff
         lgr.info("EXPORTING")
