@@ -127,3 +127,6 @@ class Citation(object):
         self._level = level
         self.count = 0
 
+    @property
+    def level(self):
+        return self._level

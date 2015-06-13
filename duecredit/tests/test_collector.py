@@ -56,7 +56,9 @@ def test_dcite_method():
         if active:
             assert_equal(len(due.citations), 1)
             assert_equal(len(due._entries), 1)
-            assert_equal(due.citations["XXX0"].count, 1)
+            citation = due.citations["XXX0"]
+            assert_equal(citation.count, 1)
+            assert_equal(citation.level, "func duecredit.tests.test_collector.method")
 
         instance = SomeClass()
         yield _test_dcite_basic, due, instance.method
@@ -64,5 +66,7 @@ def test_dcite_method():
         if active:
             assert_equal(len(due.citations), 1)
             assert_equal(len(due._entries), 1)
-            assert_equal(due.citations["XXX0"].count, 2)
+            assert_equal(citation.count, 2)
+            # TODO: we should actually get level/counts pairs so here
+            # it is already a different level
 
