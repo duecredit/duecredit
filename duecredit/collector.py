@@ -55,15 +55,17 @@ class DueCreditCollector(object):
 
         Parameters
         ----------
-        key_entry: str or DueCreditEntry
+        entry: str or DueCreditEntry
           The entry to use, either identified by its id or a new one (to be added)
         """
-        self.add(entry)
-        key_entry = entry.get_key()
+        if isinstance(entry, DueCreditEntry):
+            # new one -- add it
+            self.add(entry)
+            key_entry = entry.get_key()
+        else:  # get old one
+            key_entry = entry
 
-        # self._citations.add(key_entry)
-        # raise NotImplementedError
-        pass
+        return self._entries[key_entry]
 
     def dcite(self, *args, **kwargs):
         """Decorator for references.  Wrap a function or
@@ -85,6 +87,7 @@ class DueCreditCollector(object):
         return func_wrapper
 
     def __del__(self):
+        # TODO: spit out stuff
         lgr.info("EXPORTING")
 
 
