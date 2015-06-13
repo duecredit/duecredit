@@ -1,5 +1,6 @@
-class TextOutput(object):  # TODO some parent class to do what...?
+import pickle
 
+class TextOutput(object):  # TODO some parent class to do what...?
     def __init__(self, fd, collector):
         self.fd = fd
         self.collector = collector
@@ -14,3 +15,11 @@ DueCredit Report
         # Should we provide some base classes to differentiate between types? probbly not -- tags?
 
 
+class PickleOutput(object):
+    def __init__(self, collector, fn='.duecredit.p'):
+        self.collector = collector
+        self.fn = fn
+
+    def dump(self):
+        with open(self.fn, 'wb') as f:
+            pickle.dump(self.collector, f)
