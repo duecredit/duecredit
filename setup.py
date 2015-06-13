@@ -63,11 +63,11 @@ setup(
     provides=[PACKAGE],
     #test_suite='nose.collector',
 
-    author='Yaroslav Halchenko',
+    author='Yaroslav Halchenko, Matteo Visconti di Oleggio Castello',
     author_email='yoh@onerussian.com',
     description='Publications tracer',
     long_description=README,
-    url='https://github.com/yarikoptic/duecredit',
+    url='https://github.com/duecredit/duecredit',
     keywords='citation tracing', 
     license='2-clause BSD License',
     classifiers = [
