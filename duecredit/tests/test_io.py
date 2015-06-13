@@ -1,6 +1,6 @@
 from ..collector import DueCreditCollector
 from ..entries import BibTeX, DueCreditEntry
-from ..export import PickleOutput
+from ..io import PickleOutput
 from nose.tools import assert_equal
 
 import pickle
