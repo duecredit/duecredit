@@ -11,9 +11,9 @@ class DueCreditCollector(object):
     The mighty beast which will might become later a proxy on the way to
     talk to a real collector
     """
-    def __init__(self):
-        self._entries = {}
-        self.citations = {}
+    def __init__(self, entries=None, citations=None):
+        self._entries = entries or {}
+        self.citations = citations or {}
 
     def add(self, entry):
         """entry should be a DueCreditEntry object"""
@@ -71,7 +71,7 @@ class DueCreditCollector(object):
         citation = self.citations[entry_key]
         citation.count += 1
         # TODO: update level and use here?
-        
+
         return citation
 
     def dcite(self, *args, **kwargs):
@@ -92,6 +92,19 @@ class DueCreditCollector(object):
                 return func(*fargs, **fkwargs)
             return cite_wrapper
         return func_wrapper
+
+    def __repr__(self):
+        args = []
+        if self.citations:
+            args.append("citations={0}".format(repr(self.citations)))
+        if self._entries:
+            args.append("entries={0}".format(repr(self._entries)))
+
+        if args:
+            args = ", ".join(args)
+        else:
+            args = ""
+        return self.__class__.__name__ + '({0})'.format(args)
 
     def __del__(self):
         # TODO: spit out stuff
@@ -117,3 +130,6 @@ class Citation(object):
         self._use = use
         self._level = level
         self.count = 0
+
+    def __repr__(self):
+        return self.__class__.__name__
