@@ -30,6 +30,10 @@ def is_active():
 # Rebind the collector's methods to the module here
 if is_active():
     from .collector import DueCreditCollector, CollectorGrave
+    # where to cache bibtex entries
+    cache_dir = '~/.cache/duecredit/bibtex'
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
 
     if os.path.exists('.duecredit.p'):
         with open('.duecredit.p') as f:
