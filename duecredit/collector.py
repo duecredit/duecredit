@@ -162,7 +162,7 @@ class CollectorGrave(object):
         if type_ in ("stdout", "stderr"):
             return TextOutput(getattr(sys, type_), collector)
         elif type_ == "pickle":
-            return PickleOutput(collector).fn
+            return PickleOutput(collector)
         else:
             raise NotImplementedError()
 

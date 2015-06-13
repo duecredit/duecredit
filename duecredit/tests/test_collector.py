@@ -1,7 +1,11 @@
-from ..collector import DueCreditCollector, InactiveDueCreditCollector
+from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
+    CollectorGrave
 from ..entries import BibTeX, Doi
+from ..export import TextOutput, PickleOutput
 
-from nose.tools import assert_equal
+from mock import patch
+from nose.tools import assert_equal, assert_is_instance, assert_raises
+import os
 
 def _test_entry(due, entry):
     due.add(entry)
@@ -24,7 +28,6 @@ def _test_dcite_basic(due, callable):
     # verify that @wraps correctly passes all the docstrings etc
     assert_equal(callable.__name__, "method")
     assert_equal(callable.__doc__, "docstring")
-
 
 
 def test_dcite_method():
@@ -71,4 +74,22 @@ def test_dcite_method():
             assert_equal(citation.count, 2)
             # TODO: we should actually get level/counts pairs so here
             # it is already a different level
+
+
+def test_get_output_handler_method():
+    with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'stdout, pickle'}):
+        entry = BibTeX('@article{XXX0, ...}')
+        collector = DueCreditCollector()
+        collector.add(entry)
+        collector.cite(entry)
+
+        grave = CollectorGrave(collector)
+        handlers = [grave._get_output_handler(type_, collector)
+                    for type_ in ['stdout', 'pickle']]
+
+        assert_is_instance(handlers[0], TextOutput)
+        assert_is_instance(handlers[1], PickleOutput)
+
+        assert_raises(NotImplementedError, grave._get_output_handler,
+            'nothing', collector)
 
