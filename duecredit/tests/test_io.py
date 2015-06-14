@@ -3,13 +3,18 @@ from ..entries import BibTeX, DueCreditEntry
 from ..io import PickleOutput, import_doi
 from nose.tools import assert_equal, assert_is_instance, assert_raises
 
+import sys
 import pickle
 import tempfile
 
 
 def test_import_doi():
     doi_good = '10.1038/nrd842'
-    assert_is_instance(import_doi(doi_good), unicode)
+    if sys.version_info < (3,):
+        target_type = unicode
+    else:
+        target_type = str
+    assert_is_instance(import_doi(doi_good), target_type)
 
     doi_bad = 'fasljfdldaksj'
     assert_raises(ValueError, import_doi, doi_bad)

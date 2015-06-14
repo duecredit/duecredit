@@ -19,7 +19,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
     def dump(self):
         self.fd.write('\nDueCredit Report\n%d pieces were cited:\n'
                       % len(self.collector.citations))
-        for entry in self.collector.citations.itervalues():
+        for entry in self.collector.citations.values():
             self.fd.write('{0}\n'.format(get_text_rendering(entry)))
 
 def get_text_rendering(entry):
