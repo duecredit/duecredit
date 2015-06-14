@@ -23,7 +23,7 @@ class DueCreditEntry(object):
 
 class BibTeX(DueCreditEntry):
     def __init__(self, bibtex, key=None):
-        super(BibTeX, self).__init__(bibtex)
+        super(BibTeX, self).__init__(bibtex.strip())
         self._key = None
         self._reference = None
         self._process_rawentry()
