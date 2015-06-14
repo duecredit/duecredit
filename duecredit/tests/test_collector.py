@@ -11,7 +11,20 @@ import tempfile
 def _test_entry(due, entry):
     due.add(entry)
 
-_sample_bibtex = "@article{XXX0, ...}"
+_sample_bibtex = """
+@ARTICLE{XXX0,
+  author = {Halchenko, Yaroslav O. and Hanke, Michael},
+  title = {Open is not enough. Let{'}s take the next step: An integrated, community-driven
+    computing platform for neuroscience},
+  journal = {Frontiers in Neuroinformatics},
+  year = {2012},
+  volume = {6},
+  number = {00022},
+  doi = {10.3389/fninf.2012.00022},
+  issn = {1662-5196},
+  localfile = {HH12.pdf},
+}
+"""
 _sample_doi = "a.b.c/1.2.3"
 
 def test_entry():
@@ -79,7 +92,7 @@ def test_dcite_method():
 
 def test_get_output_handler_method():
     with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'stdout, pickle'}):
-        entry = BibTeX('@article{XXX0, ...}')
+        entry = BibTeX(_sample_bibtex)
         collector = DueCreditCollector()
         collector.add(entry)
         collector.cite(entry)

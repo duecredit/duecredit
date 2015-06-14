@@ -36,7 +36,7 @@ def _test_api(due):
          # including functionality within/by the methods
          @due.dcite('XXX00')
          def birth(self, gender):
-             print("Rachel was born")
+             return "Rachel was born"
 
     kid = Child()
     kid.birth("female")

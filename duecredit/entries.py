@@ -50,6 +50,7 @@ class FreeTextEntry(DueCreditEntry):
 class Doi(DueCreditEntry):
     def __init__(self, doi, key=None):
         super(Doi, self).__init__(doi, key)
+        self.doi = doi
         # TODO
 
 

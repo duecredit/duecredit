@@ -1,4 +1,4 @@
-from citeproc.source.bibtex import BibTeX as bibtex
+from citeproc.source.bibtex import BibTeX as cpBibTeX
 from citeproc import CitationStylesStyle, CitationStylesBibliography
 from citeproc import formatter
 from citeproc import Citation, CitationItem
@@ -7,7 +7,7 @@ import os
 from os.path import dirname, exists
 import pickle
 import requests
-from tempfile import NamedTemporaryFile
+import tempfile
 from six import PY2
 
 from . import CACHE_DIR, DUECREDIT_FILE
@@ -50,10 +50,16 @@ class TextOutput(object):  # TODO some parent class to do what...?
         self.collector = collector
 
     def dump(self):
-        self.fd.write('\nDueCredit Report\n%d pieces were cited:\n'
-                      % len(self.collector.citations))
-        for citation in self.collector.citations.values():
-            self.fd.write('{0}\n'.format(get_text_rendering(citation)))
+        citations_rendered = [
+            get_text_rendering(citation)
+            for citation in self.collector.citations.values()]
+
+        self.fd.write("""
+DueCredit Report
+
+%d pieces were cited:
+%s
+""" % (len(self.collector.citations), '\n'.join(citations_rendered)))
 
 
 def get_text_rendering(citation, style='apa'):
@@ -75,20 +81,24 @@ def get_bibtex_rendering(entry):
 def format_bibtex(bibtex_entry, style='apa'):
     key = bibtex_entry.get_key()
     # need to save it temporarily to use citeproc-py
-    with NamedTemporaryFile(mode='wt', suffix='.bib') as f:
-        f.write(bibtex_entry.rawentry.encode('utf-8'))
-
-        bib_source = bibtex(f.name)
+    fname = tempfile.mktemp(suffix='.bib')
+    try:
+        with open(fname, 'wt') as f:
+            f.write(bibtex_entry.rawentry.encode('utf-8'))
+        bib_source = cpBibTeX(fname)
         bib_style = CitationStylesStyle(style, validate=False)
         # TODO: specify which kind of formatter we want
         bibliography = CitationStylesBibliography(bib_style, bib_source,
                                                   formatter.plain)
         citation = Citation([CitationItem(key)])
         bibliography.register(citation)
+    finally:
+        os.unlink(fname)
 
     biblio_out = bibliography.bibliography()
-    print biblio_out, 'XXXYYY'
-    return str(biblio_out[0]) if biblio_out else str(bibtex_entry)
+    assert(len(biblio_out) == 1)
+    biblio_out = ''.join(biblio_out[0])
+    return biblio_out # if biblio_out else str(bibtex_entry)
 
 
 class PickleOutput(object):
