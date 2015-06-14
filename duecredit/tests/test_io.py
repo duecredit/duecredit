@@ -22,7 +22,19 @@ def test_import_doi():
 
 
 def test_pickleoutput():
-    entry = BibTeX('@article{XXX0, ...}')
+    #entry = BibTeX('@article{XXX0, ...}')
+    entry = BibTeX("@article{Atkins_2002,\n"
+                   "title=title,\n"
+                   "volume=1, \n"
+                   "url=http://dx.doi.org/10.1038/nrd842, \n"
+                   "DOI=10.1038/nrd842, \n"
+                   "number=7, \n"
+                   "journal={Nat. Rev. Drug Disc.}, \n"
+                   "publisher={Nature Publishing Group}, \n"
+                   "author={Atkins, Joshua H. and Gershell, Leland J.}, \n"
+                   "year={2002}, \n"
+                   "month={Jul}, \n"
+                   "pages={491-492}\n}")
     collector = DueCreditCollector()
     collector.add(entry)
     collector.cite(entry)

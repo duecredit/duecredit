@@ -180,3 +180,7 @@ class Citation(object):
     @property
     def level(self):
         return self._level
+
+    @property
+    def entry(self):
+        return self._entry
