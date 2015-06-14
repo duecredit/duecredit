@@ -11,6 +11,10 @@ class DueCreditEntry(object):
     def get_key(self):
         return self._key
 
+    @property
+    def rawentry(self):
+        return unicode(self._rawentry)
+
     def _process_rawentry(self):
         pass
 
