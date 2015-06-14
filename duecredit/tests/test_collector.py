@@ -7,6 +7,7 @@ from mock import patch
 from nose.tools import assert_equal, assert_is_instance, assert_raises
 import os
 import tempfile
+from StringIO import StringIO
 
 def _test_entry(due, entry):
     due.add(entry)
@@ -94,7 +95,6 @@ def test_get_output_handler_method():
     with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'stdout, pickle'}):
         entry = BibTeX(_sample_bibtex)
         collector = DueCreditCollector()
-        collector.add(entry)
         collector.cite(entry)
 
         with tempfile.NamedTemporaryFile() as f:
@@ -107,6 +107,17 @@ def test_get_output_handler_method():
 
             assert_raises(NotImplementedError, grave._get_output_handler,
                           'nothing', collector)
+
+def test_text_output():
+    entry = BibTeX(_sample_bibtex)
+    collector = DueCreditCollector()
+    collector.cite(entry)
+
+    strio = StringIO()
+    TextOutput(strio, collector).dump()
+    value = strio.getvalue()
+    assert("Halchenko, Y. O." in value)
+    assert(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
 
 
 def test_collectors_uniform_API():
