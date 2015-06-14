@@ -7,8 +7,9 @@ from six import PY2
 import sys
 import pickle
 import tempfile
+import vcr
 
-
+@vcr.use_cassette()
 def test_import_doi():
     doi_good = '10.1038/nrd842'
     if PY2:
