@@ -4,7 +4,7 @@ from ..entries import BibTeX, Doi
 from ..io import TextOutput, PickleOutput
 
 from mock import patch
-from nose.tools import assert_equal, assert_is_instance, assert_raises
+from nose.tools import assert_equal, assert_is_instance, assert_raises, assert_true
 import os
 import tempfile
 from StringIO import StringIO
@@ -92,7 +92,7 @@ def test_dcite_method():
 
 
 def test_get_output_handler_method():
-    with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'stdout, pickle'}):
+    with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'pickle'}):
         entry = BibTeX(_sample_bibtex)
         collector = DueCreditCollector()
         collector.cite(entry)
@@ -100,10 +100,10 @@ def test_get_output_handler_method():
         with tempfile.NamedTemporaryFile() as f:
             grave = CollectorGrave(collector, fn=f.name)
             handlers = [grave._get_output_handler(type_, collector)
-                        for type_ in ['stdout', 'pickle']]
+                        for type_ in ['pickle']]
 
-            assert_is_instance(handlers[0], TextOutput)
-            assert_is_instance(handlers[1], PickleOutput)
+            #assert_is_instance(handlers[0], TextOutput)
+            assert_is_instance(handlers[0], PickleOutput)
 
             assert_raises(NotImplementedError, grave._get_output_handler,
                           'nothing', collector)
@@ -116,8 +116,8 @@ def test_text_output():
     strio = StringIO()
     TextOutput(strio, collector).dump()
     value = strio.getvalue()
-    assert("Halchenko, Y. O." in value)
-    assert(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
+    assert_true("Halchenko, Y. O." in value, msg="value was %s" % value)
+    assert_true(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
 
 
 def test_collectors_uniform_API():

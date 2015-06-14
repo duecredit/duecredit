@@ -53,7 +53,8 @@ else:
     #
     # provide stubs which would do nothing
     from .collector import InactiveDueCreditCollector
-    due = InactiveDueCreditCollector
+    due = InactiveDueCreditCollector()
+
 
 # be friendly on systems with ancient numpy -- no tests, but at least
 # importable

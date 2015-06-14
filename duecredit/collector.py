@@ -2,6 +2,7 @@ import os
 import sys
 from functools import wraps
 
+from . import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
@@ -129,9 +130,9 @@ class DueCreditCollector(object):
 class CollectorGrave(object):
     """A helper which would take care about exporting citations upon its Death
     """
-    def __init__(self, collector, fn=None):
+    def __init__(self, collector, fn=DUECREDIT_FILE):
         self._due = collector
-        self.fn = fn or '.duecredit.p'
+        self.fn = fn
         # for now decide on output "format" right here
         self._outputs = [self._get_output_handler(
             type_.lower().strip(), collector, fn=fn)
@@ -149,9 +150,12 @@ class CollectorGrave(object):
         else:
             raise NotImplementedError()
 
-    def __del__(self):
+    def dump(self):
         for output in self._outputs:
             output.dump()
+
+    def __del__(self):
+        self.dump()
 
 # TODO:  provide HTML, MD, RST etc formattings
 

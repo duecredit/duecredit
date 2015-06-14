@@ -1,8 +1,7 @@
 from citeproc.source.bibtex import BibTeX as cpBibTeX
-from citeproc import CitationStylesStyle, CitationStylesBibliography
-from citeproc import formatter
-from citeproc import Citation, CitationItem
+import citeproc as cp
 
+import sys
 import os
 from os.path import dirname, exists
 import pickle
@@ -12,6 +11,7 @@ from six import PY2
 
 from . import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi
+from . import lgr
 
 def get_doi_cache_file(doi):
     return os.path.join(CACHE_DIR, doi)
@@ -63,7 +63,13 @@ DueCredit Report
 
 
 def get_text_rendering(citation, style='apa'):
-    entry = citation.entry
+    # TODO: smth fked up smwhere
+    from .collector import Citation
+    # TODO: and we need to move it away -- circular imports etc
+    if isinstance(citation, Citation):
+        entry = citation.entry
+    else:
+        entry = citation
     if isinstance(entry, Doi):
         bibtex_rendering = get_bibtex_rendering(entry)
         return get_text_rendering(bibtex_rendering)
@@ -84,13 +90,21 @@ def format_bibtex(bibtex_entry, style='apa'):
     fname = tempfile.mktemp(suffix='.bib')
     try:
         with open(fname, 'wt') as f:
-            f.write(bibtex_entry.rawentry.encode('utf-8'))
-        bib_source = cpBibTeX(fname)
-        bib_style = CitationStylesStyle(style, validate=False)
+            bibtex = bibtex_entry.rawentry
+            bibtex = bibtex.replace(u'\u2013', '--')
+            # TODO: manage to save/use UTF-8
+            f.write(bibtex.encode('ascii', 'ignore') + "\n")
+        try:
+            bib_source = cpBibTeX(fname)
+        except:
+            lgr.error("Failed to process BibTeX file %s" % fname)
+            os.system("cp %s /tmp/failed.bib" % fname)
+            return "ERRORED"
+        bib_style = cp.CitationStylesStyle(style, validate=False)
         # TODO: specify which kind of formatter we want
-        bibliography = CitationStylesBibliography(bib_style, bib_source,
-                                                  formatter.plain)
-        citation = Citation([CitationItem(key)])
+        bibliography = cp.CitationStylesBibliography(bib_style, bib_source,
+                                                     cp.formatter.plain)
+        citation = cp.Citation([cp.CitationItem(key)])
         bibliography.register(citation)
     finally:
         os.unlink(fname)
