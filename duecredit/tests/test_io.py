@@ -2,6 +2,7 @@ from ..collector import DueCreditCollector
 from ..entries import BibTeX, DueCreditEntry
 from ..io import PickleOutput, import_doi
 from nose.tools import assert_equal, assert_is_instance, assert_raises
+from six import PY2
 
 import sys
 import pickle
@@ -10,7 +11,7 @@ import tempfile
 
 def test_import_doi():
     doi_good = '10.1038/nrd842'
-    if sys.version_info < (3,):
+    if PY2:
         target_type = unicode
     else:
         target_type = str
