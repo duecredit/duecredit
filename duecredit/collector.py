@@ -194,11 +194,12 @@ class CollectorSummary(object):
 class Citation(object):
     """Encapsulates citations and information on their use"""
 
-    def __init__(self, entry, use, level):
+    def __init__(self, entry, use, level, version=None):
         self._entry = entry
         self._use = use
         self._level = level
         self.count = 0
+        self.version = version
 
     def __repr__(self):
         args = [repr(self._entry)]
@@ -220,3 +221,7 @@ class Citation(object):
     @property
     def entry(self):
         return self._entry
+
+    @property
+    def use(self):
+        return self._use

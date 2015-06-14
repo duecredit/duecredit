@@ -59,13 +59,29 @@ class TextOutput(object):  # TODO some parent class to do what...?
             get_text_rendering(citation, style=self.style)
             for citation in self.collector.citations.values()]
 
-        self.fd.write("""
-DueCredit Report
-
-%d pieces were cited:
-%s
-""" % (len(self.collector.citations), '\n'.join(citations_rendered)))
-
+        count_modules = 0
+        count_functions = 0
+        self.fd.write('DueCredit Report:\n')
+        for citation in self.collector.citations.values():
+            if citation.level and citation.level.startswith('module'):
+                count_modules += 1
+                this_module = citation.level.split(' ', 1)[1]
+                self.fd.write('- {0} (v {1}) [{2}]\n'.format(
+                    this_module,
+                    citation.version,
+                    count_modules))
+                # TODO: make this better
+                for citation_ in self.collector.citations.values():
+                    count_functions += 1
+                    if this_module in citation_.level:
+                        self.fd.write('\t- {0} [{1}]\n'.format(
+                            citation_.level.split(' ', 1)[1]),
+                            count_functions)
+        self.fd.write('\n{0} modules cited\n{1} functions cited\n'.format(
+            count_modules, count_functions))
+        if count_modules or count_functions:
+            self.fd.write('References\n' + '_' * 10 + '\n')
+        self.fd.write('\n'.join(citations_rendered))
 
 def get_text_rendering(citation, style='apa'):
     # TODO: smth fked up smwhere
