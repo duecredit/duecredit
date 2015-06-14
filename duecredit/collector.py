@@ -126,12 +126,13 @@ class DueCreditCollector(object):
                 module_ = func.__module__
                 kwargs['level'] = 'func %s.%s' % (module_, func.__name__)
                 # TODO: unittest for all the __version__ madness
-                if hasattr(module_, '__version__'):
+                module__ = sys.modules.get(module_)
+                if module__ and hasattr(module__, '__version__'):
                     # find the citation for that module
                     for citation in self.citations:
                         if citation.level == "module %s" % module_ \
                                 and citation.version is None:
-                            citation.version = module_.__version__
+                            citation.version = module__.__version__
 
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
