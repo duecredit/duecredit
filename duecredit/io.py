@@ -1,4 +1,6 @@
+from . import CACHE_DIR
 from .entries import BibTeX, Doi
+import os
 import pickle
 import requests
 
@@ -6,8 +8,13 @@ def import_doi(doi):
     headers = {'Accept': 'text/bibliography; style=bibtex'}
     url = 'http://dx.doi.org/' + doi
     r = requests.get(url, headers=headers)
+    r.encoding = 'UTF-8'
     if not r.text.strip().startswith('@'):
         raise ValueError('wrong doi specified')
+    cached = os.path.join(CACHE_DIR, doi)
+    if not os.path.exists(cached):
+        with open(cached) as f:
+            f.write(r)
     return r.text.strip()
 
 
