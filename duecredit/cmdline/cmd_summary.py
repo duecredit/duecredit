@@ -28,7 +28,7 @@ def setup_parser(parser):
         help="Filename containing collected citations. Default: %(default)s")
 
     parser.add_argument(
-        "--style", choices=("apa", "harvard1"), default="apa",
+        "--style", choices=("apa", "harvard1"), default="harvard1",
         help="Style to be used for listing citations")
 
     parser.add_argument(

@@ -53,7 +53,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
         if 'DUECREDIT_STYLE' in os.environ.keys():
             self.style = os.environ['DUECREDIT_STYLE']
         else:
-            self.style = 'apa'
+            self.style = 'harvard1'
 
     def dump(self):
         citations_rendered = [(i+1, citation,
@@ -94,7 +94,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
         self.fd.write('\n'.join([c[-1] for c in citations_rendered]))
         self.fd.write('\n')
 
-def get_text_rendering(citation, style='apa'):
+def get_text_rendering(citation, style='harvard1'):
     # TODO: smth fked up smwhere
     from .collector import Citation
     # TODO: and we need to move it away -- circular imports etc
@@ -120,7 +120,7 @@ def get_bibtex_rendering(entry):
         raise ValueError("Have no clue how to get bibtex out of %s" % entry)
 
 
-def format_bibtex(bibtex_entry, style='apa'):
+def format_bibtex(bibtex_entry, style='harvard1'):
     key = bibtex_entry.get_key()
     # need to save it temporarily to use citeproc-py
     fname = tempfile.mktemp(suffix='.bib')

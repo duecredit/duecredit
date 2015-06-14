@@ -131,7 +131,7 @@ def test_text_output():
     strio = StringIO()
     TextOutput(strio, collector).dump()
     value = strio.getvalue()
-    assert_true("Halchenko, Y. O." in value, msg="value was %s" % value)
+    assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
     assert_true(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
 
 
