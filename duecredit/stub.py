@@ -3,8 +3,27 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """
 Stub file for a guaranteed safe import of duecredit constructs:  if duecredit is not
-available
+available.
 
+To use it, just place it into your project codebase to be imported, e.g. copy as
+
+    cp stub.py /path/tomodule/module/due.py
+
+Note that it might be better to avoid naming it duecredit.py to avoid shadowing
+installed duecredit.
+
+Then use in your code as
+
+    from .due import due
+
+
+Examples
+--------
+
+TODO
+
+
+License:
 Originally a part of the duecredit, which is distributed under BSD-2 license.
 """
 
