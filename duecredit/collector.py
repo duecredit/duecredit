@@ -2,12 +2,25 @@ import os
 import sys
 from functools import wraps
 
+from . import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
 
 import logging
 lgr = logging.getLogger('duecredit.collector')
+
+from functools import wraps
+
+def never_fail(f):
+    @wraps(f)
+    def wrapped_func(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            lgr.warning("Failed to run %s: %s " % (f, e))
+            
+    return wrapped_func
 
 class DueCreditCollector(object):
     """Collect the references
@@ -19,6 +32,7 @@ class DueCreditCollector(object):
         self._entries = entries or {}
         self.citations = citations or {}
 
+    @never_fail
     def add(self, entry):
         """entry should be a DueCreditEntry object"""
         if isinstance(entry, list):
@@ -28,6 +42,7 @@ class DueCreditCollector(object):
             key = entry.get_key()
             self._entries[key] = entry
 
+    @never_fail
     def load(self, src):
         """Loads references from a file or other recognizable source
 
@@ -54,6 +69,7 @@ class DueCreditCollector(object):
     #     #         implementations
     #     pass # raise NotImplementedError
 
+    @never_fail
     def cite(self, entry, use=None, level=None):
         """Decorator for references
 
@@ -78,6 +94,7 @@ class DueCreditCollector(object):
 
         return citation
 
+    @never_fail
     def dcite(self, *args, **kwargs):
         """Decorator for references.  Wrap a function or
 
@@ -107,6 +124,7 @@ class DueCreditCollector(object):
             return cite_wrapper
         return func_wrapper
 
+    @never_fail
     def __repr__(self):
         args = []
         if self.citations:
@@ -120,6 +138,7 @@ class DueCreditCollector(object):
             args = ""
         return self.__class__.__name__ + '({0})'.format(args)
 
+    @never_fail
     def __str__(self):
         return self.__class__.__name__ + \
             ' {0:d} entries, {1:d} citations'.format(
@@ -129,9 +148,9 @@ class DueCreditCollector(object):
 class CollectorGrave(object):
     """A helper which would take care about exporting citations upon its Death
     """
-    def __init__(self, collector, fn=None):
+    def __init__(self, collector, fn=DUECREDIT_FILE):
         self._due = collector
-        self.fn = fn or '.duecredit.p'
+        self.fn = fn
         # for now decide on output "format" right here
         self._outputs = [self._get_output_handler(
             type_.lower().strip(), collector, fn=fn)
@@ -149,9 +168,12 @@ class CollectorGrave(object):
         else:
             raise NotImplementedError()
 
-    def __del__(self):
+    def dump(self):
         for output in self._outputs:
             output.dump()
+
+    def __del__(self):
+        self.dump()
 
 # TODO:  provide HTML, MD, RST etc formattings
 
