@@ -70,13 +70,19 @@ class DueCreditCollector(object):
     #     pass # raise NotImplementedError
 
     @never_fail
-    def cite(self, entry, use=None, level=None):
+    def cite(self, entry, use=None, level=None, version=None):
         """Decorator for references
 
         Parameters
         ----------
         entry: str or DueCreditEntry
           The entry to use, either identified by its id or a new one (to be added)
+        use: str, optional
+          Description of what this functionality provides
+        level: str, optional
+
+        version: str or tuple, version
+          Version of the beasat
         """
         if isinstance(entry, DueCreditEntry):
             # new one -- add it
@@ -90,6 +96,7 @@ class DueCreditCollector(object):
             self.citations[entry_key] = Citation(entry_, use, level)
         citation = self.citations[entry_key]
         citation.count += 1
+        citation.version = version
         # TODO: update level and use here?
 
         return citation
@@ -115,7 +122,15 @@ class DueCreditCollector(object):
         def func_wrapper(func):
             if 'level' not in kwargs:
                 # deduce level from the actual function which was decorated
-                kwargs['level'] = 'func %s.%s' % (func.__module__, func.__name__)
+                module_ = func.__module__
+                kwargs['level'] = 'func %s.%s' % (module_, func.__name__)
+                # TODO: unittest for all the __version__ madness
+                if hasattr(module_, '__version__'):
+                    # find the citation for that module
+                    for citation in self.citations:
+                        if citation.level == "module %s" % module_ \
+                                and citation.version is None:
+                            citation.version = module_.__version__
 
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
@@ -173,8 +188,6 @@ class CollectorSummary(object):
         for output in self._outputs:
             output.dump()
 
-    def __del__(self):
-        self.dump()
 
 # TODO:  provide HTML, MD, RST etc formattings
 
