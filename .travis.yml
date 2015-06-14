@@ -11,6 +11,9 @@ python:
 before_install:
   # - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then travis_retry sudo apt-get update -qq; fi
 
+git:
+  depth: 99999
+
 install:
   - travis_retry pip install -q coveralls 
   - pip install -r requirements.txt
