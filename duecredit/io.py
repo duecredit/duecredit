@@ -48,10 +48,15 @@ class TextOutput(object):  # TODO some parent class to do what...?
     def __init__(self, fd, collector):
         self.fd = fd
         self.collector = collector
+        # TODO: check that CLS style actually exists
+        if 'DUECREDIT_STYLE' in os.environ.keys():
+            self.style = os.environ['DUECREDIT_STYLE']
+        else:
+            self.style = 'apa'
 
     def dump(self):
         citations_rendered = [
-            get_text_rendering(citation)
+            get_text_rendering(citation, style=self.style)
             for citation in self.collector.citations.values()]
 
         self.fd.write("""
