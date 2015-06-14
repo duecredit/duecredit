@@ -21,6 +21,8 @@ lgr.setLevel(logging.DEBUG)
 
 lgr.addHandler(logging.StreamHandler(sys.stdout))
 
+CACHE_DIR = os.path.expanduser(os.path.join('~', '.cache', 'duecredit', 'bibtex'))
+
 def is_active():
     env_enable = os.environ.get('DUECREDIT_ENABLE')
     if env_enable and env_enable.lower() in ('1', 'yes'):
@@ -31,7 +33,6 @@ def is_active():
 if is_active():
     from .collector import DueCreditCollector, CollectorGrave
     # where to cache bibtex entries
-    CACHE_DIR = '~/.cache/duecredit/bibtex'
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
 

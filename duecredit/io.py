@@ -1,21 +1,34 @@
 from . import CACHE_DIR
 from .entries import BibTeX, Doi
 import os
+from os.path import dirname, exists
 import pickle
 import requests
 
+def get_doi_cache_file(doi):
+    return os.path.join(CACHE_DIR, doi)
+
 def import_doi(doi):
+    cached = get_doi_cache_file(doi)
+
+    if exists(cached):
+        with open(cached) as f:
+            return f.read().decode('utf-8')
+    # else -- fetch it
     headers = {'Accept': 'text/bibliography; style=bibtex'}
     url = 'http://dx.doi.org/' + doi
     r = requests.get(url, headers=headers)
     r.encoding = 'UTF-8'
-    if not r.text.strip().startswith('@'):
+    bibtex = r.text.strip()
+    if not bibtex.startswith('@'):
         raise ValueError('wrong doi specified')
-    cached = os.path.join(CACHE_DIR, doi)
-    if not os.path.exists(cached):
-        with open(cached) as f:
-            f.write(r)
-    return r.text.strip()
+    if not exists(cached):
+        cache_dir = dirname(cached)
+        if not exists(cache_dir):
+            os.makedirs(cache_dir)
+        with open(cached, 'w') as f:
+            f.write(bibtex.encode('utf-8'))
+    return bibtex
 
 
 class TextOutput(object):  # TODO some parent class to do what...?
