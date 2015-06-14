@@ -10,6 +10,18 @@ from .io import TextOutput, PickleOutput
 import logging
 lgr = logging.getLogger('duecredit.collector')
 
+from functools import wraps
+
+def never_fail(f):
+    @wraps(f)
+    def wrapped_func(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            lgr.warning("Failed to run %s: %s " % (f, e))
+            
+    return wrapped_func
+
 class DueCreditCollector(object):
     """Collect the references
 
@@ -20,6 +32,7 @@ class DueCreditCollector(object):
         self._entries = entries or {}
         self.citations = citations or {}
 
+    @never_fail
     def add(self, entry):
         """entry should be a DueCreditEntry object"""
         if isinstance(entry, list):
@@ -29,6 +42,7 @@ class DueCreditCollector(object):
             key = entry.get_key()
             self._entries[key] = entry
 
+    @never_fail
     def load(self, src):
         """Loads references from a file or other recognizable source
 
@@ -55,6 +69,7 @@ class DueCreditCollector(object):
     #     #         implementations
     #     pass # raise NotImplementedError
 
+    @never_fail
     def cite(self, entry, use=None, level=None):
         """Decorator for references
 
@@ -79,6 +94,7 @@ class DueCreditCollector(object):
 
         return citation
 
+    @never_fail
     def dcite(self, *args, **kwargs):
         """Decorator for references.  Wrap a function or
 
@@ -108,6 +124,7 @@ class DueCreditCollector(object):
             return cite_wrapper
         return func_wrapper
 
+    @never_fail
     def __repr__(self):
         args = []
         if self.citations:
@@ -121,6 +138,7 @@ class DueCreditCollector(object):
             args = ""
         return self.__class__.__name__ + '({0})'.format(args)
 
+    @never_fail
     def __str__(self):
         return self.__class__.__name__ + \
             ' {0:d} entries, {1:d} citations'.format(
