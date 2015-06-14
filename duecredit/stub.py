@@ -46,14 +46,16 @@ class InactiveDueCreditCollector(object):
 def _donothing_func(*args, **kwargs):
     pass
 
-BibTeX = Doi = Donate = _donothing_func
-
 try:
-    from duecredit import due
+    from duecredit import *
 except ImportError:
     # Initiate due stub
     due = InactiveDueCreditCollector()
+    BibTeX = Doi = Donate = _donothing_func
 except Exception as e:
     import logging
     logging.getLogger("duecredit").error(
         "Failed to import duecredit due to %s" % str(e))
+    # TODO: remove duplication
+    due = InactiveDueCreditCollector()
+    BibTeX = Doi = Donate = _donothing_func

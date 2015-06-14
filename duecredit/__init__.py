@@ -49,4 +49,3 @@ else:
     # provide stubs which would do nothing
     from .collector import InactiveDueCreditCollector
     due = InactiveDueCreditCollector
-

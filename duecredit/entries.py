@@ -29,7 +29,7 @@ class BibTeX(DueCreditEntry):
         self._process_rawentry()
 
     def _process_rawentry(self):
-        reg = re.match("@(?P<type>\S*)\s*{\s*(?P<key>\S*)\s*,.*",
+        reg = re.match("\s*@(?P<type>\S*)\s*{\s*(?P<key>\S*)\s*,.*",
                        self._rawentry, flags=re.MULTILINE)
         assert(reg)
         matches = reg.groupdict()
