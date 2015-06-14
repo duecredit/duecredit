@@ -1,4 +1,4 @@
-from . import CACHE_DIR
+from . import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi
 import os
 from os.path import dirname, exists
@@ -62,10 +62,15 @@ def get_bibtex_rendering(entry):
         return BibTeX(import_doi(entry.doi))
 
 class PickleOutput(object):
-    def __init__(self, collector, fn='.duecredit.p'):
+    def __init__(self, collector, fn=DUECREDIT_FILE):
         self.collector = collector
         self.fn = fn
 
     def dump(self):
         with open(self.fn, 'wb') as f:
             pickle.dump(self.collector, f)
+
+    @classmethod
+    def load(cls, filename=DUECREDIT_FILE):
+        with open(filename) as f:
+            return pickle.load(f)

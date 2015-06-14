@@ -22,6 +22,7 @@ lgr.setLevel(logging.DEBUG)
 lgr.addHandler(logging.StreamHandler(sys.stdout))
 
 CACHE_DIR = os.path.expanduser(os.path.join('~', '.cache', 'duecredit', 'bibtex'))
+DUECREDIT_FILE = '.duecredit.p'
 
 def is_active():
     env_enable = os.environ.get('DUECREDIT_ENABLE')
@@ -29,19 +30,22 @@ def is_active():
         return True
     return False
 
+def get_due():
+    from .io import PickleOutput
+    from .collector import DueCreditCollector
+    if os.path.exists(DUECREDIT_FILE):
+        return PickleOutput.load(DUECREDIT_FILE)
+    else:
+        return DueCreditCollector()
+
 # Rebind the collector's methods to the module here
 if is_active():
-    from .collector import DueCreditCollector, CollectorGrave
+    from .collector import CollectorGrave as _CollectorGrave
     # where to cache bibtex entries
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
-
-    if os.path.exists('.duecredit.p'):
-        with open('.duecredit.p') as f:
-            due = pickle.load(f)
-    else:
-        due = DueCreditCollector()
-    _export_upon_del = CollectorGrave(due)
+    due = get_due() # hidden in a function to avoid circular import of .io
+    _export_upon_del = _CollectorGrave(due)
 
 else:
     # keeping duplicate but separate so later we could even place it into a separate
@@ -50,3 +54,16 @@ else:
     # provide stubs which would do nothing
     from .collector import InactiveDueCreditCollector
     due = InactiveDueCreditCollector
+
+# be friendly on systems with ancient numpy -- no tests, but at least
+# importable
+try:
+    from numpy.testing import Tester
+    test = Tester().test
+    bench = Tester().bench
+    del Tester
+except ImportError:
+    def test(*args, **kwargs):
+        raise RuntimeError('Need numpy >= 1.2 for duecredit.tests()')
+
+from . import log

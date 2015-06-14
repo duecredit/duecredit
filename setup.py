@@ -62,7 +62,11 @@ setup(
     requires=[],
     provides=[PACKAGE],
     #test_suite='nose.collector',
-
+    entry_points={
+        'console_scripts': [
+             'duecredit=duecredit.cmdline.main:main',
+        ],
+    },
     author='Yaroslav Halchenko, Matteo Visconti di Oleggio Castello',
     author_email='yoh@onerussian.com',
     description='Publications tracer',
