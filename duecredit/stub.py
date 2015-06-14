@@ -43,10 +43,10 @@ class InactiveDueCreditCollector(object):
     def __repr__(self):
         return self.__class__.__name__ + '()'
 
-def _donothing(*args, **kwargs):
+def _donothing_func(*args, **kwargs):
     pass
 
-BibTeX = Doi = Donate = _donothing
+BibTeX = Doi = Donate = _donothing_func
 
 try:
     from duecredit import due

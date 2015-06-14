@@ -1,10 +1,19 @@
 from ..collector import DueCreditCollector
 from ..entries import BibTeX, DueCreditEntry
-from ..export import PickleOutput
-from nose.tools import assert_equal
+from ..io import PickleOutput, import_doi
+from nose.tools import assert_equal, assert_is_instance, assert_raises
 
 import pickle
 import tempfile
+
+
+def test_import_doi():
+    doi_good = '10.1038/nrd842'
+    assert_is_instance(import_doi(doi_good), unicode)
+
+    doi_bad = 'fasljfdldaksj'
+    assert_raises(ValueError, import_doi, doi_bad)
+
 
 def test_pickleoutput():
     entry = BibTeX('@article{XXX0, ...}')

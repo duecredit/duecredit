@@ -70,7 +70,7 @@ setup(
     url='https://github.com/duecredit/duecredit',
     keywords='citation tracing', 
     license='2-clause BSD License',
-    classifiers = [
+    classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Environment :: Other Environment',

@@ -3,8 +3,8 @@ import sys
 from functools import wraps
 
 from .entries import DueCreditEntry
-from .export import TextOutput, PickleOutput
 from .stub import InactiveDueCreditCollector
+from .io import TextOutput, PickleOutput
 
 import logging
 lgr = logging.getLogger('duecredit.collector')

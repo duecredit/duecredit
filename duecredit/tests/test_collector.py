@@ -1,7 +1,7 @@
 from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
     CollectorGrave
 from ..entries import BibTeX, Doi
-from ..export import TextOutput, PickleOutput
+from ..io import TextOutput, PickleOutput
 
 from mock import patch
 from nose.tools import assert_equal, assert_is_instance, assert_raises
