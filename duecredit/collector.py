@@ -4,6 +4,7 @@ from functools import wraps
 
 from .entries import DueCreditEntry
 from .export import TextOutput, PickleOutput
+from .stub import InactiveDueCreditCollector
 
 import logging
 lgr = logging.getLogger('duecredit.collector')
@@ -45,13 +46,13 @@ class DueCreditCollector(object):
     def _load_bib(self, src):
         lgr.debug("Loading %s" % src)
 
-    # TODO: figure out what would be the optimal use for the __call__
-    def __call__(self, *args, **kwargs):
-        # TODO: how to determine and cite originating module???
-        #       - we could use inspect but many people complain
-        #         that it might not work with other Python
-        #         implementations
-        pass # raise NotImplementedError
+    # # TODO: figure out what would be the optimal use for the __call__
+    # def __call__(self, *args, **kwargs):
+    #     # TODO: how to determine and cite originating module???
+    #     #       - we could use inspect but many people complain
+    #     #         that it might not work with other Python
+    #     #         implementations
+    #     pass # raise NotImplementedError
 
     def cite(self, entry, use=None, level=None):
         """Decorator for references
@@ -123,25 +124,6 @@ class DueCreditCollector(object):
         return self.__class__.__name__ + \
             ' {0:d} entries, {1:d} citations'.format(
                 len(self._entries), len(self.citations))
-
-
-class InactiveDueCreditCollector(object):
-    """
-    A short construct which should serve a stub in the modules were
-    we insert it
-    """
-    def _donothing(self, *args, **kwargs):
-        pass
-
-    def dcite(self, *args, **kwargs):
-        def nondecorating_decorator(func):
-             return func
-        return nondecorating_decorator
-
-    cite = load = add = _donothing
-
-    def __repr__(self):
-        return self.__class__.__name__ + '()'
 
 
 class CollectorGrave(object):

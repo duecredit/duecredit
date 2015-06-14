@@ -95,3 +95,9 @@ def test_get_output_handler_method():
             assert_raises(NotImplementedError, grave._get_output_handler,
                           'nothing', collector)
 
+
+def test_collectors_uniform_API():
+    get_api = lambda obj: [x for x in sorted(dir(obj))
+                           if not x.startswith('_')
+                              or x in ('__call__')]
+    assert_equal(get_api(DueCreditCollector), get_api(InactiveDueCreditCollector))

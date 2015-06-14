@@ -36,6 +36,10 @@ class BibTeX(DueCreditEntry):
         self._key = matches['key']
 
 
+class FreeTextEntry(DueCreditEntry):
+    pass # nothing special I guess
+
+
 class Doi(DueCreditEntry):
     def __init__(self, doi, key=None):
         super(Doi, self).__init__(doi, key)

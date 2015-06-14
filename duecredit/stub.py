@@ -1,0 +1,40 @@
+# emacs: -*- mode: python; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil -*-
+# ex: set sts=4 ts=4 sw=4 noet:
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+"""
+Stub file for a guaranteed safe import of duecredit constructs:  if duecredit is not
+available
+
+Originally a part of the duecredit, which is distributed under BSD-2 license.
+"""
+
+__version__ = '0.0.1'
+
+class InactiveDueCreditCollector(object):
+    def _donothing(self, *args, **kwargs):
+        pass
+
+    def dcite(self, *args, **kwargs):
+        def nondecorating_decorator(func):
+             return func
+        return nondecorating_decorator
+
+    cite = load = add = _donothing
+
+    def __repr__(self):
+        return self.__class__.__name__ + '()'
+
+def _donothing(*args, **kwargs):
+    pass
+
+BibTeX = Doi = Donate = _donothing
+
+try:
+    from duecredit import due
+except ImportError:
+    # Initiate due stub
+    due = InactiveDueCreditCollector()
+except Exception as e:
+    import logging
+    logging.getLogger("duecredit").error(
+        "Failed to import duecredit due to %s" % str(e))
