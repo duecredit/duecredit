@@ -57,16 +57,19 @@ class TextOutput(object):  # TODO some parent class to do what...?
 
     def dump(self):
         citations_rendered = [
-            get_text_rendering(citation, style=self.style)
-            for citation in self.collector.citations.values()]
+            "[%d] " % (i+1) + get_text_rendering(citation, style=self.style)
+            for i, citation in enumerate(self.collector.citations.values())]
 
         count_modules = 0
         count_functions = 0
         self.fd.write('DueCredit Report:\n')
         for citation in self.collector.citations.values():
-            if citation.level and citation.level.startswith('module'):
+            if citation.level and citation.level.startswith('module '):
                 count_modules += 1
-                this_module = citation.level.split(' ', 1)[1]
+                try:
+                    this_module = citation.level.split(' ', 1)[1]
+                except:
+                    continue
                 self.fd.write('- {0} (v {1}) [{2}]\n'.format(
                     this_module,
                     citation.version,
@@ -74,10 +77,15 @@ class TextOutput(object):  # TODO some parent class to do what...?
                 # TODO: make this better
                 for citation_ in self.collector.citations.values():
                     count_functions += 1
+                    # TODO -- exatrct module name and compare
                     if this_module in citation_.level:
-                        self.fd.write('\t- {0} [{1}]\n'.format(
-                            citation_.level.split(' ', 1)[1]),
-                            count_functions)
+                        try:
+                            self.fd.write('\t- {0} [{1}]\n'.format(
+                                citation_.level.split(' ', 1)[1],
+                                count_functions))
+                        except:
+                            lgr.warning("CRAPPED HERE")
+                            continue
         self.fd.write('\n{0} modules cited\n{1} functions cited\n'.format(
             count_modules, count_functions))
         if count_modules or count_functions:
