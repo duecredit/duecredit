@@ -45,10 +45,11 @@ def import_doi(doi):
 
 
 class TextOutput(object):  # TODO some parent class to do what...?
-    def __init__(self, fd, collector):
+    def __init__(self, fd, collector, style=None):
         self.fd = fd
         self.collector = collector
         # TODO: check that CLS style actually exists
+        self.style = style
         if 'DUECREDIT_STYLE' in os.environ.keys():
             self.style = os.environ['DUECREDIT_STYLE']
         else:
@@ -103,6 +104,10 @@ def get_text_rendering(citation, style='apa'):
 def get_bibtex_rendering(entry):
     if isinstance(entry, Doi):
         return BibTeX(import_doi(entry.doi))
+    elif isinstance(entry, BibTeX):
+        return entry
+    else:
+        raise ValueError("Have no clue how to get bibtex out of %s" % entry)
 
 
 def format_bibtex(bibtex_entry, style='apa'):
@@ -149,3 +154,18 @@ class PickleOutput(object):
     def load(cls, filename=DUECREDIT_FILE):
         with open(filename) as f:
             return pickle.load(f)
+
+class BibTeXOutput(object):  # TODO some parent class to do what...?
+    def __init__(self, fd, collector):
+        self.fd = fd
+        self.collector = collector
+
+    def dump(self):
+        for citation in self.collector.citations.values():
+            try:
+                bibtex = get_bibtex_rendering(citation.entry)
+            except:
+                lgr.warning("Failed to generate bibtex for %s" % citation.entry)
+                continue
+            self.fd.write(bibtex.rawentry + "\n")
+

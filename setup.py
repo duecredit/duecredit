@@ -37,9 +37,12 @@ try:
 except OSError as e:
     print('Assume we are running from a source distribution.')
     # read version from VERSION_FILE
-    with open(VERSION_FILE) as version_file:
-        code = compile(version_file.read(), VERSION_FILE, 'exec')
-        exec(code)
+    if os.path.exists(VERSION_FILE):
+        with open(VERSION_FILE) as version_file:
+            code = compile(version_file.read(), VERSION_FILE, 'exec')
+            exec(code)
+    else:
+        __version__ = '0.unknown'
 
 with open('README.rst') as file:
     README = file.read()

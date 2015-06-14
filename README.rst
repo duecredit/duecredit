@@ -2,6 +2,19 @@
 duecredit
 =========
 
+.. |build-status|
+   image:: https://secure.travis-ci.org/duecredit/duecredit.png
+           ?branch=master
+   :target: http://travis-ci.org/duecredit/duecredit
+   :alt: duecredit travis-ci build status
+
+.. |coverage-status|
+   image:: https://coveralls.io/repos/duecredit/duecredit/badge.png
+           ?branch=master
+   :target: https://coveralls.io/r/duecredit/duecredit
+   :alt: duecredit coveralls coverage status
+
+
 duecredit is being conceived to address the problem of inadequate
 citation of scientific software and methods, and limited visibility of
 donation requests for open-source software.
@@ -13,15 +26,41 @@ level of reference detail, i.e. only references for actually used
 functionality will be presented back if software provides multiple
 citeable implementations.
 
-Warning/Disclaimer
-------------------
+duecredit 101
+=============
 
-There is nothing working yet -- it is just being conceived in spare
-moments.  I hope to keep pushing it whenever I have a moment.
+You can already start "registering" citations using duecredit in your
+software.  duecredit will remain an optional dependency, i.e. your software
+will work correctly even without duecredit installed.  For that
 
-But if you found idea interesting and want to provide feedback, join, or
-even take over -- you are most welcome.  I would be delighted to hear any
-feedback.
+1. copy `duecredit/stub.py` to your codebase, e.g.
+
+       wget -q -O /path/tomodule/yourmodule/due.py \
+          https://raw.githubusercontent.com/duecredit/duecredit/master/duecredit/stub.py
+
+
+   **Note** that it might be better to avoid naming it duecredit.py to avoid shadowing
+   installed duecredit.
+
+2. Then use in your code as
+
+    from .due import due, Doi
+
+   1. To provide reference for the entire module just use e.g.
+
+       due.cite(Doi("1.2.3/x.y.z"), use="Solves all your problems", level="module xyz")
+
+   2. To provide a reference for a function or a method, use dcite decorator
+
+       @due.dcite(Doi("1.2.3/x.y.z"), use="Resolves constipation issue")
+       def pushit():
+           ...
+
+3. Then whenever anyone runs their analysis which uses your code and sets `DUECREDIT_ENABLE=yes`
+   environment variable, and invokes any of the cited function/methods, at the end of the run
+   all collected bibliography will appear.  Moreover you can use `duecredit summary` command
+   to show that information again (stored in `.duecredit.p` file) or export it as a BibTeX file
+   ready for reuse
 
 
 Ultimate goals
@@ -117,7 +156,7 @@ Module level
 >>> from duecredit import due, BibTeX, Donate
 >>>
 >>> # Add XXX00 reference
->>> due.add(BibTeX("""{XXX00, ...}"""))
+>>> due.add(BibTeX("""{XXX00, ...}"""), use="module blah")
 >>>
 >>> # and/or load multiple from a file
 >>> due.load('/home/soul/deep/good_intentions.bib')
@@ -125,7 +164,6 @@ Module level
 >>> # Reference XXX00 entry.  If not pre-loaded
 >>> # a complete BibTeX or some other entry could be
 >>> # provided in place of the key
->>> due('XXX00', use="")   # Cite entire module
 >>> due(Donate(url="http://alimony.money/kid#1"))
 
 
@@ -141,17 +179,17 @@ def purpose_of_life():
 
 class Children(object):
      # Conception is usually way too easy and is just for pleasure,
-	 # thus not worth referencing
+     # thus not worth referencing
      def __init__(self):
-	     pass
+         pass
 
      @due.dec(Donate("http://social.support"))
      def birth(self, gender):
-	     pass
+         pass
 
-     @due.dec(BibTeX("""{YYY00, title='Memoir of ...', ...}"""))
-	 def tough_life(self, reincarnations=1, ...):
-	     pass
+   @due.dec(BibTeX("""{YYY00, title='Memoir of ...', ...}"""))
+     def tough_life(self, reincarnations=1, ...):
+         pass
 
 
 Output

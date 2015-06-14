@@ -14,8 +14,8 @@ before_install:
 install:
   - travis_retry pip install -q coveralls 
   - pip install -r requirements.txt
+  - python setup.py --help # just to trigger generation of .version
   - pip install -e .
-  #- python setup.py --help # just to trigger generation of .version
 
 script:
   - nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO
