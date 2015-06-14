@@ -40,13 +40,18 @@ def get_due():
 
 # Rebind the collector's methods to the module here
 if is_active():
-    from .collector import CollectorGrave as _CollectorGrave
+    from .collector import CollectorSummary
+    import atexit
     # where to cache bibtex entries
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
-    due = get_due() # hidden in a function to avoid circular import of .io
-    _export_upon_del = _CollectorGrave(due)
-
+    due = get_due()  # hidden in a function to avoid circular import of .io
+    # Wrapper to create and dump summary... passing method doesn't work:
+    #  probably removes instance too early
+    def crap():
+        _due_summary = CollectorSummary(due)
+        _due_summary.dump()
+    atexit.register(crap)
 else:
     # keeping duplicate but separate so later we could even place it into a separate
     # submodule to possibly minimize startup time impact even more

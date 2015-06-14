@@ -145,7 +145,8 @@ class DueCreditCollector(object):
                 len(self._entries), len(self.citations))
 
 
-class CollectorGrave(object):
+# TODO: redo heavily -- got very messy
+class CollectorSummary(object):
     """A helper which would take care about exporting citations upon its Death
     """
     def __init__(self, collector, fn=DUECREDIT_FILE):

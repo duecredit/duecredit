@@ -1,5 +1,5 @@
 from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
-    CollectorGrave
+    CollectorSummary
 from ..entries import BibTeX, Doi
 from ..io import TextOutput, PickleOutput
 
@@ -98,14 +98,14 @@ def test_get_output_handler_method():
         collector.cite(entry)
 
         with tempfile.NamedTemporaryFile() as f:
-            grave = CollectorGrave(collector, fn=f.name)
-            handlers = [grave._get_output_handler(type_, collector)
+            summary = CollectorSummary(collector, fn=f.name)
+            handlers = [summary._get_output_handler(type_, collector)
                         for type_ in ['pickle']]
 
             #assert_is_instance(handlers[0], TextOutput)
             assert_is_instance(handlers[0], PickleOutput)
 
-            assert_raises(NotImplementedError, grave._get_output_handler,
+            assert_raises(NotImplementedError, summary._get_output_handler,
                           'nothing', collector)
 
 def test_text_output():
