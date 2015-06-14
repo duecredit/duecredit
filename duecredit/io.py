@@ -9,6 +9,7 @@ from os.path import dirname, exists
 import pickle
 import requests
 from tempfile import NamedTemporaryFile
+from six import PY2
 
 def get_doi_cache_file(doi):
     return os.path.join(CACHE_DIR, doi)
@@ -19,7 +20,11 @@ def import_doi(doi):
 
     if exists(cached):
         with open(cached) as f:
-            return f.read().decode('utf-8')
+            doi = f.read()
+            if PY2:
+                return doi.decode('utf-8')
+            return doi
+
     # else -- fetch it
     headers = {'Accept': 'text/bibliography; style=bibtex'}
     url = 'http://dx.doi.org/' + doi

@@ -136,7 +136,7 @@ class CollectorGrave(object):
         self._outputs = [self._get_output_handler(
             type_.lower().strip(), collector, fn=fn)
             for type_ in os.environ.get('DUECREDIT_OUTPUTS',
-                                        'stdout').split(',')
+                                        'stdout,pickle').split(',')
             if type_]
 
     @staticmethod
