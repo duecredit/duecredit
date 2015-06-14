@@ -1,0 +1,5 @@
+mock
+nose>=1.3.4
+vcrpy
+requests
+citeproc-py

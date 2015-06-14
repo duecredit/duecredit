@@ -19,7 +19,7 @@ def never_fail(f):
             return f(*args, **kwargs)
         except Exception as e:
             lgr.warning("Failed to run %s: %s " % (f, e))
-            
+
     return wrapped_func
 
 class DueCreditCollector(object):
