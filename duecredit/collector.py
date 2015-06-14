@@ -164,14 +164,14 @@ class DueCreditCollector(object):
 class CollectorSummary(object):
     """A helper which would take care about exporting citations upon its Death
     """
-    def __init__(self, collector, fn=DUECREDIT_FILE):
+    def __init__(self, collector, outputs="stdout,pickle", fn=DUECREDIT_FILE):
         self._due = collector
         self.fn = fn
         # for now decide on output "format" right here
         self._outputs = [self._get_output_handler(
             type_.lower().strip(), collector, fn=fn)
             for type_ in os.environ.get('DUECREDIT_OUTPUTS',
-                                        'stdout,pickle').split(',')
+                                        outputs).split(',')
             if type_]
 
     @staticmethod

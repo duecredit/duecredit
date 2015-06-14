@@ -10,8 +10,11 @@
 
 """
 
+import sys
 import os
 from .. import DUECREDIT_FILE, lgr
+from ..collector import CollectorSummary
+from ..io import TextOutput, BibTeXOutput
 
 __docformat__ = 'restructuredtext'
 
@@ -25,8 +28,12 @@ def setup_parser(parser):
         help="Filename containing collected citations. Default: %(default)s")
 
     parser.add_argument(
-        "--style", default="apa",
+        "--style", choices=("apa", "harvard1"), default="apa",
         help="Style to be used for listing citations")
+
+    parser.add_argument(
+        "--format", choices=("text", "bibtex"), default="text",
+        help="Way to present the summary")
 
 def run(args):
     from ..io import PickleOutput
@@ -34,8 +41,15 @@ def run(args):
         lgr.debug("File %s doesn't exist.  No summary available")
         return 1
 
-    due = PickleOutput.load(DUECREDIT_FILE)
+    due = PickleOutput.load(args.filename)
+    #CollectorSummary(due).dump()
 
-    print "TODO"
+    if args.format == "text":
+        out = TextOutput(sys.stdout, due, args.style)
+    elif args.format == "bibtex":
+        out = BibTeXOutput(sys.stdout, due)
+    else:
+        raise ValueError("unknown to treat %s" % args.format)
+    out.dump()
 
 
