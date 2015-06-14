@@ -17,13 +17,10 @@ class TextOutput(object):  # TODO some parent class to do what...?
         self.collector = collector
 
     def dump(self):
-        self.fd.write("""
-DueCredit Report
-
-%d pieces were cited:
-        """ % len(self.collector.citations))
-        # Group by type???? e.g. Donations should have different meaning from regular ones
-        # Should we provide some base classes to differentiate between types? probbly not -- tags?
+        self.fd.write('\nDueCredit Report\n%d pieces were cited:\n'
+                      % len(self.collector.citations))
+        for entry in self.collector.citations.itervalues():
+            self.fd.write('{0}\n'.format(get_text_rendering(entry)))
 
 def get_text_rendering(entry):
     if isinstance(entry, Doi):
@@ -31,7 +28,7 @@ def get_text_rendering(entry):
         return get_text_rendering(bibtex_rendering)
     elif isinstance(entry, BibTeX):
         # TODO: get Text rendering of bibtex
-        return entry._rawentry
+        return entry.format()
     else:
         return str(entry)
 

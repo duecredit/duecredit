@@ -35,6 +35,9 @@ class BibTeX(DueCreditEntry):
         matches = reg.groupdict()
         self._key = matches['key']
 
+    def format(self):
+        # TODO: return nice formatting of the entry
+        return str(self._rawentry)
 
 class Doi(DueCreditEntry):
     def __init__(self, doi, key=None):
