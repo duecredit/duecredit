@@ -56,14 +56,14 @@ class TextOutput(object):  # TODO some parent class to do what...?
             self.style = 'apa'
 
     def dump(self):
-        citations_rendered = [
-            "[%d] " % (i+1) + get_text_rendering(citation, style=self.style)
+        citations_rendered = [(i+1, citation,
+            "[%d] " % (i+1) + get_text_rendering(citation, style=self.style))
             for i, citation in enumerate(self.collector.citations.values())]
 
         count_modules = 0
         count_functions = 0
         self.fd.write('DueCredit Report:\n')
-        for citation in self.collector.citations.values():
+        for refnr, citation, _ in citations_rendered:
             if citation.level and citation.level.startswith('module '):
                 count_modules += 1
                 try:
@@ -73,16 +73,17 @@ class TextOutput(object):  # TODO some parent class to do what...?
                 self.fd.write('- {0} (v {1}) [{2}]\n'.format(
                     this_module,
                     citation.version,
-                    count_modules))
+                    refnr))
                 # TODO: make this better
-                for citation_ in self.collector.citations.values():
-                    count_functions += 1
+                for refnr_, citation_, _ in citations_rendered:
                     # TODO -- exatrct module name and compare
-                    if this_module in citation_.level:
+                    if this_module in citation_.level \
+                            and citation.level != citation_.level:
+                        count_functions += 1
                         try:
                             self.fd.write('\t- {0} [{1}]\n'.format(
                                 citation_.level.split(' ', 1)[1],
-                                count_functions))
+                                refnr_))
                         except:
                             lgr.warning("CRAPPED HERE")
                             continue
@@ -90,7 +91,8 @@ class TextOutput(object):  # TODO some parent class to do what...?
             count_modules, count_functions))
         if count_modules or count_functions:
             self.fd.write('References\n' + '_' * 10 + '\n')
-        self.fd.write('\n'.join(citations_rendered))
+        self.fd.write('\n'.join([c[-1] for c in citations_rendered]))
+        self.fd.write('\n')
 
 def get_text_rendering(citation, style='apa'):
     # TODO: smth fked up smwhere

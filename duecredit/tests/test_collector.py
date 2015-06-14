@@ -7,6 +7,7 @@ from mock import patch
 from nose.tools import assert_equal, assert_is_instance, assert_raises, assert_true
 import os
 import tempfile
+import sys
 from StringIO import StringIO
 
 def _test_entry(due, entry):
@@ -24,6 +25,20 @@ _sample_bibtex = """
   doi = {10.3389/fninf.2012.00022},
   issn = {1662-5196},
   localfile = {HH12.pdf},
+}
+"""
+_sample_bibtex2 = """
+@ARTICLE{Atkins_2002,
+  title = {title},
+  volume = {666},
+  url = {http://dx.doi.org/10.1038/nrd842},
+  DOI = {10.1038/nrd842},
+  number = {3009},
+  journal = {My Fancy. Journ.},
+  publisher = {The Publisher},
+  author = {Atkins, Joshua H. and Gershell, Leland J.},
+  year = {2002},
+  month = {Jul},
 }
 """
 _sample_doi = "a.b.c/1.2.3"
@@ -125,3 +140,42 @@ def test_collectors_uniform_API():
                            if not x.startswith('_')
                               or x in ('__call__')]
     assert_equal(get_api(DueCreditCollector), get_api(InactiveDueCreditCollector))
+
+def test_text_output_dump_formatting():
+    due = DueCreditCollector()
+
+    # XXX: atm just to see if it spits out stuff
+    @due.dcite(BibTeX(_sample_bibtex), use='solution to life',
+               level='module mymodule', version='0.0.16')
+    def mymodule(arg1, kwarg2="blah"):
+        """docstring"""
+        assert_equal(arg1, "magical")
+        assert_equal(kwarg2, 1)
+
+        @due.dcite(BibTeX(_sample_bibtex2), use='solution to life',
+                   level='mymodule myfunction')
+        def myfunction(arg42):
+            pass
+
+        myfunction('argh')
+        return "load"
+
+    # check we don't have anything output
+    strio = StringIO()
+    TextOutput(strio, due).dump()
+    value = strio.getvalue()
+    assert_true('0 modules cited' in value, msg='value was {0}'.format(value))
+    assert_true('0 functions cited' in value,
+                msg='value was {0}'.format(value))
+
+    # now we call it -- check it prints stuff
+    mymodule('magical', kwarg2=1)
+    TextOutput(strio, due).dump()
+    value = strio.getvalue()
+    assert_true('1 modules cited' in value, msg='value was {0}'.format(value))
+    assert_true('1 functions cited' in value,
+                msg='value was {0}'.format(value))
+    assert_true('(v 0.0.16)' in value,
+                msg='value was {0}'.format(value))
+    assert_equal(len(value.split('\n')), 17, msg='value was {0}'.format(value))
+

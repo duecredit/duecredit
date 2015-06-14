@@ -96,7 +96,8 @@ class DueCreditCollector(object):
             self.citations[entry_key] = Citation(entry_, use, level)
         citation = self.citations[entry_key]
         citation.count += 1
-        citation.version = version
+        if not citation.version:
+            citation.version = version
         # TODO: update level and use here?
 
         return citation
