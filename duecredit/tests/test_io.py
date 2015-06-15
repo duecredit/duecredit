@@ -8,7 +8,7 @@ from six import PY2
 import sys
 import pickle
 import tempfile
-from test_collector import _sample_bibtex, _sample_bibtex2
+from .test_collector import _sample_bibtex, _sample_bibtex2
 import vcr
 
 if PY2:
