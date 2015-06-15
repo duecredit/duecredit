@@ -7,7 +7,7 @@ import os
 import sys
 
 from datetime import datetime
-from distutils.core import setup
+from setuptools import setup
 from pkgutil import walk_packages
 from subprocess import Popen, PIPE
 
