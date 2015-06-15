@@ -36,18 +36,23 @@ def test_pickleoutput():
                    "year={2002}, \n"
                    "month={Jul}, \n"
                    "pages={491-492}\n}")
-    collector = DueCreditCollector()
-    collector.add(entry)
-    collector.cite(entry)
+    collector_ = DueCreditCollector()
+    collector_.add(entry)
+    collector_.cite(entry)
 
-    with tempfile.NamedTemporaryFile() as fn:
-        pickler = PickleOutput(collector, fn=fn.name)
-        assert_equal(pickler.fn, fn.name)
-        assert_equal(pickler.dump(), None)
-        collector_loaded = pickle.load(fn)
+    # test it doesn't puke with an empty collector
+    collectors = [collector_, DueCreditCollector()]
 
-        assert_equal(collector.citations.keys(),
-                     collector_loaded.citations.keys())
-        # TODO: implement comparison of citations
-        assert_equal(collector._entries.keys(),
-                     collector_loaded._entries.keys())
+    for collector in collectors:
+        with tempfile.NamedTemporaryFile() as fn:
+            pickler = PickleOutput(collector, fn=fn.name)
+            assert_equal(pickler.fn, fn.name)
+            assert_equal(pickler.dump(), None)
+            collector_loaded = pickle.load(fn)
+
+            assert_equal(collector.citations.keys(),
+                         collector_loaded.citations.keys())
+            # TODO: implement comparison of citations
+            assert_equal(collector._entries.keys(),
+                         collector_loaded._entries.keys())
+
