@@ -90,7 +90,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
         self.fd.write('\n{0} modules cited\n{1} functions cited\n'.format(
             count_modules, count_functions))
         if count_modules or count_functions:
-            self.fd.write('References\n' + '_' * 10 + '\n')
+            self.fd.write('References\n' + '-' * 10 + '\n')
         self.fd.write('\n'.join([c[-1] for c in citations_rendered]))
         self.fd.write('\n')
 
