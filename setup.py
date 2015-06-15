@@ -44,7 +44,7 @@ except OSError as e:
     else:
         __version__ = '0.unknown'
 
-with open('README.rst') as file:
+with open('README.md') as file:
     README = file.read()
 
 
