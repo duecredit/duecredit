@@ -127,15 +127,16 @@ def format_bibtex(bibtex_entry, style='harvard1'):
     try:
         with open(fname, 'wt') as f:
             bibtex = bibtex_entry.rawentry
-            bibtex = bibtex.replace(u'\u2013', '--')
+            bibtex = bibtex.replace(u'\u2013', '--') + "\n"
             # TODO: manage to save/use UTF-8
-            f.write(bibtex.encode('ascii', 'ignore') + "\n")
+            if PY2:
+                bibtex = bibtex.encode('ascii', 'ignore')
+            f.write(bibtex)
         try:
             bib_source = cpBibTeX(fname)
-        except:
+        except Exception as e:
             lgr.error("Failed to process BibTeX file %s" % fname)
-            os.system("cp %s /tmp/failed.bib" % fname)
-            return "ERRORED"
+            return "ERRORED: %s" % str(e)
         bib_style = cp.CitationStylesStyle(style, validate=False)
         # TODO: specify which kind of formatter we want
         bibliography = cp.CitationStylesBibliography(bib_style, bib_source,
@@ -162,7 +163,7 @@ class PickleOutput(object):
 
     @classmethod
     def load(cls, filename=DUECREDIT_FILE):
-        with open(filename) as f:
+        with open(filename, 'rb') as f:
             return pickle.load(f)
 
 class BibTeXOutput(object):  # TODO some parent class to do what...?

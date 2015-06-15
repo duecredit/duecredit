@@ -2,6 +2,7 @@
 #emacs: -*- mode: python-mode; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil -*- 
 #ex: set sts=4 ts=4 sw=4 noet:
 import re
+from six import PY2
 
 class DueCreditEntry(object):
     def __init__(self, rawentry, key=None):
@@ -13,7 +14,10 @@ class DueCreditEntry(object):
 
     @property
     def rawentry(self):
-        return unicode(self._rawentry)
+        if PY2:
+            return unicode(self._rawentry)
+        else:
+            return self._rawentry
 
     def _process_rawentry(self):
         pass

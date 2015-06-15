@@ -107,7 +107,7 @@ def setup_parser():
         cmd_name = cmd[4:]
         subcmdmod = getattr(__import__('duecredit.cmdline',
                                        globals(), locals(),
-                                       [cmd], -1),
+                                       [cmd], 0),
                             cmd)
         # deal with optional parser args
         if 'parser_args' in subcmdmod.__dict__:
