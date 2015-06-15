@@ -7,7 +7,7 @@ import os
 import sys
 
 from datetime import datetime
-from distutils.core import setup
+from setuptools import setup
 from pkgutil import walk_packages
 from subprocess import Popen, PIPE
 
@@ -44,7 +44,7 @@ except OSError as e:
     else:
         __version__ = '0.unknown'
 
-with open('README.rst') as file:
+with open('README.md') as file:
     README = file.read()
 
 
