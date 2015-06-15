@@ -2,17 +2,8 @@
 duecredit
 =========
 
-.. |build-status|
-   image:: https://secure.travis-ci.org/duecredit/duecredit.png
-           ?branch=master
-   :target: http://travis-ci.org/duecredit/duecredit
-   :alt: duecredit travis-ci build status
-
-.. |coverage-status|
-   image:: https://coveralls.io/repos/duecredit/duecredit/badge.png
-           ?branch=master
-   :target: https://coveralls.io/r/duecredit/duecredit
-   :alt: duecredit coveralls coverage status
+[![Build Status](https://travis-ci.org/duecredit/duecredit.svg?branch=master)](https://travis-ci.org/duecredit/duecredit)
+[![Coverage Status](https://coveralls.io/repos/duecredit/duecredit/badge.svg)](https://coveralls.io/r/duecredit/duecredit)
 
 
 duecredit is being conceived to address the problem of inadequate
