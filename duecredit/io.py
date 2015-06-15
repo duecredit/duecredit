@@ -40,7 +40,10 @@ def import_doi(doi):
         if not exists(cache_dir):
             os.makedirs(cache_dir)
         with open(cached, 'w') as f:
-            f.write(bibtex.encode('utf-8'))
+            if PY2:
+                f.write(bibtex.encode('utf-8'))
+            else:
+                f.write(bibtex)
     return bibtex
 
 
