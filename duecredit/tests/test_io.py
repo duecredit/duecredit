@@ -1,13 +1,20 @@
 from ..collector import DueCreditCollector
 from ..entries import BibTeX, DueCreditEntry
-from ..io import PickleOutput, import_doi
-from nose.tools import assert_equal, assert_is_instance, assert_raises
+from ..io import TextOutput, PickleOutput, import_doi
+from nose.tools import assert_equal, assert_is_instance, assert_raises, \
+    assert_true
 from six import PY2
 
 import sys
 import pickle
 import tempfile
+from test_collector import _sample_bibtex, _sample_bibtex2
 import vcr
+
+if PY2:
+    from StringIO import StringIO
+else:
+    from io import StringIO
 
 @vcr.use_cassette()
 def test_import_doi():
@@ -56,3 +63,52 @@ def test_pickleoutput():
             assert_equal(collector._entries.keys(),
                          collector_loaded._entries.keys())
 
+def test_text_output():
+    entry = BibTeX(_sample_bibtex)
+    collector = DueCreditCollector()
+    collector.cite(entry)
+
+    strio = StringIO()
+    TextOutput(strio, collector).dump()
+    value = strio.getvalue()
+    assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
+    assert_true(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
+
+
+def test_text_output_dump_formatting():
+    due = DueCreditCollector()
+
+    # XXX: atm just to see if it spits out stuff
+    @due.dcite(BibTeX(_sample_bibtex), use='solution to life',
+               level='module mymodule', version='0.0.16')
+    def mymodule(arg1, kwarg2="blah"):
+        """docstring"""
+        assert_equal(arg1, "magical")
+        assert_equal(kwarg2, 1)
+
+        @due.dcite(BibTeX(_sample_bibtex2), use='solution to life',
+                   level='mymodule myfunction')
+        def myfunction(arg42):
+            pass
+
+        myfunction('argh')
+        return "load"
+
+    # check we don't have anything output
+    strio = StringIO()
+    TextOutput(strio, due).dump()
+    value = strio.getvalue()
+    assert_true('0 modules cited' in value, msg='value was {0}'.format(value))
+    assert_true('0 functions cited' in value,
+                msg='value was {0}'.format(value))
+
+    # now we call it -- check it prints stuff
+    mymodule('magical', kwarg2=1)
+    TextOutput(strio, due).dump()
+    value = strio.getvalue()
+    assert_true('1 modules cited' in value, msg='value was {0}'.format(value))
+    assert_true('1 functions cited' in value,
+                msg='value was {0}'.format(value))
+    assert_true('(v 0.0.16)' in value,
+                msg='value was {0}'.format(value))
+    assert_equal(len(value.split('\n')), 17, msg='value was {0}'.format(value))
