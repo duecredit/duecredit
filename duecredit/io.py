@@ -81,8 +81,9 @@ class TextOutput(object):  # TODO some parent class to do what...?
                             and citation.level != citation_.level:
                         count_functions += 1
                         try:
-                            self.fd.write('\t- {0} [{1}]\n'.format(
+                            self.fd.write('  - {0} ({1}) [{2}]\n'.format(
                                 citation_.level.split(' ', 1)[1],
+                                citation_.use,
                                 refnr_))
                         except:
                             lgr.warning("CRAPPED HERE")
