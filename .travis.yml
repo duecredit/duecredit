@@ -15,6 +15,7 @@ git:
   depth: 99999
 
 install:
+  - if [[ $TRAVIS_PYTHON_VERSION == pypy ]] ; then dpkg --compare-versions $(pypy --version 2>&1 | awk '/PyPy/{print $2;}') ge 2.5.1 || { d=$PWD; cd /tmp; wget --no-check-certificate https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.1-linux64.tar.bz2; tar -xjvf pypy*bz2; cd pypy-*/bin/; export PATH=$PWD:$PATH; cd $d; } ; fi
   - travis_retry pip install -q coveralls 
   - pip install -r requirements.txt
   - python setup.py --help # just to trigger generation of .version
