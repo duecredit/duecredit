@@ -127,9 +127,11 @@ def format_bibtex(bibtex_entry, style='harvard1'):
     try:
         with open(fname, 'wt') as f:
             bibtex = bibtex_entry.rawentry
-            bibtex = bibtex.replace(u'\u2013', '--')
+            bibtex = bibtex.replace(u'\u2013', '--') + "\n"
             # TODO: manage to save/use UTF-8
-            f.write(bibtex.encode('ascii', 'ignore') + "\n")
+            if PY2:
+                bibtex = bibtex.encode('ascii', 'ignore')
+            f.write(bibtex)
         try:
             bib_source = cpBibTeX(fname)
         except:

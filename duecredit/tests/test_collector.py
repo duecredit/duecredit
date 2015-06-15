@@ -7,8 +7,13 @@ from mock import patch
 from nose.tools import assert_equal, assert_is_instance, assert_raises, assert_true
 import os
 import tempfile
-import sys
-from StringIO import StringIO
+from six import PY2
+
+if PY2:
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
 
 def _test_entry(due, entry):
     due.add(entry)

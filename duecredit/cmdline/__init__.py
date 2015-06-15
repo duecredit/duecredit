@@ -11,5 +11,5 @@
 
 __docformat__ = 'restructuredtext'
 
-import cmd_summary
-import cmd_test
+from . import cmd_summary
+from . import cmd_test
