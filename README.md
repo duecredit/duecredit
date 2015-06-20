@@ -1,4 +1,3 @@
-=========
 duecredit
 =========
 
@@ -65,7 +64,7 @@ User-view
 Then upon running the code citing any papers, `.duecredit.p` file will get
 assembled to be queried later, e.g.:
 
-    $> duecredit summary --format=bibtex        
+    $> duecredit summary --format=bibtex
     @article{Hanke_2009, title={PyMVPA: a Python Toolbox for Multivariate Pattern Analysis of fMRI Data}, volume={7}, ISSN={1559-0089}, url={http://dx.doi.org/10.1007/s12021-008-9041-y}, DOI={10.1007/s12021-008-9041-y}, number={1}, journal={Neuroinform}, publisher={Springer Science + Business Media}, author={Hanke, Michael and Halchenko, Yaroslav O. and Sederberg, Per B. and Hanson, Stephen José and Haxby, James V. and Pollmann, Stefan}, year={2009}, month={Jan}, pages={37–53}}
     @INPROCEEDINGS{breiman2001,
         author = {Leo Breiman},
@@ -76,7 +75,7 @@ assembled to be queried later, e.g.:
     }
     ...
 
-    $> duecredit summary                
+    $> duecredit summary
     DueCredit Report:
     - mvpa2 (v None) [1]
       - mvpa2.clfs.transerror._call (Bayesian hypothesis testing) [4]
@@ -100,17 +99,17 @@ Ultimate goals
 Reduce demand for prima ballerina projects
 ------------------------------------------
 
-Problem: Scientific software is often developed to gain citations for
+**Problem**: Scientific software is often developed to gain citations for
 original publication through the use of the software implementing it.
-Unfortunately such an established procedure discourages contributions
-to the existing projects and fosters new projects to be developed from
+Unfortunately such established procedure discourages contributions
+to existing projects and fosters new projects to be developed from
 scratch.
 
-Solution: With easy ways to provide all-and-only relevant references
-for used functionality within a large(r) framework scientific
-developers would prefer to contribute to already existing projects.
+**Solution**: With easy ways to provide all-and-only relevant references
+for used functionality within a large(r) framework, scientific
+developers will prefer to contribute to already existing projects.
 
-Benefits: As a result, scientific developers would immediately benefit
+**Benefits**: As a result, scientific developers will immediately benefit
 from adhering to proper development procedures (codebase structuring,
 testing, etc) and already established delivery and deployment channels
 existing projects already have.  This will increase efficiency and
@@ -121,22 +120,18 @@ everyone likes to bash about (reproducibility, longevity, etc.).
 Adequately reference core libraries
 -----------------------------------
 
-Problem: Scientific software often if not always uses 3rd party
+**Problem**: Scientific software often, if not always, uses 3rd party
 libraries (e.g., NumPy, SciPy, atlas) which might not even be visible
 at the user level.  Therefore they are rarely referenced in the
 publications despite providing the fundamental core for solving a
 scientific problem at hands.
 
-Solution: With automated bibliography compilation for all used
+**Solution**: With automated bibliography compilation for all used
 libraries, such projects and their authors would get a chance to
 receive adequate citability.
 
-Benefits: Adequate appreciation of the scientific software
+**Benefits**: Adequate appreciation of the scientific software
 developments.  Coupled with a solution for "prima ballerina" problem,
 more contributions will flow into the core/foundational projects
 making new methodological developments readily available to even wider
 audiences without proliferation of the low quality scientific software.
-
-
-
-
