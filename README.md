@@ -59,6 +59,41 @@ will work correctly even without duecredit installed.  For that
    reuse.
 
 
+User-view
+---------
+
+Then upon running the code citing any papers, `.duecredit.p` file will get
+assembled to be queried later, e.g.:
+
+    $> duecredit summary --format=bibtex        
+    @article{Hanke_2009, title={PyMVPA: a Python Toolbox for Multivariate Pattern Analysis of fMRI Data}, volume={7}, ISSN={1559-0089}, url={http://dx.doi.org/10.1007/s12021-008-9041-y}, DOI={10.1007/s12021-008-9041-y}, number={1}, journal={Neuroinform}, publisher={Springer Science + Business Media}, author={Hanke, Michael and Halchenko, Yaroslav O. and Sederberg, Per B. and Hanson, Stephen José and Haxby, James V. and Pollmann, Stefan}, year={2009}, month={Jan}, pages={37–53}}
+    @INPROCEEDINGS{breiman2001,
+        author = {Leo Breiman},
+        title = {Random Forests},
+        booktitle = {Machine Learning},
+        year = {2001},
+        pages = {5--32}
+    }
+    ...
+
+    $> duecredit summary                
+    DueCredit Report:
+    - mvpa2 (v None) [1]
+      - mvpa2.clfs.transerror._call (Bayesian hypothesis testing) [4]
+    - sklearn (v None) [3]
+      - sklearn.ensemble.forest.fit (None) [2]
+
+    2 modules cited
+    2 functions cited
+    References
+    ----------
+    [1] Hanke, M. et al., 2009. PyMVPA: a Python Toolbox for Multivariate Pattern Analysis of fMRI Data. Neuroinform, 7(1), pp.37–53.
+    [2] Breiman, L., 2001. Random Forests. In Machine Learning. pp. 5–32.
+    ...
+
+
+
+
 Ultimate goals
 ==============
 
