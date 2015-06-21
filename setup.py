@@ -63,6 +63,7 @@ setup(
     package_data={PACKAGE: []},
     scripts=[],
     requires=[],
+    include_package_data=True,
     provides=[PACKAGE],
     #test_suite='nose.collector',
     entry_points={
