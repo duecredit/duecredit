@@ -3,6 +3,7 @@
 duecredit -- trace software for the publications
 """
 
+import re
 import os
 import sys
 
@@ -47,7 +48,6 @@ except OSError as e:
 with open('README.md') as file:
     README = file.read()
 
-
 def find_packages(path, prefix):
     yield prefix
     prefix = prefix + "."
@@ -62,7 +62,10 @@ setup(
     packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
     package_data={PACKAGE: []},
     scripts=[],
-    requires=[],
+    install_requires=['requests', 'citeproc-py', 'nose[TEST]'],
+    extras_require={
+        'TEST': ['mock', 'vcrpy']
+        },
     include_package_data=True,
     provides=[PACKAGE],
     #test_suite='nose.collector',
@@ -76,7 +79,9 @@ setup(
     description='Publications tracer',
     long_description=README,
     url='https://github.com/duecredit/duecredit',
-    keywords='citation tracing', 
+    # Download URL will point to the latest release, thus suffixes removed
+    download_url='https://github.com/duecredit/duecredit/releases/tag/%s' % re.sub('-.*$', '', __version__),
+    keywords=['citation tracing',],
     license='2-clause BSD License',
     classifiers=[
         'Development Status :: 3 - Alpha',
