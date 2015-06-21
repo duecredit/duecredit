@@ -62,10 +62,7 @@ setup(
     packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
     package_data={PACKAGE: []},
     scripts=[],
-    install_requires=['requests', 'citeproc-py', 'nose[TEST]'],
-    extras_require={
-        'TEST': ['mock', 'vcrpy']
-        },
+    install_requires=['requests', 'citeproc-py'],
     include_package_data=True,
     provides=[PACKAGE],
     #test_suite='nose.collector',
