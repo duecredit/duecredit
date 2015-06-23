@@ -6,7 +6,11 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-"""TODO"""
+"""Module/app to automate collection of relevant to analysis publications.
+
+Please see README.md shipped along with duecredit to get a better idea about
+its functionality
+"""
 
 import logging
 import os
