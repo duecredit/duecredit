@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-duecredit -- trace software for the publications
+duecredit -- publications (donations, etc) tracer
 """
 
 import re
@@ -73,7 +73,7 @@ setup(
     },
     author='Yaroslav Halchenko, Matteo Visconti di Oleggio Castello',
     author_email='yoh@onerussian.com',
-    description='Publications tracer',
+    description='Publications (and donations) tracer',
     long_description=README,
     url='https://github.com/duecredit/duecredit',
     # Download URL will point to the latest release, thus suffixes removed
