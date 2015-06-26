@@ -8,6 +8,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
+import os
 import logging
 import sys
 from functools import wraps
@@ -60,12 +61,66 @@ def optional_args(decorator):
     return wrapper
 
 
+def never_fail(f):
+    """Assure that function never fails -- all exceptions are caught"""
+    @wraps(f)
+    def wrapped_func(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            lgr.warning("Failed to run %s: %s " % (f, e))
+
+    if os.environ.get('DUECREDIT_ALLOW_FAIL', False):
+        return f
+    else:
+        return wrapped_func
+
+
+def borrowdoc(cls, methodname=None, replace=None):
+    """Return a decorator to borrow docstring from another `cls`.`methodname`
+
+    Common use is to borrow a docstring from the class's method for an
+    adapter function (e.g. sphere_searchlight borrows from Searchlight)
+
+    Examples
+    --------
+    To borrow `__repr__` docstring from parent class `Mapper`, do::
+
+       @borrowdoc(Mapper)
+       def __repr__(self):
+           ...
+
+    Parameters
+    ----------
+    cls
+      Usually a parent class
+    methodname : None or str
+      Name of the method from which to borrow.  If None, would use
+      the same name as of the decorated method
+    replace : None or str, optional
+      If not None, then not entire docstring gets replaced but only the
+      matching to "replace" value string
+    """
+
+    def _borrowdoc(method):
+        """Decorator which assigns to the `method` docstring from another
+        """
+        if methodname is None:
+            other_method = getattr(cls, method.__name__)
+        else:
+            other_method = getattr(cls, methodname)
+        if hasattr(other_method, '__doc__'):
+            if not replace:
+                method.__doc__ = other_method.__doc__
+            else:
+                method.__doc__ = method.__doc__.replace(replace, other_method.__doc__)
+        return method
+    return _borrowdoc
 
 
 #
 # Context Managers
 #
-
 
 
 #

@@ -1,3 +1,13 @@
+# emacs: -*- mode: python; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil -*-
+# ex: set sts=4 ts=4 sw=4 noet:
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+#
+#   See COPYING file distributed along with the duecredit package for the
+#   copyright and license terms.
+#
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+"""Citation and citations Collector classes"""
+
 import os
 import sys
 from functools import wraps
@@ -6,21 +16,68 @@ from . import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
+from .utils import never_fail, borrowdoc
 
 import logging
 lgr = logging.getLogger('duecredit.collector')
 
-from functools import wraps
 
-def never_fail(f):
-    @wraps(f)
-    def wrapped_func(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except Exception as e:
-            lgr.warning("Failed to run %s: %s " % (f, e))
+class Citation(object):
+    """Encapsulates citations and information on their use"""
 
-    return wrapped_func
+    def __init__(self, entry, use=None, level=None, version=None, kind="canonical"):
+        """Cite a reference
+
+        Parameters
+        ----------
+        entry: str or DueCreditEntry
+          The entry to use, either identified by its id or a new one (to be added)
+        use: str, optional
+          Description of what this functionality provides
+        level: str, optional
+          Either for the entire module ("module NAME") or a specific function/method
+          ("func module.[class.]name")
+        version: str or tuple, version
+          Version of the beast
+        kind: ('canonical', 'use', 'edu')
+          Describe the kind of a reference for this method. E.g. "canonical" would
+          refer to original publication which introduced the method.  "use" would
+          point to publications demonstrating good use of the method. "edu" --
+          references to tutorials, textbooks and other materials useful to learn more
+        """
+        self._entry = entry
+        self._use = use
+        self._level = level
+        self.count = 0
+        assert(kind in ('canonical', 'use', 'edu'))
+        self.kind = kind
+        self.version = version
+
+    def __repr__(self):
+        args = [repr(self._entry)]
+        if self._use:
+            args.append("use={0}".format(repr(self._use)))
+        if self._level:
+            args.append("level={0}".format(repr(self._level)))
+
+        if args:
+            args = ", ".join(args)
+        else:
+            args = ""
+        return self.__class__.__name__ + '({0})'.format(args)
+
+    @property
+    def level(self):
+        return self._level
+
+    @property
+    def entry(self):
+        return self._entry
+
+    @property
+    def use(self):
+        return self._use
+
 
 class DueCreditCollector(object):
     """Collect the references
@@ -28,6 +85,7 @@ class DueCreditCollector(object):
     The mighty beast which will might become later a proxy on the way to
     talk to a real collector
     """
+
     def __init__(self, entries=None, citations=None):
         self._entries = entries or {}
         self.citations = citations or {}
@@ -69,21 +127,10 @@ class DueCreditCollector(object):
     #     #         implementations
     #     pass # raise NotImplementedError
 
+
     @never_fail
-    def cite(self, entry, use=None, level=None, version=None):
-        """Decorator for references
-
-        Parameters
-        ----------
-        entry: str or DueCreditEntry
-          The entry to use, either identified by its id or a new one (to be added)
-        use: str, optional
-          Description of what this functionality provides
-        level: str, optional
-
-        version: str or tuple, version
-          Version of the beasat
-        """
+    @borrowdoc(Citation, "__init__")
+    def cite(self, entry, **kwargs):
         if isinstance(entry, DueCreditEntry):
             # new one -- add it
             self.add(entry)
@@ -93,24 +140,20 @@ class DueCreditCollector(object):
         entry_key = entry_.get_key()
 
         if entry_key not in self.citations:
-            self.citations[entry_key] = Citation(entry_, use, level)
+            self.citations[entry_key] = Citation(entry_, **kwargs)
+
         citation = self.citations[entry_key]
         citation.count += 1
         if not citation.version:
-            citation.version = version
+            citation.version = kwargs.get('version', None)
         # TODO: update level and use here?
 
         return citation
 
     @never_fail
+    @borrowdoc(Citation, "__init__", replace="PLUGDOCSTRING")
     def dcite(self, *args, **kwargs):
-        """Decorator for references.  Wrap a function or
-
-        Parameters
-        ----------
-        args, kwargs
-          Arguments to be passed to cite.  If no "level" provided, we deduce it
-          from the wrapped function/method
+        """Decorator for references.  PLUGDOCSTRING
 
         Examples
         --------
@@ -123,6 +166,7 @@ class DueCreditCollector(object):
         def func_wrapper(func):
             if 'level' not in kwargs:
                 # deduce level from the actual function which was decorated
+                # TODO: must include class name
                 module_ = func.__module__
                 kwargs['level'] = 'func %s.%s' % (module_, func.__name__)
                 # TODO: unittest for all the __version__ madness
@@ -170,11 +214,12 @@ class CollectorSummary(object):
         self._due = collector
         self.fn = fn
         # for now decide on output "format" right here
-        self._outputs = [self._get_output_handler(
-            type_.lower().strip(), collector, fn=fn)
-            for type_ in os.environ.get('DUECREDIT_OUTPUTS',
-                                        outputs).split(',')
-            if type_]
+        self._outputs = [
+            self._get_output_handler(
+                type_.lower().strip(), collector, fn=fn)
+            for type_ in os.environ.get('DUECREDIT_OUTPUTS', outputs).split(',')
+            if type_
+        ]
 
     @staticmethod
     def _get_output_handler(type_, collector, fn=None):
@@ -193,37 +238,3 @@ class CollectorSummary(object):
 
 # TODO:  provide HTML, MD, RST etc formattings
 
-class Citation(object):
-    """Encapsulates citations and information on their use"""
-
-    def __init__(self, entry, use, level, version=None):
-        self._entry = entry
-        self._use = use
-        self._level = level
-        self.count = 0
-        self.version = version
-
-    def __repr__(self):
-        args = [repr(self._entry)]
-        if self._use:
-            args.append("use={0}".format(repr(self._use)))
-        if self._level:
-            args.append("level={0}".format(repr(self._level)))
-
-        if args:
-            args = ", ".join(args)
-        else:
-            args = ""
-        return self.__class__.__name__ + '({0})'.format(args)
-
-    @property
-    def level(self):
-        return self._level
-
-    @property
-    def entry(self):
-        return self._entry
-
-    @property
-    def use(self):
-        return self._use

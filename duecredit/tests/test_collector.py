@@ -1,5 +1,5 @@
 from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
-    CollectorSummary
+    CollectorSummary, Citation
 from ..entries import BibTeX, Doi
 from ..io import PickleOutput
 
@@ -129,3 +129,12 @@ def test_collectors_uniform_API():
                               or x in ('__call__')]
     assert_equal(get_api(DueCreditCollector), get_api(InactiveDueCreditCollector))
 
+
+def _test__docs__(method):
+    assert("entry:" in method.__doc__)
+    assert("kind: (" in method.__doc__)
+
+def test__docs__():
+    yield _test__docs__, DueCreditCollector.cite
+    yield _test__docs__, DueCreditCollector.dcite
+    yield _test__docs__, Citation.__init__
