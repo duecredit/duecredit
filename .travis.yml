@@ -23,8 +23,7 @@ install:
 
 script:
   - nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO
-# test installation TODO
-#  - sudo python setup.py install
+  - sudo `which python` setup.py install  # test installation
 
 after_success:
-  - coveralls --config_file .coveragerc
+  - coveralls
