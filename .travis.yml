@@ -1,6 +1,7 @@
 # vim ft=yaml
 # travis-ci.org definition for DueCredit build
 language: python
+sudo: false
 python:
   - "2.7"
 #  - "3.2"
@@ -23,7 +24,7 @@ install:
 
 script:
   - nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO
-  - sudo `which python` setup.py install  # test installation
+  - python setup.py install  # test installation
 
 after_success:
   - coveralls
