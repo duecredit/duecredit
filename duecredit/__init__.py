@@ -77,3 +77,10 @@ except ImportError:
         raise RuntimeError('Need numpy >= 1.2 for duecredit.tests()')
 
 from . import log
+
+# Deal with injector
+from injections import injector
+
+injector.activate()
+#import mvpa2.suite
+#injector.deactivate()
