@@ -79,7 +79,7 @@ except ImportError:
 from . import log
 
 # Deal with injector
-from injections import injector
+from .injections import injector
 
 injector.activate()
 #import mvpa2.suite
