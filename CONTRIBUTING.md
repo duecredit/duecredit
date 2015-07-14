@@ -142,7 +142,7 @@ sudo apt-get install libxml2-dev libxslt1-dev
 
 On Mac OS X Yosemite additional steps are required to make `lxml` work properly
 (see [this stackoverflow
-answer](https://stackoverflow.com/questions/19548011/cannot-install-lxml-on\
+answer](https://stackoverflow.com/questions/19548011/cannot-install-lxml-on
 -mac-os-x-10-9/26544099#26544099?newreg=d3394d8210cc4779accfac05fe5c9b21)).
 We recommend using homebrew to install the same dependencies 
 (see the [Homebrew website](http://brew.sh/) to install it), then run
