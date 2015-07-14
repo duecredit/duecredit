@@ -25,7 +25,7 @@ lgr = logging.getLogger('duecredit.collector')
 class Citation(object):
     """Encapsulates citations and information on their use"""
 
-    def __init__(self, entry, use=None, level=None, version=None, kind="canonical"):
+    def __init__(self, entry, use=None, level=None, version=None, tags=["ref"]):
         """Cite a reference
 
         Parameters
@@ -39,18 +39,21 @@ class Citation(object):
           ("func module.[class.]name")
         version: str or tuple, version
           Version of the beast
-        kind: ('canonical', 'use', 'edu')
-          Describe the kind of a reference for this method. E.g. "canonical" would
-          refer to original publication which introduced the method.  "use" would
-          point to publications demonstrating good use of the method. "edu" --
-          references to tutorials, textbooks and other materials useful to learn more
+        tags: list of str, optional
+          Add tags for the reference for this method.  Some tags have associated
+          semantics in duecredit, e.g.
+          - "impl" tag describes this method an implementation of the cited method
+          - "ref" tag describes this method as the original implementation of
+            the cited method
+          - "use" tag points to publications demonstrating a good use of the method
+          - "edu" references to tutorials, textbooks and other materials useful to learn
+            more
         """
         self._entry = entry
         self._use = use
         self._level = level
         self.count = 0
-        assert(kind in ('canonical', 'use', 'edu'))
-        self.kind = kind
+        self.tags = tags
         self.version = version
 
     def __repr__(self):

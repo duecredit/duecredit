@@ -132,7 +132,7 @@ def test_collectors_uniform_API():
 
 def _test__docs__(method):
     assert("entry:" in method.__doc__)
-    assert("kind: (" in method.__doc__)
+    assert("tags: " in method.__doc__)
 
 def test__docs__():
     yield _test__docs__, DueCreditCollector.cite

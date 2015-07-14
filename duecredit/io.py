@@ -149,7 +149,7 @@ def format_bibtex(bibtex_entry, style='harvard1'):
             # return warnings back
             warnings.filters = old_filters
         bib_style = cp.CitationStylesStyle(style, validate=False)
-        # TODO: specify which kind of formatter we want
+        # TODO: specify which tags of formatter we want
         bibliography = cp.CitationStylesBibliography(bib_style, bib_source,
                                                      cp.formatter.plain)
         citation = cp.Citation([cp.CitationItem(key)])
