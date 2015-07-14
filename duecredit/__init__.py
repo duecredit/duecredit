@@ -52,10 +52,18 @@ if is_active():
     due = get_due()  # hidden in a function to avoid circular import of .io
     # Wrapper to create and dump summary... passing method doesn't work:
     #  probably removes instance too early
+
     def crap():
         _due_summary = CollectorSummary(due)
         _due_summary.dump()
     atexit.register(crap)
+
+
+    # Deal with injector
+    from .injections import injector
+
+    injector.activate()
+    #injector.deactivate()
 else:
     # keeping duplicate but separate so later we could even place it into a separate
     # submodule to possibly minimize startup time impact even more
@@ -77,10 +85,3 @@ except ImportError:
         raise RuntimeError('Need numpy >= 1.2 for duecredit.tests()')
 
 from . import log
-
-# Deal with injector
-from .injections import injector
-
-injector.activate()
-#import mvpa2.suite
-#injector.deactivate()

@@ -6,12 +6,12 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-"""
+"""Facility to automagically decorate with references other modules
 """
 
 __docformat__ = 'restructuredtext'
 
-from .importer import *
+from .injector import *
 from ..entries import Doi, BibTeX
 
 injector = DueCreditInjector()
