@@ -12,7 +12,7 @@ import os
 import sys
 from functools import wraps
 
-from . import DUECREDIT_FILE
+from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput

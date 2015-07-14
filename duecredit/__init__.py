@@ -12,21 +12,12 @@ Please see README.md shipped along with duecredit to get a better idea about
 its functionality
 """
 
-import logging
 import os
-import pickle
-import sys
 
-from .entries import *
+from .entries import Doi, BibTeX, Donate
 from .version import __version__, __release_date__
 
-lgr = logging.getLogger('duecredit')
-lgr.setLevel(logging.DEBUG)
-
-lgr.addHandler(logging.StreamHandler(sys.stdout))
-
-CACHE_DIR = os.path.expanduser(os.path.join('~', '.cache', 'duecredit', 'bibtex'))
-DUECREDIT_FILE = '.duecredit.p'
+from .log import lgr
 
 def is_active():
     env_enable = os.environ.get('DUECREDIT_ENABLE')
@@ -34,54 +25,59 @@ def is_active():
         return True
     return False
 
-def get_due():
-    from .io import PickleOutput
-    from .collector import DueCreditCollector
-    if os.path.exists(DUECREDIT_FILE):
-        return PickleOutput.load(DUECREDIT_FILE)
+def _get_due(active=False):
+    """Returns "due" Collector (real or a stub) and sets up dumping atexit for active one
+    """
+    from .config import CACHE_DIR, DUECREDIT_FILE
+
+    # Rebind the collector's methods to the module here
+    if active or is_active():
+        from duecredit.collector import CollectorSummary, DueCreditCollector
+        from .io import load_due
+        import atexit
+        # where to cache bibtex entries
+        if not os.path.exists(CACHE_DIR):
+            os.makedirs(CACHE_DIR)
+        if os.path.exists(DUECREDIT_FILE):
+            due = load_due(DUECREDIT_FILE)
+        else:
+            due = DueCreditCollector()
+
+        # Wrapper to create and dump summary... passing method doesn't work:
+        #  probably removes instance too early
+        def crap():
+            _due_summary = CollectorSummary(due)
+            _due_summary.dump()
+
+        atexit.register(crap)
+
+        # Deal with injector
+        from .injections import injector
+
+        injector.activate()
+        #injector.deactivate()
     else:
-        return DueCreditCollector()
-
-# Rebind the collector's methods to the module here
-if is_active():
-    from .collector import CollectorSummary
-    import atexit
-    # where to cache bibtex entries
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
-    due = get_due()  # hidden in a function to avoid circular import of .io
-    # Wrapper to create and dump summary... passing method doesn't work:
-    #  probably removes instance too early
-
-    def crap():
-        _due_summary = CollectorSummary(due)
-        _due_summary.dump()
-    atexit.register(crap)
+        # keeping duplicate but separate so later we could even place it into a separate
+        # submodule to possibly minimize startup time impact even more
+        #
+        # provide stubs which would do nothing
+        from .collector import InactiveDueCreditCollector
+        due = InactiveDueCreditCollector()
+    return due
 
 
-    # Deal with injector
-    from .injections import injector
-
-    injector.activate()
-    #injector.deactivate()
-else:
-    # keeping duplicate but separate so later we could even place it into a separate
-    # submodule to possibly minimize startup time impact even more
-    #
-    # provide stubs which would do nothing
-    from .collector import InactiveDueCreditCollector
-    due = InactiveDueCreditCollector()
-
+due = _get_due()
 
 # be friendly on systems with ancient numpy -- no tests, but at least
 # importable
 try:
-    from numpy.testing import Tester
-    test = Tester().test
-    bench = Tester().bench
-    del Tester
+    from numpy.testing import Tester as _Tester
+    test = _Tester().test
+    _bench = _Tester().bench
+    del _Tester
 except ImportError:
     def test(*args, **kwargs):
         raise RuntimeError('Need numpy >= 1.2 for duecredit.tests()')
 
-from . import log
+# Minimize default imports
+__all__ = [ 'Doi', 'BibTeX', 'Donate', 'due' ]

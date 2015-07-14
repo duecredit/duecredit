@@ -1,7 +1,6 @@
 from citeproc.source.bibtex import BibTeX as cpBibTeX
 import citeproc as cp
 
-import sys
 import os
 from os.path import dirname, exists
 import pickle
@@ -9,9 +8,9 @@ import requests
 import tempfile
 from six import PY2
 
-from . import CACHE_DIR, DUECREDIT_FILE
+from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi
-from . import lgr
+from .log import lgr
 
 def get_doi_cache_file(doi):
     return os.path.join(CACHE_DIR, doi)
@@ -155,7 +154,7 @@ def format_bibtex(bibtex_entry, style='harvard1'):
     biblio_out = ''.join(biblio_out[0])
     return biblio_out # if biblio_out else str(bibtex_entry)
 
-
+# TODO: harmonize order of arguments
 class PickleOutput(object):
     def __init__(self, collector, fn=DUECREDIT_FILE):
         self.collector = collector
@@ -184,3 +183,6 @@ class BibTeXOutput(object):  # TODO some parent class to do what...?
                 continue
             self.fd.write(bibtex.rawentry + "\n")
 
+
+def load_due(filename):
+    return PickleOutput.load(filename)
