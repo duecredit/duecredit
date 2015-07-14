@@ -4,3 +4,8 @@ __pycache__
 /dist
 /MANIFEST
 /duecredit/version.py
+/venv*
+/.tox
+.duecredit.p
+.coverage
+*.egg-info
