@@ -7,6 +7,7 @@ import pickle
 import requests
 import tempfile
 from six import PY2
+import warnings
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi
@@ -135,11 +136,17 @@ def format_bibtex(bibtex_entry, style='harvard1'):
             if PY2:
                 bibtex = bibtex.encode('ascii', 'ignore')
             f.write(bibtex)
+        # We need to avoid cpBibTex spitting out warnings
+        old_filters = warnings.filters[:]  # store a copy of filters
+        warnings.simplefilter('ignore', UserWarning)
         try:
             bib_source = cpBibTeX(fname)
         except Exception as e:
             lgr.error("Failed to process BibTeX file %s" % fname)
             return "ERRORED: %s" % str(e)
+        finally:
+            # return warnings back
+            warnings.filters = old_filters
         bib_style = cp.CitationStylesStyle(style, validate=False)
         # TODO: specify which kind of formatter we want
         bibliography = cp.CitationStylesBibliography(bib_style, bib_source,
