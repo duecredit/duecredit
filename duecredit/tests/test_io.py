@@ -112,3 +112,7 @@ def test_text_output_dump_formatting():
     assert_true('(v 0.0.16)' in value,
                 msg='value was {0}'.format(value))
     assert_equal(len(value.split('\n')), 17, msg='value was {0}'.format(value))
+
+    # verify that we have returned to previous state of filters
+    import warnings
+    assert_true(('ignore', None, UserWarning, None, 0) not in warnings.filters)
