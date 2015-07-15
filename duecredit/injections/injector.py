@@ -60,7 +60,8 @@ class DueCreditInjector(object):
     def __init__(self):
         self._entries = {}  # dict:  modulename: {object: [(cite args, cite kwargs)]}
 
-    def add(self, modulename, obj, *args, **kwargs):
+    def add(self, modulename, obj, min_version=None, max_version=None,
+            *args, **kwargs):
         """Add a citation for a given module or object within it
 
         Parameters
@@ -69,6 +70,9 @@ class DueCreditInjector(object):
           Name of the module (possibly a sub-module)
         obj : string or None
           Name of the object (function, method within a class) or None (if for entire module)
+        min_version, max_version : string or tuple, optional
+          Min (inclusive) / Max (exclusive) version of the module where this
+          citation is applicable
         *args, **kwargs
           Arguments to be passed into cite. Note that "level" will be automatically set
           if not provided
@@ -78,7 +82,9 @@ class DueCreditInjector(object):
         if obj not in self._entries[modulename]:
             self._entries[modulename][obj] = []
         obj_entries = self._entries[modulename][obj]
-        obj_entries.append((args, kwargs))
+        obj_entries.append({'args': args, 'kwargs': kwargs,
+                            'min_version': min_version,
+                            'max_version': max_version})
 
     def process(self, name, mod):
         """Process import of the module, possibly decorating some methods with duecredit entries
