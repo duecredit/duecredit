@@ -25,7 +25,7 @@ lgr = logging.getLogger('duecredit.collector')
 class Citation(object):
     """Encapsulates citations and information on their use"""
 
-    def __init__(self, entry, use=None, level=None, version=None, tags=["ref"]):
+    def __init__(self, entry, use=None, path=None, version=None, tags=None):
         """Cite a reference
 
         Parameters
@@ -34,11 +34,12 @@ class Citation(object):
           The entry to use, either identified by its id or a new one (to be added)
         use: str, optional
           Description of what this functionality provides
-        level: str, optional
-          Either for the entire module ("module NAME") or a specific function/method
-          ("func module.[class.]name")
+        path: str, optional
+          Path to the object which this citation associated with.  Format is
+          "module[.submodules][:[class.]method]", i.e. ":" is used to separate module
+          path from the path within the module.
         version: str or tuple, version
-          Version of the beast
+          Version of the beast (e.g. of the module) where applicable
         tags: list of str, optional
           Add tags for the reference for this method.  Some tags have associated
           semantics in duecredit, e.g.
@@ -51,17 +52,18 @@ class Citation(object):
         """
         self._entry = entry
         self._use = use
-        self._level = level
+        # We might want extract all the relevant functionality into a separate class
+        self._path = path
         self.count = 0
-        self.tags = tags
+        self.tags = tags or []
         self.version = version
 
     def __repr__(self):
         args = [repr(self._entry)]
         if self._use:
             args.append("use={0}".format(repr(self._use)))
-        if self._level:
-            args.append("level={0}".format(repr(self._level)))
+        if self._path:
+            args.append("path={0}".format(repr(self._path)))
 
         if args:
             args = ", ".join(args)
@@ -70,8 +72,8 @@ class Citation(object):
         return self.__class__.__name__ + '({0})'.format(args)
 
     @property
-    def level(self):
-        return self._level
+    def path(self):
+        return self._path
 
     @property
     def entry(self):
@@ -80,6 +82,34 @@ class Citation(object):
     @property
     def use(self):
         return self._use
+
+    @property
+    def cites_module(self):
+        return self.path and ':' not in self.path
+
+    @property
+    def module(self):
+        if not self.path:
+            return None
+        return self.path.split(':', 1)[0]
+
+    def __contains__(self, entry):
+        """Checks if provided entry 'contained' in this one given its path
+
+        If current entry is associated with a module, contained will be and entry
+        of
+        - the same module
+        - submodule of the current module or function within
+
+        If current entry is associated with a specific function/class, it can contain
+        another entry if it really contains it as an attribute
+        """
+        if self.cites_module:
+            return ((self.path == entry.path) or
+                    (entry.path.startswith(self.path + '.')) or
+                    (entry.path.startswith(self.path + ':')))
+        else:
+            return entry.path.startswith(self.path + '.')
 
 
 class DueCreditCollector(object):
@@ -149,7 +179,7 @@ class DueCreditCollector(object):
         citation.count += 1
         if not citation.version:
             citation.version = kwargs.get('version', None)
-        # TODO: update level and use here?
+        # TODO: update path and use here?
 
         return citation
 
@@ -167,19 +197,23 @@ class DueCreditCollector(object):
 
         """
         def func_wrapper(func):
-            if 'level' not in kwargs:
-                # deduce level from the actual function which was decorated
+            if 'path' not in kwargs:
+                # deduce path from the actual function which was decorated
                 # TODO: must include class name
                 module_ = func.__module__
-                kwargs['level'] = 'func %s.%s' % (module_, func.__name__)
+                # TODO: might make use of inspect.getmro
+                # see e.g.
+                # http://stackoverflow.com/questions/961048/get-class-that-defined-method
+                lgr.debug("Decorating func %s within module %s" % (func.__name__, module_))
+                kwargs['path'] = '%s:%s' % (module_, func.__name__)
                 # TODO: unittest for all the __version__ madness
-                module__ = sys.modules.get(module_)
-                if module__ and hasattr(module__, '__version__'):
+                module_loaded = sys.modules.get(module_)
+                if module_loaded and hasattr(module_loaded, '__version__'):
                     # find the citation for that module
                     for citation in self.citations:
-                        if citation.level == "module %s" % module_ \
+                        if citation.path.split(':') == module_ \
                                 and citation.version is None:
-                            citation.version = module__.__version__
+                            citation.version = module_loaded.__version__
 
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):

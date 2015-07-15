@@ -20,7 +20,10 @@ def _test_api(due):
     due.load('/home/siiioul/deep/good_intentions.bib')
 
     # Cite entire module
-    due.cite('XXX00', use="Answers to existential questions", level="module")
+    due.cite('XXX00', use="Answers to existential questions", path="module")
+    # Cita some method within some submodule
+    due.cite('XXX01', use="More answers to existential questions",
+             path="module.submodule:class1.whoknowswhat2.func1")
 
     # dcite  for decorator cite
     # cite specific functionality if/when it gets called up

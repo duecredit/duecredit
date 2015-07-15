@@ -68,29 +68,26 @@ class TextOutput(object):  # TODO some parent class to do what...?
         count_functions = 0
         self.fd.write('DueCredit Report:\n')
         for refnr, citation, _ in citations_rendered:
-            if citation.level and citation.level.startswith('module '):
+            if citation.cites_module:
                 count_modules += 1
-                try:
-                    this_module = citation.level.split(' ', 1)[1]
-                except:
-                    continue
+                this_module = citation.module
                 self.fd.write('- {0} (v {1}) [{2}]\n'.format(
                     this_module,
                     citation.version,
                     refnr))
                 # TODO: make this better
                 for refnr_, citation_, _ in citations_rendered:
-                    # TODO -- exatrct module name and compare
-                    if this_module in citation_.level \
-                            and citation.level != citation_.level:
+                    # TODO -- extract module name and compare
+                    if this_module in citation_.path \
+                            and citation.path != citation_.path:
                         count_functions += 1
                         try:
                             self.fd.write('  - {0} ({1}) [{2}]\n'.format(
-                                citation_.level.split(' ', 1)[1],
+                                citation_.module,
                                 citation_.use,
                                 refnr_))
-                        except:
-                            lgr.warning("CRAPPED HERE")
+                        except Exception as e:
+                            lgr.warning("CRAPPED HERE: %s" % (str(e)))
                             continue
         self.fd.write('\n{0} modules cited\n{1} functions cited\n'.format(
             count_modules, count_functions))

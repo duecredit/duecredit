@@ -80,14 +80,14 @@ def test_text_output_dump_formatting():
 
     # XXX: atm just to see if it spits out stuff
     @due.dcite(BibTeX(_sample_bibtex), use='solution to life',
-               level='module mymodule', version='0.0.16')
+               path='mymodule', version='0.0.16')
     def mymodule(arg1, kwarg2="blah"):
         """docstring"""
         assert_equal(arg1, "magical")
         assert_equal(kwarg2, 1)
 
         @due.dcite(BibTeX(_sample_bibtex2), use='solution to life',
-                   level='mymodule myfunction')
+                   path='mymodule:myfunction')
         def myfunction(arg42):
             pass
 
