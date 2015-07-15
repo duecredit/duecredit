@@ -1,9 +1,6 @@
 Contributing to DueCredit
 =========================
 
-**Note: This document is just to get started, more thorough
-contributing guidelines are coming.**
-
 [gh-duecredit]: http://github.com/duecredit/duecredit
 
 Files organization
@@ -31,10 +28,7 @@ we outline the workflow used by the developers:
 0. Have a clone of our main [project repository][gh-duecredit] as `origin`
    remote in your git:
 
-          git clone --recursive git://github.com/duecredit/duecredit
-
-    `--recursive` is used to initialize any needed git submodules.  If you have 
-    cloned without it already, just run `git submodule update --init --recursive`
+          git clone git://github.com/duecredit/duecredit
 
 1. Fork the [project repository][gh-duecredit]: click on the 'Fork'
    button near the top of the page.  This creates a copy of the code
@@ -174,17 +168,6 @@ then to later deactivate the virtualenv just simply enter
 deactivate
 ```
 
-Remember, some tests use testing repositories which are available as submodules
-under the `duecredit/tests/testrepos` submodule (two tier- to not pollute
-top repository submodules namespace).  To enable those tests do:
-
-```sh
-git submodule update --init --recursive
-```
-
-or do the original repository clone described above with the `--recursive` 
-option.
-
 
 ### Coverage
 
@@ -193,7 +176,7 @@ You can also check for common programming errors with the following tools:
 - Code with good unittest coverage (at least 80%), check with:
 
           pip install nose coverage
-          nosetests --with-coverage path/to/tests_for_package
+          nosetests --with-coverage duecredit
 
 
 ### Linting
