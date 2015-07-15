@@ -211,7 +211,7 @@ class DueCreditCollector(object):
                 if module_loaded and hasattr(module_loaded, '__version__'):
                     # find the citation for that module
                     for citation in self.citations:
-                        if citation.path.split(':') == module_ \
+                        if citation.module == module_ \
                                 and citation.version is None:
                             citation.version = module_loaded.__version__
 
