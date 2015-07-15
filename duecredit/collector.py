@@ -25,14 +25,14 @@ lgr = logging.getLogger('duecredit.collector')
 class Citation(object):
     """Encapsulates citations and information on their use"""
 
-    def __init__(self, entry, use=None, path=None, version=None, tags=None):
+    def __init__(self, entry, desc=None, path=None, version=None, tags=None):
         """Cite a reference
 
         Parameters
         ----------
         entry: str or DueCreditEntry
           The entry to use, either identified by its id or a new one (to be added)
-        use: str, optional
+        desc: str, optional
           Description of what this functionality provides
         path: str, optional
           Path to the object which this citation associated with.  Format is
@@ -51,7 +51,7 @@ class Citation(object):
             more
         """
         self._entry = entry
-        self._use = use
+        self._desc = desc
         # We might want extract all the relevant functionality into a separate class
         self._path = path
         self.count = 0
@@ -60,8 +60,8 @@ class Citation(object):
 
     def __repr__(self):
         args = [repr(self._entry)]
-        if self._use:
-            args.append("use={0}".format(repr(self._use)))
+        if self._desc:
+            args.append("desc={0}".format(repr(self._desc)))
         if self._path:
             args.append("path={0}".format(repr(self._path)))
 
@@ -80,8 +80,8 @@ class Citation(object):
         return self._entry
 
     @property
-    def use(self):
-        return self._use
+    def desc(self):
+        return self._desc
 
     @property
     def cites_module(self):
@@ -191,7 +191,7 @@ class DueCreditCollector(object):
         Examples
         --------
 
-        @due.dcite('XXX00', use="Provides an answer for meaningless existence")
+        @due.dcite('XXX00', desc="Provides an answer for meaningless existence")
         def purpose_of_life():
             return None
 
