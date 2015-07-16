@@ -8,6 +8,11 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 import sys
+if sys.version_info < (3,):
+    import __builtin__
+else:
+    import builtins as __builtin__
+_orig__import__ = __builtin__.__import__
 
 from duecredit.collector import DueCreditCollector, InactiveDueCreditCollector
 from duecredit.entries import BibTeX, Doi
@@ -17,6 +22,7 @@ from ..injections import DueCreditInjector, find_object
 
 from nose.tools import assert_equal
 from nose.tools import assert_false
+from nose.tools import assert_true
 
 class TestActiveInjector(object):
     def setup(self):
@@ -26,7 +32,9 @@ class TestActiveInjector(object):
         self.injector.activate()
 
     def teardown(self):
+        assert_false(__builtin__.__import__ is _orig__import__)
         self.injector.deactivate()
+        assert_true(__builtin__.__import__ is _orig__import__)
         self._cleanup_modules()
 
     def _cleanup_modules(self):
@@ -48,6 +56,12 @@ class TestActiveInjector(object):
 
         assert_equal(len(self.due._entries), 1)   # we should get an entry now
         assert_equal(len(self.due.citations), 0)  # but not yet a citation
+
+        import duecredit.tests.mod as mod
+        _, _, obj = find_object(mod, func)
+        assert_true(obj.__duecredited__)              # we wrapped
+        assert_false(obj.__duecredited__ is obj)      # and it is not pointing to the same func
+        assert_equal(obj.__doc__, "custom docstring") # we preserved docstring
 
         # TODO: test decoration features -- preserver __doc__ etc
         exec('ret = %s(None, "somevalue")' % (func_call or func))
@@ -72,7 +86,6 @@ class TestActiveInjector(object):
 def _test_find_object(mod, path, parent, obj_name, obj):
     assert_equal(find_object(mod, path), (parent, obj_name, obj))
 
-
 def test_find_object():
     import duecredit.tests.mod as mod
     yield _test_find_object, mod, 'testfunc1', mod, 'testfunc1', mod.testfunc1
@@ -80,3 +93,17 @@ def test_find_object():
     yield _test_find_object, mod, 'TestClass1.testmeth1', mod.TestClass1, 'testmeth1', mod.TestClass1.testmeth1
     yield _test_find_object, mod, 'TestClass12.Embed.testmeth1', \
           mod.TestClass12.Embed, 'testmeth1', mod.TestClass12.Embed.testmeth1
+
+def test_no_double_activation():
+    orig__import__ = __builtin__.__import__
+    try:
+        due = DueCreditCollector()
+        injector = DueCreditInjector(collector=due)
+        injector.activate()
+        assert_false(__builtin__.__import__ is orig__import__)
+        duecredited__import__ = __builtin__.__import__
+        injector.activate()
+        assert_true(__builtin__.__import__ is duecredited__import__) # we didn't decorate again
+    finally:
+        injector.deactivate()
+        __builtin__.__import__ = orig__import__

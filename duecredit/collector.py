@@ -233,6 +233,8 @@ class DueCreditCollector(object):
             def cite_wrapper(*fargs, **fkwargs):
                 citation = self.cite(*args, **kwargs)
                 return func(*fargs, **fkwargs)
+
+            cite_wrapper.__duecredited__ = func
             return cite_wrapper
         return func_wrapper
 

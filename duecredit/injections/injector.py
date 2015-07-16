@@ -141,7 +141,7 @@ class DueCreditInjector(object):
         global _orig__import
 
         _orig__import_ = __builtin__.__import__
-        if not hasattr(_orig__import_, '__duecredited'):
+        if not hasattr(_orig__import_, '__duecredited__'):
             # for paranoid Yarik so we have assurance we are not somehow
             # overriding our decorator
             _orig__import = _orig__import_
@@ -156,12 +156,12 @@ class DueCreditInjector(object):
                     lgr.log(1, "Module %s was imported", name)
                     self.process(name, mod)
                 return mod
-            __import.__duecredited = True
+            __import.__duecredited__ = True
 
             lgr.debug("Assigning our importer")
             __builtin__.__import__ = __import
         else:
-            lgr.warning("Seems that we are activating duecredit_importer is called twice."
+            lgr.warning("Seems that we are calling duecredit_importer twice."
                         " No harm is done but shouldn't happen")
 
     @staticmethod
