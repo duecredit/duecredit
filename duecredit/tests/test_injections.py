@@ -18,12 +18,16 @@ from nose.tools import assert_equal
 
 class TestActiveInjector(object):
     def setup(self):
+        self._cleanup_modules()
         self.due = DueCreditCollector()
         self.injector = DueCreditInjector(collector=self.due)
         self.injector.activate()
 
     def teardown(self):
         self.injector.deactivate()
+        self._cleanup_modules()
+
+    def _cleanup_modules(self):
         if 'duecredit.tests.mod' in sys.modules:
             sys.modules.pop('duecredit.tests.mod')
 
@@ -37,6 +41,7 @@ class TestActiveInjector(object):
         assert_equal(len(self.due.citations), 0)
 
         from duecredit.tests.mod import testfunc1
+
         assert_equal(len(self.due._entries), 1)   # we should get an entry now
         assert_equal(len(self.due.citations), 0)  # but not yet a citation
 

@@ -16,6 +16,7 @@ from functools import wraps
 
 from .. import lgr
 
+from six import iteritems
 if sys.version_info < (3,):
     import __builtin__
 else:
@@ -108,7 +109,7 @@ class DueCreditInjector(object):
         # go through the known entries and register them within the collector, and
         # decorate corresponding methods
         # There could be multiple records per module
-        for func_name, func_entry_records in self._entry_records[name].iteritems():
+        for func_name, func_entry_records in iteritems(self._entry_records[name]):
             # TODO: classes etc
             if func_name not in dir(mod):
                 lgr.warning("Could not find %s in module %s" % (func_name, mod))

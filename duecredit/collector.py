@@ -227,6 +227,8 @@ class DueCreditCollector(object):
                                 and citation.version is None:
                             citation.version = module_loaded.__version__
 
+            # TODO: check if we better use wrapt module which provides superior "correctness"
+            #       of decorating.  vcrpy uses wrapt, and that thing seems to wrap
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
                 citation = self.cite(*args, **kwargs)
