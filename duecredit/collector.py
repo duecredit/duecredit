@@ -98,7 +98,7 @@ class Citation(object):
     def __contains__(self, entry):
         """Checks if provided entry 'contained' in this one given its path
 
-        If current entry is associated with a module, contained will be and entry
+        If current entry is associated with a module, contained will be an entry
         of
         - the same module
         - submodule of the current module or function within
