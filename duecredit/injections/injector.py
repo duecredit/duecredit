@@ -54,7 +54,19 @@ class DueCreditImporter(object):
 sys.meta_path = [DueCreditImporter()]
 """
 
-__all__ = ['DueCreditInjector']
+__all__ = ['DueCreditInjector', 'find_object']
+
+def find_object(mod, path):
+    """Finds object among present within module "mod" given path specification within
+
+    Returns
+    """
+    obj = mod  # we will look first within module
+    for obj_name in path.split('.'):
+        parent = obj
+        obj = getattr(parent, obj_name)
+    return parent, obj_name, obj
+
 
 class DueCreditInjector(object):
 
@@ -98,7 +110,7 @@ class DueCreditInjector(object):
         """
         if not name in self._entry_records:
             return
-            lgr.info("Module %s known to injector was imported", name)
+        lgr.debug("Request to process known to injector module %s", name)
 
         try:
             mod = sys.modules[name]
@@ -109,20 +121,21 @@ class DueCreditInjector(object):
         # go through the known entries and register them within the collector, and
         # decorate corresponding methods
         # There could be multiple records per module
-        for func_name, func_entry_records in iteritems(self._entry_records[name]):
-            # TODO: classes etc
-            if func_name not in dir(mod):
-                lgr.warning("Could not find %s in module %s" % (func_name, mod))
+        for obj_path, obj_entry_records in iteritems(self._entry_records[name]):
+            try:
+                parent, obj_name, obj = find_object(mod, obj_path)
+            except KeyError as e:
+                lgr.warning("Could not find %s in module %s: %s" % (obj_path, mod, e))
                 continue
+
             # there could be multiple per func
-            for func_entry_record in func_entry_records:
-                entry = func_entry_record['entry']
+            for obj_entry_record in obj_entry_records:
+                entry = obj_entry_record['entry']
                 # Add entry explicitly
                 self._collector.add(entry)
-                # TODO: decorate the function which will also add entries
-                decorator = self._collector.dcite(entry.get_key(), **func_entry_record['kwargs'])
-                func = getattr(mod, func_name)
-                setattr(mod, func_name, decorator(func))
+                # TODO: decorate the object (function, method) which will also add entries
+                decorator = self._collector.dcite(entry.get_key(), **obj_entry_record['kwargs'])
+                setattr(parent, obj_name, decorator(obj))
 
     def activate(self):
         global _orig__import
