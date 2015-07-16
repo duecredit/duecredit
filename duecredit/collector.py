@@ -84,8 +84,17 @@ class DueCreditCollector(object):
 
     The mighty beast which will might become later a proxy on the way to
     talk to a real collector
+
+    Parameters
+    ----------
+    entries : list of DueCreditEntry, optional
+      List of reference items (BibTeX, Doi, etc) known to the collector
+    citations : list of Citation, optional
+      List of citations -- associations between references and particular
+      code, with a description for its use, tags etc
     """
 
+    # TODO?  rename "entries" to "references"?  or "references" is closer to "citations"
     def __init__(self, entries=None, citations=None):
         self._entries = entries or {}
         self.citations = citations or {}
@@ -127,7 +136,6 @@ class DueCreditCollector(object):
     #     #         implementations
     #     pass # raise NotImplementedError
 
-
     @never_fail
     @borrowdoc(Citation, "__init__")
     def cite(self, entry, **kwargs):
@@ -139,6 +147,8 @@ class DueCreditCollector(object):
             entry_ = self._entries[entry]
         entry_key = entry_.get_key()
 
+        # TODO: we must allow the same entry be present in multiple citations, so
+        # RF to do so
         if entry_key not in self.citations:
             self.citations[entry_key] = Citation(entry_, **kwargs)
 

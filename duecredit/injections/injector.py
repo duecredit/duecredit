@@ -57,11 +57,16 @@ __all__ = ['DueCreditInjector']
 
 class DueCreditInjector(object):
 
-    def __init__(self):
-        self._entries = {}  # dict:  modulename: {object: [(cite args, cite kwargs)]}
+    def __init__(self, collector=None):
+        if collector is None:
+            from duecredit import due
+            collector = due
+        self._collector = collector
+        self._entry_records = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
 
-    def add(self, modulename, obj, min_version=None, max_version=None,
-            *args, **kwargs):
+    def add(self, modulename, obj, entry,
+            min_version=None, max_version=None,
+            **kwargs):
         """Add a citation for a given module or object within it
 
         Parameters
@@ -73,27 +78,50 @@ class DueCreditInjector(object):
         min_version, max_version : string or tuple, optional
           Min (inclusive) / Max (exclusive) version of the module where this
           citation is applicable
-        *args, **kwargs
-          Arguments to be passed into cite. Note that "level" will be automatically set
+        **kwargs
+          Keyword arguments to be passed into cite. Note that "level" will be automatically set
           if not provided
         """
-        if modulename not in self._entries:
-            self._entries[modulename] = {}
-        if obj not in self._entries[modulename]:
-            self._entries[modulename][obj] = []
-        obj_entries = self._entries[modulename][obj]
-        obj_entries.append({'args': args, 'kwargs': kwargs,
+        if modulename not in self._entry_records:
+            self._entry_records[modulename] = {}
+        if obj not in self._entry_records[modulename]:
+            self._entry_records[modulename][obj] = []
+        obj_entries = self._entry_records[modulename][obj]
+        obj_entries.append({'entry': entry,
+                            'kwargs': kwargs,
                             'min_version': min_version,
                             'max_version': max_version})
 
     def process(self, name, mod):
         """Process import of the module, possibly decorating some methods with duecredit entries
         """
-        if name in self._entries:
+        if not name in self._entry_records:
+            return
             lgr.info("Module %s known to injector was imported", name)
-            # TODO: decorate those registered things
-            pass  # TODO -- decorate those objects
-        pass
+
+        try:
+            mod = sys.modules[name]
+        except KeyError:
+            lgr.warning("Failed to access module %s among sys.modules" % name)
+            return
+
+        # go through the known entries and register them within the collector, and
+        # decorate corresponding methods
+        # There could be multiple records per module
+        for func_name, func_entry_records in self._entry_records[name].iteritems():
+            # TODO: classes etc
+            if func_name not in dir(mod):
+                lgr.warning("Could not find %s in module %s" % (func_name, mod))
+                continue
+            # there could be multiple per func
+            for func_entry_record in func_entry_records:
+                entry = func_entry_record['entry']
+                # Add entry explicitly
+                self._collector.add(entry)
+                # TODO: decorate the function which will also add entries
+                decorator = self._collector.dcite(entry.get_key(), **func_entry_record['kwargs'])
+                func = getattr(mod, func_name)
+                setattr(mod, func_name, decorator(func))
 
     def activate(self):
         global _orig__import
