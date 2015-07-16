@@ -38,11 +38,11 @@ will work correctly even without duecredit installed.  For that
 
      to provide reference for the entire module just use e.g.
 
-         due.cite(Doi("1.2.3/x.y.z"), desc="Solves all your problems", path="magicpy")
+         due.cite(Doi("1.2.3/x.y.z"), description="Solves all your problems", path="magicpy")
 
      To provide a reference for a function or a method, use dcite decorator
 
-         @due.dcite(Doi("1.2.3/x.y.z"), desc="Resolves constipation issue")
+         @due.dcite(Doi("1.2.3/x.y.z"), description="Resolves constipation issue")
          def pushit():
              ...
 

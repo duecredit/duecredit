@@ -25,14 +25,14 @@ lgr = logging.getLogger('duecredit.collector')
 class Citation(object):
     """Encapsulates citations and information on their use"""
 
-    def __init__(self, entry, desc=None, path=None, version=None, tags=None):
+    def __init__(self, entry, description=None, path=None, version=None, tags=['implementation']):
         """Cite a reference
 
         Parameters
         ----------
         entry: str or DueCreditEntry
           The entry to use, either identified by its id or a new one (to be added)
-        desc: str, optional
+        description: str, optional
           Description of what this functionality provides
         path: str, optional
           Path to the object which this citation associated with.  Format is
@@ -43,15 +43,17 @@ class Citation(object):
         tags: list of str, optional
           Add tags for the reference for this method.  Some tags have associated
           semantics in duecredit, e.g.
-          - "impl" tag describes this method an implementation of the cited method
-          - "ref" tag describes this method as the original implementation of
+          - "implementation" [default] tag describes as an implementation of the cited
+             method
+          - "reference" tag describes as the original implementation of
             the cited method
-          - "use" tag points to publications demonstrating a good use of the method
+          - "use" tag points to publications demonstrating a worthwhile noting use
+             the method
           - "edu" references to tutorials, textbooks and other materials useful to learn
             more
         """
         self._entry = entry
-        self._desc = desc
+        self._description = description
         # We might want extract all the relevant functionality into a separate class
         self._path = path
         self.count = 0
@@ -60,8 +62,8 @@ class Citation(object):
 
     def __repr__(self):
         args = [repr(self._entry)]
-        if self._desc:
-            args.append("desc={0}".format(repr(self._desc)))
+        if self._description:
+            args.append("description={0}".format(repr(self._description)))
         if self._path:
             args.append("path={0}".format(repr(self._path)))
 
@@ -80,8 +82,8 @@ class Citation(object):
         return self._entry
 
     @property
-    def desc(self):
-        return self._desc
+    def description(self):
+        return self._description
 
     @property
     def cites_module(self):
@@ -191,7 +193,7 @@ class DueCreditCollector(object):
         Examples
         --------
 
-        @due.dcite('XXX00', desc="Provides an answer for meaningless existence")
+        @due.dcite('XXX00', description="Provides an answer for meaningless existence")
         def purpose_of_life():
             return None
 

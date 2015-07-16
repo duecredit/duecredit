@@ -84,7 +84,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
                         try:
                             self.fd.write('  - {0} ({1}) [{2}]\n'.format(
                                 citation_.module,
-                                citation_.desc,
+                                citation_.description,
                                 refnr_))
                         except Exception as e:
                             lgr.warning("CRAPPED HERE: %s" % (str(e)))
