@@ -5,6 +5,7 @@ from ..io import PickleOutput
 
 from mock import patch
 from nose.tools import assert_equal, assert_is_instance, assert_raises, assert_true
+from nose.tools import assert_false
 import os
 import tempfile
 
@@ -41,6 +42,38 @@ _sample_bibtex2 = """
 }
 """
 _sample_doi = "a.b.c/1.2.3"
+
+def test_citation_paths():
+    entry = BibTeX(_sample_bibtex)
+
+    cit1 = Citation(entry, path="somemodule")
+    assert_true(cit1.cites_module)
+    assert_equal(cit1.module, "somemodule")
+
+    cit2 = Citation(entry, path="somemodule.submodule")
+    assert_true(cit2.cites_module)
+    assert_equal(cit2.module, "somemodule.submodule")
+
+    assert_true(cit1 in cit1)
+    assert_true(cit2 in cit1)
+    assert_false(cit1 in cit2)
+
+    cit3 = Citation(entry, path="somemodule.submodule:class2.func2")
+    assert_false(cit3.cites_module)
+    assert_equal(cit3.module, "somemodule.submodule")
+
+    assert_true(cit2 in cit1)
+    assert_true(cit3 in cit1)
+    assert_true(cit3 in cit2)
+    assert_false(cit2 in cit3)
+
+    cit4 = Citation(entry, path="somemodule2:class2.func2")
+    assert_false(cit4.cites_module)
+    assert_equal(cit4.module, "somemodule2")
+
+    assert_false(cit1 in cit4)
+    assert_false(cit4 in cit1)
+
 
 def test_entry():
     entry = BibTeX(_sample_bibtex)
@@ -91,8 +124,10 @@ def test_dcite_method():
             assert_equal(len(due._entries), 1)
             citation = due.citations["XXX0"]
             assert_equal(citation.count, 1)
-            assert_equal(citation.level, "func duecredit.tests."
-                                         "test_collector.method")
+            # TODO: this is probably incomplete path but unlikely we would know
+            # any better
+            assert_equal(citation.path, "duecredit.tests."
+                                         "test_collector:method")
 
         instance = SomeClass()
         yield _test_dcite_basic, due, instance.method
@@ -101,8 +136,8 @@ def test_dcite_method():
             assert_equal(len(due.citations), 1)
             assert_equal(len(due._entries), 1)
             assert_equal(citation.count, 2)
-            # TODO: we should actually get level/counts pairs so here
-            # it is already a different level
+            # TODO: we should actually get path/counts pairs so here
+            # it is already a different path
 
 
 def test_get_output_handler_method():
@@ -132,7 +167,7 @@ def test_collectors_uniform_API():
 
 def _test__docs__(method):
     assert("entry:" in method.__doc__)
-    assert("kind: (" in method.__doc__)
+    assert("tags: " in method.__doc__)
 
 def test__docs__():
     yield _test__docs__, DueCreditCollector.cite

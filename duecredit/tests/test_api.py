@@ -20,11 +20,14 @@ def _test_api(due):
     due.load('/home/siiioul/deep/good_intentions.bib')
 
     # Cite entire module
-    due.cite('XXX00', use="Answers to existential questions", level="module")
+    due.cite('XXX00', description="Answers to existential questions", path="module")
+    # Cita some method within some submodule
+    due.cite('XXX01', description="More answers to existential questions",
+             path="module.submodule:class1.whoknowswhat2.func1")
 
     # dcite  for decorator cite
     # cite specific functionality if/when it gets called up
-    @due.dcite('XXX00', use="Provides an answer for meaningless existence")
+    @due.dcite('XXX00', description="Provides an answer for meaningless existence")
     def purpose_of_life():
         return None
 
