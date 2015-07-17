@@ -160,6 +160,9 @@ class DueCreditInjector(object):
 
             lgr.debug("Assigning our importer")
             __builtin__.__import__ = __import
+
+            # TODO: retrospect sys.modules about possibly already loaded modules
+            # which we cover, so they need to be decorated at this point
         else:
             lgr.warning("Seems that we are calling duecredit_importer twice."
                         " No harm is done but shouldn't happen")
