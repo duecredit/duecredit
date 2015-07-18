@@ -88,7 +88,7 @@ try:
 except ImportError:
     def test(*args, **kwargs):
         raise RuntimeError('Need numpy >= 1.2 for duecredit.tests()')
-test.__test__ = False
+    test.__test__ = False
 
 # Minimize default imports
 __all__ = [ 'Doi', 'BibTeX', 'Donate', 'due' ]
