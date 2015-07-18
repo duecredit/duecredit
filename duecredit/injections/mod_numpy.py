@@ -6,7 +6,7 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-"""Automatic injection of bibliography entries for scipy module
+"""Automatic injection of bibliography entries for numpy module
 """
 
 from ..entries import Doi, BibTeX
@@ -18,11 +18,15 @@ max_version = None
 
 
 def inject(injector):
-    injector.add('scipy', None, BibTeX("""
-    @Misc{JOP+01,
-      author =    {Eric Jones and Travis Oliphant and Pearu Peterson and others},
-      title =     {{SciPy}: Open source scientific tools for {Python}},
-      year =      {2001--},
-      url = "http://www.scipy.org/",
-      note = {[Online; accessed 2015-07-13]}
-    }"""), description="Scientific tools library")
+    injector.add('numpy', None, BibTeX("""
+    @article{van2011numpy,
+        title={The NumPy array: a structure for efficient numerical computation},
+        author={Van Der Walt, Stefan and Colbert, S Chris and Varoquaux, Gael},
+        journal={Computing in Science \& Engineering},
+        volume={13},
+        number={2},
+        pages={22--30},
+        year={2011},
+        publisher={AIP Publishing}
+        }
+    """), description="Scientific tools library")
