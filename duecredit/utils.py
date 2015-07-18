@@ -68,7 +68,9 @@ def never_fail(f):
         try:
             return f(*args, **kwargs)
         except Exception as e:
-            lgr.warning("Failed to run %s: %s " % (f, e))
+            lgr.warning("DueCredit internal failure while running %s: %s. "
+                        "Please report to developers at https://github.com/duecredit/duecredit/issues"
+                        % (f, e))
 
     if os.environ.get('DUECREDIT_ALLOW_FAIL', False):
         return f

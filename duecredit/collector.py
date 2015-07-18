@@ -12,7 +12,7 @@ import os
 import sys
 from functools import wraps
 
-from . import DUECREDIT_FILE
+from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
@@ -119,8 +119,17 @@ class DueCreditCollector(object):
 
     The mighty beast which will might become later a proxy on the way to
     talk to a real collector
+
+    Parameters
+    ----------
+    entries : list of DueCreditEntry, optional
+      List of reference items (BibTeX, Doi, etc) known to the collector
+    citations : list of Citation, optional
+      List of citations -- associations between references and particular
+      code, with a description for its use, tags etc
     """
 
+    # TODO?  rename "entries" to "references"?  or "references" is closer to "citations"
     def __init__(self, entries=None, citations=None):
         self._entries = entries or {}
         self.citations = citations or {}
@@ -162,7 +171,6 @@ class DueCreditCollector(object):
     #     #         implementations
     #     pass # raise NotImplementedError
 
-
     @never_fail
     @borrowdoc(Citation, "__init__")
     def cite(self, entry, **kwargs):
@@ -174,6 +182,8 @@ class DueCreditCollector(object):
             entry_ = self._entries[entry]
         entry_key = entry_.get_key()
 
+        # TODO: we must allow the same entry be present in multiple citations, so
+        # RF to do so
         if entry_key not in self.citations:
             self.citations[entry_key] = Citation(entry_, **kwargs)
 
@@ -217,10 +227,14 @@ class DueCreditCollector(object):
                                 and citation.version is None:
                             citation.version = module_loaded.__version__
 
+            # TODO: check if we better use wrapt module which provides superior "correctness"
+            #       of decorating.  vcrpy uses wrapt, and that thing seems to wrap
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
                 citation = self.cite(*args, **kwargs)
                 return func(*fargs, **fkwargs)
+
+            cite_wrapper.__duecredited__ = func
             return cite_wrapper
         return func_wrapper
 

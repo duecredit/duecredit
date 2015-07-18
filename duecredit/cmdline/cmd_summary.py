@@ -12,7 +12,9 @@
 
 import sys
 import os
-from .. import DUECREDIT_FILE, lgr
+
+from ..log import lgr
+from ..config import DUECREDIT_FILE
 from ..collector import CollectorSummary
 from ..io import TextOutput, BibTeXOutput
 
