@@ -11,6 +11,8 @@
 
 __docformat__ = 'restructuredtext'
 
+from os.path import basename, join as pathjoin, dirname
+from glob import glob
 import sys
 from functools import wraps
 
@@ -22,44 +24,23 @@ if sys.version_info < (3,):
 else:
     import builtins as __builtin__
 
-"""
-Original version which is too fragile and just too intrusive
-since we are literally to replace the entire importer
-
-import imp
-
-class DueCreditImporter(object):
-    def __init__(self):
-        print("Initialized our importer")
-        pass
-
-    def find_module(self,  fullname, path=None):
-        print(" Storing path %s for %s" % (path, fullname))
-        self.path = path
-        return self # for now for every module
-
-    def load_module(self, name):
-        if name in sys.modules:
-            print("  Returning loaded already module for %s" % name)
-            return sys.modules[name]
-        path = self.path if '.' in name else None
-        print("   Finding module %s under %s" % (name.split('.')[-1], path))
-        module_info = imp.find_module(name.split('.')[-1], path)
-        module = imp.load_module(name, *module_info)
-        sys.modules[name] = module
-
-        print ("  Imported %s" % name)
-        return module
-
-sys.meta_path = [DueCreditImporter()]
-"""
 
 __all__ = ['DueCreditInjector', 'find_object']
+
+def get_modules_for_injection():
+    """Get local modules which provide "inject" method to provide delayed population of injector
+    """
+    return sorted([basename(x)[:-3]
+                   for x in glob(pathjoin(dirname(__file__), "mod_*.py"))
+                   ])
 
 def find_object(mod, path):
     """Finds object among present within module "mod" given path specification within
 
     Returns
+    -------
+
+    parent, obj_name, obj
     """
     obj = mod  # we will look first within module
     for obj_name in path.split('.'):
@@ -69,13 +50,28 @@ def find_object(mod, path):
 
 
 class DueCreditInjector(object):
+    """Takes care about "injecting" duecredit references into 3rd party modules upon their import
 
+    First entries to be "injected" need to be add'ed to the instance.
+    To not incure significant duecredit startup penalty, those entries are added
+    for a corresponding package only whenever corresponding top-level module gets
+    imported.
+    """
     def __init__(self, collector=None):
         if collector is None:
             from duecredit import due
             collector = due
         self._collector = collector
+        self._delayed_entries = {}
         self._entry_records = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
+
+    def _populate_delayed_entries(self):
+        self._delayed_entries = {}
+        for inj_mod_name in get_modules_for_injection():
+            assert(inj_mod_name.startswith('mod_'))
+            mod_name = inj_mod_name[4:]
+            lgr.debug("Adding delayed injection for %s", (mod_name,))
+            self._delayed_entries[mod_name] = inj_mod_name
 
     def add(self, modulename, obj, entry,
             min_version=None, max_version=None,
@@ -105,37 +101,57 @@ class DueCreditInjector(object):
                             'min_version': min_version,
                             'max_version': max_version})
 
-    def process(self, name, mod):
+    def _process_delayed_injection(self, mod_name):
+        lgr.debug("Processing delayed injection for %s", mod_name)
+        inj_mod_name = self._delayed_entries[mod_name]
+        try:
+            inj_mod = __import__("duecredit.injections." + inj_mod_name,
+                                 fromlist=["duecredit.injections"])
+        except Exception as e:
+            raise RuntimeError("Failed to import %s: %s" % (inj_mod_name, e))
+        # TODO: process min/max_versions etc
+        assert(hasattr(inj_mod, 'inject'))
+        inj_mod.inject(self)
+
+    def process(self, mod_name, mod):
         """Process import of the module, possibly decorating some methods with duecredit entries
         """
-        if not name in self._entry_records:
+
+        if mod_name in self._delayed_entries:
+            # should be hit only once, "theoretically" unless I guess reimport is used etc
+            self._process_delayed_injection(mod_name)
+
+        if mod_name not in self._entry_records:
             return
-        lgr.debug("Request to process known to injector module %s", name)
+        lgr.debug("Request to process known to injector module %s", mod_name)
 
         try:
-            mod = sys.modules[name]
+            mod = sys.modules[mod_name]
         except KeyError:
-            lgr.warning("Failed to access module %s among sys.modules" % name)
+            lgr.warning("Failed to access module %s among sys.modules" % mod_name)
             return
 
         # go through the known entries and register them within the collector, and
         # decorate corresponding methods
         # There could be multiple records per module
-        for obj_path, obj_entry_records in iteritems(self._entry_records[name]):
-            try:
-                parent, obj_name, obj = find_object(mod, obj_path)
-            except KeyError as e:
-                lgr.warning("Could not find %s in module %s: %s" % (obj_path, mod, e))
-                continue
+        for obj_path, obj_entry_records in iteritems(self._entry_records[mod_name]):
+            if obj_path:
+                # so we point to an object within the mod
+                try:
+                    parent, obj_name, obj = find_object(mod, obj_path)
+                except KeyError as e:
+                    lgr.warning("Could not find %s in module %s: %s" % (obj_path, mod, e))
+                    continue
 
             # there could be multiple per func
             for obj_entry_record in obj_entry_records:
                 entry = obj_entry_record['entry']
                 # Add entry explicitly
                 self._collector.add(entry)
-                # TODO: decorate the object (function, method) which will also add entries
-                decorator = self._collector.dcite(entry.get_key(), **obj_entry_record['kwargs'])
-                setattr(parent, obj_name, decorator(obj))
+                if obj_path:  # if not entire module -- decorate!
+                    # TODO: decorate the object (function, method) which will also add entries
+                    decorator = self._collector.dcite(entry.get_key(), **obj_entry_record['kwargs'])
+                    setattr(parent, obj_name, decorator(obj))
 
     def activate(self):
         global _orig__import
@@ -158,6 +174,8 @@ class DueCreditInjector(object):
                 return mod
             __import.__duecredited__ = True
 
+            self._populate_delayed_entries()
+
             lgr.debug("Assigning our importer")
             __builtin__.__import__ = __import
 
@@ -166,6 +184,7 @@ class DueCreditInjector(object):
         else:
             lgr.warning("Seems that we are calling duecredit_importer twice."
                         " No harm is done but shouldn't happen")
+
 
     @staticmethod
     def deactivate():

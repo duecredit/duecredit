@@ -18,8 +18,9 @@ from duecredit.collector import DueCreditCollector, InactiveDueCreditCollector
 from duecredit.entries import BibTeX, Doi
 
 from six import viewvalues
-from ..injections import DueCreditInjector, find_object
+from ..injections.injector import DueCreditInjector, find_object, get_modules_for_injection
 
+from nose import SkipTest
 from nose.tools import assert_equal
 from nose.tools import assert_false
 from nose.tools import assert_true
@@ -82,6 +83,18 @@ class TestActiveInjector(object):
         yield self._test_simple_injection, "TestClass12.Embed.testmeth1", \
               'from duecredit.tests.mod import TestClass12; c = TestClass12.Embed()', 'c.testmeth1'
 
+    def test_delayed_entries(self):
+        # verify that addition of delayed injections happened
+        modules_for_injection = get_modules_for_injection()
+        assert_equal(len(self.injector._delayed_entries), len(modules_for_injection))
+        assert_equal(self.injector._entry_records, {})    # but no entries were added
+        assert('scipy' in self.injector._delayed_entries)  # We must have it ATM
+
+        try:
+            # We do have injections for scipy
+            import scipy
+        except ImportError as e:
+            raise SkipTest("scipy was not found: %s" % (e,))
 
 def _test_find_object(mod, path, parent, obj_name, obj):
     assert_equal(find_object(mod, path), (parent, obj_name, obj))
@@ -107,3 +120,6 @@ def test_no_double_activation():
     finally:
         injector.deactivate()
         __builtin__.__import__ = orig__import__
+
+def test_get_modules_for_injection():
+    assert_equal(get_modules_for_injection(), ['mod_scipy'])

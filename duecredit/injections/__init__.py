@@ -11,17 +11,5 @@
 
 __docformat__ = 'restructuredtext'
 
-from .injector import *
-from ..entries import Doi, BibTeX
+from .injector import DueCreditInjector
 
-injector = DueCreditInjector()
-
-# TODO: if collection grows we might need to delay definitions of those, e.g. to defer to instantiation of them per each module etc
-injector.add('scipy', None, BibTeX("""
-@Misc{JOP+01,
-  author =    {Eric Jones and Travis Oliphant and Pearu Peterson and others},
-  title =     {{SciPy}: Open source scientific tools for {Python}},
-  year =      {2001--},
-  url = "http://www.scipy.org/",
-  note = {[Online; accessed 2015-07-13]}
-}"""), use="Scientific tools library")
