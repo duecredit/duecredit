@@ -122,4 +122,5 @@ def test_no_double_activation():
         __builtin__.__import__ = orig__import__
 
 def test_get_modules_for_injection():
-    assert_equal(get_modules_for_injection(), ['mod_scipy'])
+    assert_equal(get_modules_for_injection(), ['mod_numpy', 'mod_scipy',
+                                               'mod_sklearn'])
