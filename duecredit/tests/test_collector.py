@@ -163,6 +163,49 @@ def test_args_match_conditions():
     yield _test_args_match_conditions, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'},
                                      (2, 'scope'): {'life', 'DC_DEFAULT'}}
 
+def test_dcite_match_conditions():
+
+    due = DueCreditCollector()
+    due.add(BibTeX(_sample_bibtex))
+
+    @due.dcite("XXX0", conditions={(1, "kwarg2"): {"blah", "DC_DEFAULT"}})
+    @due.dcite(Doi(_sample_doi), conditions={(1, "kwarg2"): {"boo"}})
+    def method(arg1, kwarg2="blah"):
+        """docstring"""
+        assert_equal(arg1, "magical")
+        return "load %s" % kwarg2
+
+    assert_equal(due.citations, {})
+    assert_equal(len(due._entries), 1)
+
+    assert_equal(method("magical", "unknown"), "load unknown")
+    assert_equal(due.citations, {})
+    assert_equal(len(due._entries), 1)
+
+    assert_equal(method("magical"), "load blah")
+
+    assert_equal(len(due.citations), 1)
+    assert_equal(len(due._entries), 1)
+    citation = due.citations["XXX0"]
+    assert_equal(citation.count, 1)
+
+    # Cause the same citation
+    assert_equal(method("magical", "blah"), "load blah")
+    # Nothing should change
+    assert_equal(len(due.citations), 1)
+    assert_equal(len(due._entries), 1)
+    citation = due.citations["XXX0"]
+    assert_equal(citation.count, 2)  # Besides the count
+
+    # Now cause new citation given another value
+    assert_equal(method("magical", "boo"), "load boo")
+    assert_equal(len(due.citations), 2)
+    assert_equal(len(due._entries), 2)
+    assert_equal(due.citations["XXX0"].count, 2)  # Count should stay the same for XXX0
+    assert_equal(due.citations[_sample_doi].count, 1) # And we got one new counted
+
+
+
 def test_get_output_handler_method():
     with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'pickle'}):
         entry = BibTeX(_sample_bibtex)
