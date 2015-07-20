@@ -139,6 +139,29 @@ def test_dcite_method():
             # TODO: we should actually get path/counts pairs so here
             # it is already a different path
 
+def _test_args_match_choices(conds):
+    args_match_choices = DueCreditCollector._args_match_choices
+    assert_true(args_match_choices(conds))
+    assert_true(args_match_choices(conds, None))
+    assert_true(args_match_choices(conds, someirrelevant=True))
+    assert_true(args_match_choices(conds, method='purge'))
+    assert_true(args_match_choices(conds, method='fullpurge'))
+    assert_true(args_match_choices(conds, None, 'purge'))
+    assert_true(args_match_choices(conds, None, 'fullpurge'))
+    assert_true(args_match_choices(conds, None, 'fullpurge', someirrelevant="buga"))
+    assert_false(args_match_choices(conds, None, 'push'))
+    assert_false(args_match_choices(conds, method='push'))
+    if len(conds) < 2:
+        return
+    #  got compound case
+    assert_true(args_match_choices(conds, scope='life'))
+    assert_false(args_match_choices(conds, scope='someother'))
+    #assert_true(args_match_choices(conds, None, None, 'life'))  # ambigous/conflicting
+
+def test_args_match_choices():
+    yield _test_args_match_choices, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'}}
+    yield _test_args_match_choices, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'},
+                                     (2, 'scope'): {'life', 'DC_DEFAULT'}}
 
 def test_get_output_handler_method():
     with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'pickle'}):

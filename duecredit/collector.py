@@ -12,6 +12,8 @@ import os
 import sys
 from functools import wraps
 
+from six import iteritems
+
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
@@ -195,20 +197,62 @@ class DueCreditCollector(object):
 
         return citation
 
+    @staticmethod
+    def _args_match_choices(cite_conditions, *fargs, **fkwargs):
+        """Helper to identify when to trigger citation given parameters to the function call
+        """
+        hit_default = False
+        for (arg, kwarg), values in iteritems(cite_conditions):
+            if len(fargs) > arg:
+                return fargs[arg] in values
+            if kwarg in fkwargs:
+                return fkwargs[kwarg] in values
+            if 'DC_DEFAULT' in values:
+                hit_default = True
+        return hit_default
+
     @never_fail
     @borrowdoc(Citation, "__init__", replace="PLUGDOCSTRING")
     def dcite(self, *args, **kwargs):
         """Decorator for references.  PLUGDOCSTRING
 
+        Parameters
+        ----------
+        cite_conditions: dict, optional
+          If reference should be cited whenever parameters to the function call
+          satisfy given values.  Use "DC_DEFAULT" keyword as a value to depict default
+          value (e.g. if no explicit value was provided for that positional or keyword
+          argument).
+
+          Notes:
+            first matching argument (or e.g. absence of it, given presence of
+            "DC_DEFAULT") would result in match and order of items within cite_conditions is not
+            guaranteed unless you use some OrderedDict.  Overall matching multiple cases
+            is not fully tested and we would appreciate a feedback and use-cases
+
         Examples
         --------
 
-        @due.dcite('XXX00', description="Provides an answer for meaningless existence")
-        def purpose_of_life():
-            return None
+        >>> from duecredit import due
+        >>> @due.dcite('XXX00', description="Provides an answer for meaningless existence")
+        ... def purpose_of_life():
+        ...     return None
+
+        Conditional citation given argument to the function
+
+        >>> @due.dcite('XXX00', description="Relief through the movement",
+        ...            cite_conditions={(1, 'method'): {'purge', 'DC_DEFAULT'}})
+        ... @due.dcite('XXX01', description="Relief through the drug treatment",
+        ...            cite_conditions={(1, 'method'): {'drug'}})
+        ... def relief(x, method='purge'):
+        ...     if method == 'purge': return "crap"
+        ...     elif method == 'drug': return "swallow"
+        >>> relief("doesn't matter")
+        'crap'
 
         """
         def func_wrapper(func):
+            cite_conditions = kwargs.pop('cite_conditions', {})
             if 'path' not in kwargs:
                 # deduce path from the actual function which was decorated
                 # TODO: must include class name
@@ -231,7 +275,12 @@ class DueCreditCollector(object):
             #       of decorating.  vcrpy uses wrapt, and that thing seems to wrap
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
-                citation = self.cite(*args, **kwargs)
+                try:
+                    if not cite_conditions \
+                        or self._args_match_choices(cite_conditions, *fargs, **fkwargs):
+                        citation = self.cite(*args, **kwargs)
+                except Exception as e:
+                    lgr.warning("Failed to cite due to %s" % (e,))
                 return func(*fargs, **fkwargs)
 
             cite_wrapper.__duecredited__ = func
