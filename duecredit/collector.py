@@ -198,11 +198,11 @@ class DueCreditCollector(object):
         return citation
 
     @staticmethod
-    def _args_match_choices(cite_conditions, *fargs, **fkwargs):
+    def _args_match_conditions(conditions, *fargs, **fkwargs):
         """Helper to identify when to trigger citation given parameters to the function call
         """
         hit_default = False
-        for (arg, kwarg), values in iteritems(cite_conditions):
+        for (arg, kwarg), values in iteritems(conditions):
             if len(fargs) > arg:
                 return fargs[arg] in values
             if kwarg in fkwargs:
@@ -218,7 +218,7 @@ class DueCreditCollector(object):
 
         Parameters
         ----------
-        cite_conditions: dict, optional
+        conditions: dict, optional
           If reference should be cited whenever parameters to the function call
           satisfy given values.  Use "DC_DEFAULT" keyword as a value to depict default
           value (e.g. if no explicit value was provided for that positional or keyword
@@ -226,7 +226,7 @@ class DueCreditCollector(object):
 
           Notes:
             first matching argument (or e.g. absence of it, given presence of
-            "DC_DEFAULT") would result in match and order of items within cite_conditions is not
+            "DC_DEFAULT") would result in match and order of items within conditions is not
             guaranteed unless you use some OrderedDict.  Overall matching multiple cases
             is not fully tested and we would appreciate a feedback and use-cases
 
@@ -241,9 +241,9 @@ class DueCreditCollector(object):
         Conditional citation given argument to the function
 
         >>> @due.dcite('XXX00', description="Relief through the movement",
-        ...            cite_conditions={(1, 'method'): {'purge', 'DC_DEFAULT'}})
+        ...            conditions={(1, 'method'): {'purge', 'DC_DEFAULT'}})
         ... @due.dcite('XXX01', description="Relief through the drug treatment",
-        ...            cite_conditions={(1, 'method'): {'drug'}})
+        ...            conditions={(1, 'method'): {'drug'}})
         ... def relief(x, method='purge'):
         ...     if method == 'purge': return "crap"
         ...     elif method == 'drug': return "swallow"
@@ -252,7 +252,7 @@ class DueCreditCollector(object):
 
         """
         def func_wrapper(func):
-            cite_conditions = kwargs.pop('cite_conditions', {})
+            conditions = kwargs.pop('conditions', {})
             if 'path' not in kwargs:
                 # deduce path from the actual function which was decorated
                 # TODO: must include class name
@@ -276,8 +276,8 @@ class DueCreditCollector(object):
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
                 try:
-                    if not cite_conditions \
-                        or self._args_match_choices(cite_conditions, *fargs, **fkwargs):
+                    if not conditions \
+                        or self._args_match_conditions(conditions, *fargs, **fkwargs):
                         citation = self.cite(*args, **kwargs)
                 except Exception as e:
                     lgr.warning("Failed to cite due to %s" % (e,))
