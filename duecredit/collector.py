@@ -220,7 +220,10 @@ class DueCreditCollector(object):
         ----------
         conditions: dict, optional
           If reference should be cited whenever parameters to the function call
-          satisfy given values.  Use "DC_DEFAULT" keyword as a value to depict default
+          satisfy given values.  Each key in the dictionary is a 2 element tuple
+          with first element, integer, pointing to a position of the argument in the original
+          function call signature, while second provides the name, thus if used as a keyword
+          argument.  Use "DC_DEFAULT" keyword as a value to depict default
           value (e.g. if no explicit value was provided for that positional or keyword
           argument).
 
