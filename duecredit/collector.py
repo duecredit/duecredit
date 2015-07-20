@@ -202,9 +202,9 @@ class DueCreditCollector(object):
         """Helper to identify when to trigger citation given parameters to the function call
         """
         hit_default = False
-        for (arg, kwarg), values in iteritems(conditions):
-            if len(fargs) > arg:
-                return fargs[arg] in values
+        for (argpos, kwarg), values in iteritems(conditions):
+            if len(fargs) > argpos:
+                return fargs[argpos] in values
             if kwarg in fkwargs:
                 return fkwargs[kwarg] in values
             if 'DC_DEFAULT' in values:
