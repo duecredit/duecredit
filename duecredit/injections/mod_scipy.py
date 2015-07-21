@@ -26,3 +26,38 @@ def inject(injector):
       url = "http://www.scipy.org/",
       note = {[Online; accessed 2015-07-13]}
     }"""), description="Scientific tools library")
+
+    injector.add('scipy.cluster.hierarchy', 'ward', BibTeX("""
+    @article{ward1963hierarchical,
+        title={Hierarchical grouping to optimize an objective function},
+        author={Ward Jr, Joe H},
+        journal={Journal of the American statistical association},
+        volume={58},
+        number={301},
+        pages={236--244},
+        year={1963},
+        publisher={Taylor \& Francis}
+    }"""), description="Ward hierarchical clustering", min_version='v0.4.3')
+
+    injector.add('scipy.cluster.hierarchy', 'single', BibTeX("""
+    @article{gower1969minimum,
+        title={Minimum spanning trees and single linkage cluster analysis},
+        author={Gower, John C and Ross, GJS},
+        journal={Applied statistics},
+        pages={54--64},
+        year={1969},
+        publisher={JSTOR}
+    }"""), description="Single linkage hierarchical clustering")
+
+    injector.add('scipy.cluster.hierarchy', 'single', BibTeX("""
+    @article{sibson1973slink,
+        title={SLINK: an optimally efficient algorithm for the single-link
+        cluster method},
+        author={Sibson, Robin},
+        journal={The Computer Journal},
+        volume={16},
+        number={1},
+        pages={30--34},
+        year={1973},
+        publisher={Br Computer Soc}
+    }"""), description="Single linkage hierarchical clustering")
