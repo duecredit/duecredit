@@ -4,3 +4,4 @@ vcrpy
 contextlib2
 requests
 citeproc-py
+six
