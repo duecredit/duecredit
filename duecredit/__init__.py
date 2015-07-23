@@ -20,11 +20,12 @@ from .version import __version__, __release_date__
 from .log import lgr
 from .utils import never_fail
 
-def is_active():
-    env_enable = os.environ.get('DUECREDIT_ENABLE')
-    if env_enable and env_enable.lower() in ('1', 'yes'):
-        return True
-    return False
+def _get_duecredit_enable():
+    env_enable = os.environ.get('DUECREDIT_ENABLE', 'no')
+    if not env_enable.lower() in ('0', '1', 'yes', 'no', 'true', 'false'):
+        lgr.warning("Misunderstood value %s for DUECREDIT_ENABLE. "
+                    "Use 'yes' or 'no', or '0' or '1'")
+    return env_enable.lower() in ('1', 'yes', 'true')
 
 @never_fail
 def _get_active_due():
@@ -36,45 +37,43 @@ def _get_active_due():
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
     if os.path.exists(DUECREDIT_FILE):
-        due = load_due(DUECREDIT_FILE)
+        due_ = load_due(DUECREDIT_FILE)
     else:
-        due = DueCreditCollector()
+        due_ = DueCreditCollector()
 
     # Wrapper to create and dump summary... passing method doesn't work:
     #  probably removes instance too early
     def crap():
-        _due_summary = CollectorSummary(due)
+        _due_summary = CollectorSummary(due_)
         _due_summary.dump()
 
     atexit.register(crap)
 
     # Deal with injector
     from .injections import DueCreditInjector
-    injector = DueCreditInjector(collector=due)
+    injector = DueCreditInjector(collector=due_)
     injector.activate()
-    #injector.deactivate()
-    return due
+    return due_
 
 def _get_due(active=False):
     """Returns "due" Collector (real or a stub) and sets up dumping atexit for active one
     """
 
     # Rebind the collector's methods to the module here
-    if active or is_active():
-        due = _get_active_due()
+    if active or _get_duecredit_enable():
+        due_ = _get_active_due()
     else:
-        due = None
+        due_ = None
 
     # if not active or failed to activate
-    if due is None:
+    if due_ is None:
         # keeping duplicate but separate so later we could even place it into a separate
         # submodule to possibly minimize startup time impact even more
         #
         # provide stubs which would do nothing
         from .collector import InactiveDueCreditCollector
-        due = InactiveDueCreditCollector()
-    return due
-
+        due_ = InactiveDueCreditCollector()
+    return due_
 
 due = _get_due()
 
@@ -91,4 +90,4 @@ except ImportError:
     test.__test__ = False
 
 # Minimize default imports
-__all__ = [ 'Doi', 'BibTeX', 'Donate', 'due' ]
+__all__ = ['Doi', 'BibTeX', 'Donate', 'due']
