@@ -11,6 +11,8 @@
 
 __docformat__ = 'restructuredtext'
 
+from ..config import DUECREDIT_FILE
+import os
 from os.path import basename, join as pathjoin, dirname
 from glob import glob
 import sys
@@ -59,7 +61,12 @@ class DueCreditInjector(object):
     """
     def __init__(self, collector=None):
         if collector is None:
-            from duecredit import due
+            if os.path.exists(DUECREDIT_FILE):
+                from ..io import load_due
+                due = load_due(DUECREDIT_FILE)
+            else:
+                from ..collector import DueCreditCollector
+                due = DueCreditCollector()
             collector = due
         self._collector = collector
         self._delayed_entries = {}
