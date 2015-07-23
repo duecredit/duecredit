@@ -25,7 +25,9 @@ def inject(injector):
       year =      {2001--},
       url = "http://www.scipy.org/",
       note = {[Online; accessed 2015-07-13]}
-    }"""), description="Scientific tools library")
+    }"""),
+                 description="Scientific tools library",
+                 tags=['implementation'])
 
     # scipy.cluster.hierarchy general references
     # TODO: we should allow to pass a list of entries
@@ -39,8 +41,10 @@ def inject(injector):
         pages={241--254},
         year={1967},
         publisher={Springer}
-    }"""), min_version='v0.4.3',
-                 description="Global references for the module")
+    }"""),
+                 min_version='0.4.3',
+                 description="Hierarchical clustering",
+                 tags=['edu'])
 
     injector.add('scipy.cluster.hierarchy', None, BibTeX("""
     @article{sneath1962numerical,
@@ -52,8 +56,10 @@ def inject(injector):
         pages={855--860},
         year={1962},
         publisher={Nature Publishing Group}
-    }"""), description="Global references for the module",
-                 min_version='v0.4.3')
+    }"""),
+                 description="Hierarchical clustering",
+                 min_version='0.4.3',
+                 tags=['edu'])
 
     injector.add('scipy.cluster.hierarchy', None, BibTeX("""
     @article{batagelj1995comparing,
@@ -65,8 +71,10 @@ def inject(injector):
         pages={73--90},
         year={1995},
         publisher={Springer}
-    }"""), description="Global references for the module",
-                 min_version='v0.4.3')
+    }"""),
+                 description="Hierarchical clustering",
+                 min_version='0.4.3',
+                 tags=['edu'])
 
     injector.add('scipy.cluster.hierarchy', None, BibTeX("""
     @book{sokal1958statistical,
@@ -75,8 +83,10 @@ def inject(injector):
         publisher = {University of Kansas},
         year = {1958},
         series = {University of Kansas science bulletin}
-    }"""), description="Global references for the module",
-                 min_version='v0.4.3')
+    }"""),
+                 description="Hierarchical clustering",
+                 min_version='0.4.3',
+                 tags=['edu'])
 
     injector.add('scipy.cluster.hierarchy', None, BibTeX("""
     @article{edelbrock1979mixture,
@@ -89,8 +99,10 @@ def inject(injector):
         pages={367--384},
         year={1979},
         publisher={Taylor \& Francis}
-    }"""), description="Global references for the module",
-                 min_version='v0.4.3')
+    }"""),
+                 description="Hierarchical clustering",
+                 min_version='0.4.3',
+                 tags=['edu'])
 
     injector.add('scipy.cluster.hierarchy', None, BibTeX("""
     @book{jain1988algorithms,
@@ -98,8 +110,10 @@ def inject(injector):
         author={Jain, Anil K and Dubes, Richard C},
         year={1988},
         publisher={Prentice-Hall, Inc.}
-    }"""), description="Global references for the module",
-                 min_version='v0.4.3')
+    }"""),
+                 description="Hierarchical clustering",
+                 min_version='0.4.3',
+                 tags=['edu'])
 
     injector.add('scipy.cluster.hierarchy', None, BibTeX("""
     @article{fisher1936use,
@@ -111,8 +125,11 @@ def inject(injector):
         pages={179--188},
         year={1936},
         publisher={Wiley Online Library}
-    }"""), description="Global references for the module",
-                 min_version='v0.4.3')
+    }"""),
+                 description="Hierarchical clustering",
+                 min_version='0.4.3',
+                 tags=['edu'])
+
     # Here options for linkage
     injector.add('scipy.cluster.hierarchy', 'linkage', BibTeX("""
     @article{ward1963hierarchical,
@@ -124,9 +141,11 @@ def inject(injector):
         pages={236--244},
         year={1963},
         publisher={Taylor \& Francis}
-    }"""), conditions={(1, 'method'): {'ward'}},
+    }"""),
+                 conditions={(1, 'method'): {'ward'}},
                  description="Ward hierarchical clustering",
-                 min_version='v0.4.3')
+                 min_version='0.4.3',
+                 tags=['reference'])
 
     injector.add('scipy.cluster.hierarchy', 'linkage', BibTeX("""
     @article{gower1969minimum,
@@ -136,8 +155,11 @@ def inject(injector):
         pages={54--64},
         year={1969},
         publisher={JSTOR}
-    }"""), conditions={(1, 'method'): {'single', 'DC_DEFAULT'}},
-                 description="Single linkage hierarchical clustering")
+    }"""),
+                 conditions={(1, 'method'): {'single', 'DC_DEFAULT'}},
+                 description="Single linkage hierarchical clustering",
+                 min_version='0.4.3',
+                 tags=['reference'])
 
     injector.add('scipy.cluster.hierarchy', 'linkage', BibTeX("""
     @article{sibson1973slink,
@@ -150,5 +172,8 @@ def inject(injector):
         pages={30--34},
         year={1973},
         publisher={Br Computer Soc}
-    }"""), conditions={(1, 'method'): {'single', 'DC_DEFAULT'}},
-                 description="Single linkage hierarchical clustering")
+    }"""),
+                 conditions={(1, 'method'): {'single', 'DC_DEFAULT'}},
+                 description="Single linkage hierarchical clustering",
+                 min_version='0.4.3',
+                 tags=['implementation'])
