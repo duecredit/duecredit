@@ -11,8 +11,6 @@
 
 __docformat__ = 'restructuredtext'
 
-from ..config import DUECREDIT_FILE
-import os
 from os.path import basename, join as pathjoin, dirname
 from glob import glob
 import sys
