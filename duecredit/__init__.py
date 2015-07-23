@@ -50,7 +50,7 @@ def _get_active_due():
 
     # Deal with injector
     from .injections import DueCreditInjector
-    injector = DueCreditInjector()
+    injector = DueCreditInjector(collector=due)
     injector.activate()
     #injector.deactivate()
     return due
