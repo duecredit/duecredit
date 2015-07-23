@@ -40,7 +40,8 @@ def setup_parser(parser):
 def run(args):
     from ..io import PickleOutput
     if not os.path.exists(args.filename):
-        lgr.debug("File %s doesn't exist.  No summary available")
+        lgr.debug("File {0} doesn't exist.  No summary available".format(
+            args.filename))
         return 1
 
     due = PickleOutput.load(args.filename)
