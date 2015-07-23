@@ -61,12 +61,7 @@ class DueCreditInjector(object):
     """
     def __init__(self, collector=None):
         if collector is None:
-            if os.path.exists(DUECREDIT_FILE):
-                from ..io import load_due
-                due = load_due(DUECREDIT_FILE)
-            else:
-                from ..collector import DueCreditCollector
-                due = DueCreditCollector()
+            from duecredit import due
             collector = due
         self._collector = collector
         self._delayed_entries = {}
