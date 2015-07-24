@@ -241,12 +241,14 @@ class DueCreditInjector(object):
 
                 try:
                     self.__import_level += 1
+                    # TODO: safe-guard all our logic so
+                    # if anything goes wrong post-import -- we still return imported module
                     mod = self._orig_import(name, *args, **kwargs)
                     self._handle_fresh_imports(name, import_level_prefix, level)
                 finally:
                     self.__import_level -= 1
 
-                if self.__import_level == 0:
+                if self.__import_level == 0 and self.__queue_to_process:
                     self._process_queue()
 
                 lgr.log(1, "%sReturning %s", import_level_prefix, mod)
