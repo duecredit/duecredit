@@ -18,9 +18,6 @@ from glob import glob
 import sys
 from functools import wraps
 
-# We need to pre-import whatever could be imported within mod_ delayed injectors
-from .. import entries
-
 from .. import lgr
 
 from six import iteritems
