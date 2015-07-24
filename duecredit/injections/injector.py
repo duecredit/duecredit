@@ -11,10 +11,15 @@
 
 __docformat__ = 'restructuredtext'
 
+import pdb
+import os
 from os.path import basename, join as pathjoin, dirname
 from glob import glob
 import sys
 from functools import wraps
+
+# We need to pre-import whatever could be imported within mod_ delayed injectors
+from .. import entries
 
 from .. import lgr
 
@@ -26,6 +31,15 @@ else:
 
 
 __all__ = ['DueCreditInjector', 'find_object']
+
+# TODO: move elsewhere
+def _short_str(obj, l=30):
+    """Return a shortened str of an object -- for logging"""
+    s = str(obj)
+    if len(s) > l:
+        return s[:l-3] + "..."
+    else:
+        return s
 
 def get_modules_for_injection():
     """Get local modules which provide "inject" method to provide delayed population of injector
@@ -72,6 +86,7 @@ class DueCreditInjector(object):
         # would need to be processed whenever we are back at __import_level == 1
         self.__import_level = 0
         self.__queue_to_process = set()
+        self.__processing_queue = False
 
     def _populate_delayed_injections(self):
         self._delayed_injections = {}
@@ -99,6 +114,7 @@ class DueCreditInjector(object):
           Keyword arguments to be passed into cite. Note that "level" will be automatically set
           if not provided
         """
+        lgr.debug("Adding citation entry %s for %s:%s", _short_str(entry), modulename, obj)
         if modulename not in self._entry_records:
             self._entry_records[modulename] = {}
         if obj not in self._entry_records[modulename]:
@@ -118,18 +134,27 @@ class DueCreditInjector(object):
         inj_mod_name = self._delayed_injections[mod_name]
         assert(not hasattr(self._orig_import, '__duecredited__'))
         try:
-            inj_mod = self._orig_import("duecredit.injections." + inj_mod_name,
+            inj_mod_name_full = "duecredit.injections." + inj_mod_name
+            lgr.log(3, "Importing %s", inj_mod_name_full)
+            # Mark it is a processed already, to avoid its processing etc
+            # TODO: consider just making a flag to avoid any __import__ decorating during
+            # this operation
+            self._processed_modules.add(inj_mod_name_full)
+            inj_mod = self._orig_import(inj_mod_name_full,
                                         fromlist=["duecredit.injections"])
         except Exception as e:
+            if os.environ.get('DUECREDIT_ALLOW_FAIL', False):
+                raise
             raise RuntimeError("Failed to import %s: %r" % (inj_mod_name, e))
         # TODO: process min/max_versions etc
         assert(hasattr(inj_mod, 'inject'))
+        lgr.log(3, "Calling injector of %s", inj_mod_name_full)
         inj_mod.inject(self)
 
     def process(self, mod_name): #, mod):
         """Process import of the module, possibly decorating some methods with duecredit entries
         """
-
+        assert(self.__import_level == 0) # we should never process while nested within imports
         # We need to mark that module as processed EARLY, so we don't try to re-process it
         # while doing _process_delayed_injection
         self._processed_modules.add(mod_name)
@@ -141,7 +166,7 @@ class DueCreditInjector(object):
         if mod_name not in self._entry_records:
             return
 
-        lgr.debug("Request to process known to injector module %s", mod_name)
+        lgr.debug("Process %d injections for module %s", len(self._entry_records[mod_name]), mod_name)
 
         try:
             mod = sys.modules[mod_name]
@@ -153,6 +178,7 @@ class DueCreditInjector(object):
         # decorate corresponding methods
         # There could be multiple records per module
         for obj_path, obj_entry_records in iteritems(self._entry_records[mod_name]):
+            parent, obj_name = None, None
             if obj_path:
                 # so we point to an object within the mod
                 try:
@@ -162,6 +188,7 @@ class DueCreditInjector(object):
                     continue
 
             # there could be multiple per func
+            lgr.log(4, "Considering %d records for decoration of %s:%s", len(obj_entry_records), parent, obj_name)
             for obj_entry_record in obj_entry_records:
                 entry = obj_entry_record['entry']
                 # Add entry explicitly
@@ -169,7 +196,12 @@ class DueCreditInjector(object):
                 if obj_path:  # if not entire module -- decorate!
                     # TODO: decorate the object (function, method) which will also add entries
                     decorator = self._collector.dcite(entry.get_key(), **obj_entry_record['kwargs'])
+                    lgr.debug("Decorating %s:%s with %s", parent, obj_name, decorator)
                     setattr(parent, obj_name, decorator(obj))
+                else:
+                    lgr.log(3, "Not decorating %s:%s since obj_path is empty", parent, obj_name)
+
+        lgr.log(3, "Done processing injections for module %s", mod_name)
 
     def activate(self, retrospect=True):
         """
@@ -179,14 +211,20 @@ class DueCreditInjector(object):
           Either consider already loaded modules
         """
 
-        if not self._orig_import: #not hasattr(self._orig_import, '__duecredited__'):
+        if not self._orig_import:
             # for paranoid Yarik so we have assurance we are not somehow
             # overriding our decorator
+            if hasattr(__builtin__.__import__, '__duecredited__'):
+                raise RuntimeError("__import__ is already duecredited decorated")
+
             self._orig_import = __builtin__.__import__
 
-            # just a check for paranoid me
             @wraps(__builtin__.__import__)
             def __import(name, *args, **kwargs):
+                if self.__processing_queue:
+                    # return right away without any decoration in such a case
+                    return self._orig_import(name, *args, **kwargs)
+
                 # importing submodule might result in importing a new one and
                 # name here is not sufficient to determine which module would actually
                 # get imported unless level=0 (absolute import), but that one rarely used
@@ -207,13 +245,13 @@ class DueCreditInjector(object):
 
                     mod = self._orig_import(name, *args, **kwargs)
 
-                    new_imported_modules = set(sys.modules.keys()) - self._processed_modules
+                    new_imported_modules = set(sys.modules.keys()) - self._processed_modules - self.__queue_to_process
 
                     if new_imported_modules:
-                        #lgr.log(4, "%d new modules were detected upon import of %s (level=%s)", #. Prev imported now: %s",
-                        #        len(new_imported_modules), name, level)#, prev_imported_modules)
-                        lgr.log(2, "%s%d new modules were detected: %s, upon import of %s (level=%s)", #. Prev imported now: %s",
-                                import_level_prefix, len(new_imported_modules), new_imported_modules, name, level)#, prev_imported_modules)
+                        lgr.log(4, "%s%d new modules were detected upon import of %s (level=%s)",
+                                import_level_prefix, len(new_imported_modules), name, level)
+                        #lgr.log(2, "%s%d new modules were detected: %s, upon import of %s (level=%s)",
+                        #        import_level_prefix, len(new_imported_modules), new_imported_modules, name, level)
 
                     for imported_mod in new_imported_modules:
                         if imported_mod in self.__queue_to_process:
@@ -237,9 +275,19 @@ class DueCreditInjector(object):
                 if self.__import_level == 0:
                     # process the queue
                     lgr.debug("Processing queue of imported %d modules", len(self.__queue_to_process))
-                    while self.__queue_to_process:
-                        self.process(self.__queue_to_process.pop())
-                    assert(not len(self.__queue_to_process))
+                    # We need first to process top-level modules etc, so delayed injections get picked up,
+                    # let's sort by the level
+                    queue_with_levels = sorted([(mod.count('.'), mod) for mod in self.__queue_to_process])
+                    self.__processing_queue = True
+                    try:
+                        sorted_queue = [x[1] for x in queue_with_levels]
+                        while sorted_queue:
+                            mod_name = sorted_queue.pop(0)
+                            self.process(mod_name)
+                            self.__queue_to_process.remove(mod_name)
+                        assert(not len(self.__queue_to_process))
+                    finally:
+                        self.__processing_queue = False
 
                 lgr.log(1, "%sReturning %s", import_level_prefix, mod)
                 return mod
