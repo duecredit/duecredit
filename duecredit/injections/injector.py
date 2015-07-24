@@ -194,7 +194,6 @@ class DueCreditInjector(object):
                 # Add entry explicitly
                 self._collector.add(entry)
                 if obj_path:  # if not entire module -- decorate!
-                    # TODO: decorate the object (function, method) which will also add entries
                     decorator = self._collector.dcite(entry.get_key(), **obj_entry_record['kwargs'])
                     lgr.debug("Decorating %s:%s with %s", parent, obj_name, decorator)
                     setattr(parent, obj_name, decorator(obj))
