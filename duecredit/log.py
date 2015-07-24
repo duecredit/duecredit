@@ -51,7 +51,7 @@ class TraceBack(object):
 
     def __call__(self):
         ftb = traceback.extract_stack(limit=100)[:-2]
-        entries = [[mbasename(x[0]), str(x[1])] for x in ftb]
+        entries = [[mbasename(x[0]), str(x[1])] for x in ftb if mbasename(x[0]) != 'logging.__init__']
         entries = [ e for e in entries if e[0] != 'unittest' ]
 
         # lets make it more consize
@@ -102,6 +102,8 @@ class ColorFormatter(logging.Formatter):
             use_color = is_interactive()
         self.use_color = use_color and platform.system() != 'Windows'  # don't use color on windows
         msg = self.formatter_msg(self._get_format(log_name), self.use_color)
+        self._tb = TraceBack(collide=os.environ.get('DUECREDIT_LOGTRACEBACK', '') == 'collide') \
+            if os.environ.get('DUECREDIT_LOGTRACEBACK', False) else None
         logging.Formatter.__init__(self, msg)
 
     def _get_format(self, log_name=False):
@@ -130,6 +132,8 @@ class ColorFormatter(logging.Formatter):
             levelname_color = self.COLOR_SEQ % fore_color + "%-7s" % levelname + self.RESET_SEQ
             record.levelname = levelname_color
         record.msg = record.msg.replace("\n", "\n| ")
+        if self._tb:
+            record.msg = self._tb() + "  " + record.msg
 
         return logging.Formatter.format(self, record)
 
