@@ -28,6 +28,13 @@ def _get_duecredit_enable():
     return env_enable.lower() in ('1', 'yes', 'true')
 
 @never_fail
+def _get_inactive_due():
+    # keeping duplicate but separate so later we could even place it into a separate
+    # submodule to possibly minimize startup time impact even more
+    from .collector import InactiveDueCreditCollector
+    return InactiveDueCreditCollector()
+
+@never_fail
 def _get_active_due():
     from .config import CACHE_DIR, DUECREDIT_FILE
     from duecredit.collector import CollectorSummary, DueCreditCollector
@@ -36,8 +43,18 @@ def _get_active_due():
     # where to cache bibtex entries
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
+
+    # TODO:  this needs to move to atexit handling, that we load previous
+    # one and them merge with new ones.  Informative bits could be -- how
+    # many new citations we got
     if os.path.exists(DUECREDIT_FILE):
-        due_ = load_due(DUECREDIT_FILE)
+        try:
+            due_ = load_due(DUECREDIT_FILE)
+        except Exception as e:
+            lgr.warning("Failed to load previously collected %s. "
+                        "DueCredit will not be active for this session."
+                        % DUECREDIT_FILE)
+            return _get_inactive_due()
     else:
         due_ = DueCreditCollector()
 
@@ -60,19 +77,13 @@ def _get_due(active=False):
     """
 
     # Rebind the collector's methods to the module here
+    due_ = None
     if active or _get_duecredit_enable():
         due_ = _get_active_due()
-    else:
-        due_ = None
 
     # if not active or failed to activate
     if due_ is None:
-        # keeping duplicate but separate so later we could even place it into a separate
-        # submodule to possibly minimize startup time impact even more
-        #
-        # provide stubs which would do nothing
-        from .collector import InactiveDueCreditCollector
-        due_ = InactiveDueCreditCollector()
+        due_ = _get_inactive_due()
     return due_
 
 due = _get_due()
