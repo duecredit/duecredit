@@ -134,8 +134,6 @@ class DueCreditInjector(object):
             inj_mod_name_full = "duecredit.injections." + inj_mod_name
             lgr.log(3, "Importing %s", inj_mod_name_full)
             # Mark it is a processed already, to avoid its processing etc
-            # TODO: consider just making a flag to avoid any __import__ decorating during
-            # this operation
             self._processed_modules.add(inj_mod_name_full)
             inj_mod = self._orig_import(inj_mod_name_full,
                                         fromlist=["duecredit.injections"])
@@ -148,7 +146,7 @@ class DueCreditInjector(object):
         lgr.log(3, "Calling injector of %s", inj_mod_name_full)
         inj_mod.inject(self)
 
-    def process(self, mod_name): #, mod):
+    def process(self, mod_name):
         """Process import of the module, possibly decorating some methods with duecredit entries
         """
         assert(self.__import_level == 0) # we should never process while nested within imports
@@ -288,7 +286,7 @@ class DueCreditInjector(object):
                     and package not in self._processed_modules \
                     and package not in self.__queue_to_process:
                 # if its parent package wasn't yet imported before
-                lgr.log(3, "%sParent of %s, %s wasn't yet processed, doing now",
+                lgr.log(3, "%sParent of %s, %s wasn't yet processed, adding to the queue",
                         import_level_prefix, imported_mod, package)
                 self.__queue_to_process.add(package)
             self.__queue_to_process.add(imported_mod)
@@ -312,7 +310,6 @@ class DueCreditInjector(object):
         finally:
             self.__processing_queue = False
 
-    #@staticmethod
     def deactivate(self):
         if not self._orig_import:
             lgr.warning("_orig_import is not yet known, so we haven't decorated default importer yet."
