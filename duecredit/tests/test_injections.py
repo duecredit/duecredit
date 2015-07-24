@@ -30,7 +30,7 @@ class TestActiveInjector(object):
         self._cleanup_modules()
         self.due = DueCreditCollector()
         self.injector = DueCreditInjector(collector=self.due)
-        self.injector.activate()
+        self.injector.activate(retrospect=False) # numpy might be already loaded... TODO
 
     def teardown(self):
         assert_false(__builtin__.__import__ is _orig__import__)
@@ -86,9 +86,9 @@ class TestActiveInjector(object):
     def test_delayed_entries(self):
         # verify that addition of delayed injections happened
         modules_for_injection = get_modules_for_injection()
-        assert_equal(len(self.injector._delayed_entries), len(modules_for_injection))
+        assert_equal(len(self.injector._delayed_injections), len(modules_for_injection))
         assert_equal(self.injector._entry_records, {})    # but no entries were added
-        assert('scipy' in self.injector._delayed_entries)  # We must have it ATM
+        assert('scipy' in self.injector._delayed_injections)  # We must have it ATM
 
         try:
             # We do have injections for scipy
