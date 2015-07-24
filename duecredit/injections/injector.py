@@ -276,7 +276,7 @@ class DueCreditInjector(object):
                     lgr.debug("Processing queue of imported %d modules", len(self.__queue_to_process))
                     # We need first to process top-level modules etc, so delayed injections get picked up,
                     # let's sort by the level
-                    queue_with_levels = sorted([(mod.count('.'), mod) for mod in self.__queue_to_process])
+                    queue_with_levels = sorted([(m.count('.'), m) for m in self.__queue_to_process])
                     self.__processing_queue = True
                     try:
                         sorted_queue = [x[1] for x in queue_with_levels]
