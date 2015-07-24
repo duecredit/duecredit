@@ -25,6 +25,12 @@ from nose.tools import assert_equal
 from nose.tools import assert_false
 from nose.tools import assert_true
 
+try:
+    import mvpa2
+    _have_mvpa2 = True
+except ImportError:
+    _have_mvpa2 = False
+
 class TestActiveInjector(object):
     def setup(self):
         self._cleanup_modules()
@@ -95,6 +101,13 @@ class TestActiveInjector(object):
             import scipy
         except ImportError as e:
             raise SkipTest("scipy was not found: %s" % (e,))
+
+    def test_import_mvpa2_suite(self):
+        if not _have_mvpa2:
+            raise SkipTest("no mvpa2 found")
+        # just a smoke test for now
+        import mvpa2.suite as mv
+
 
 def _test_find_object(mod, path, parent, obj_name, obj):
     assert_equal(find_object(mod, path), (parent, obj_name, obj))
