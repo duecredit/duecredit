@@ -145,6 +145,7 @@ class DueCreditCollector(object):
         else:
             key = entry.get_key()
             self._entries[key] = entry
+            lgr.log(1, "Collector added entry %s", key)
 
     @never_fail
     def load(self, src):
