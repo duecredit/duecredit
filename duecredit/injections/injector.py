@@ -223,7 +223,8 @@ class DueCreditInjector(object):
                 if self.__processing_queue:
                     # return right away without any decoration in such a case
                     return self._orig_import(name, *args, **kwargs)
-
+                import_level_prefix = self._import_level_prefix
+                lgr.log(1, "%sProcessing request to import %s", import_level_prefix, name)
                 # importing submodule might result in importing a new one and
                 # name here is not sufficient to determine which module would actually
                 # get imported unless level=0 (absolute import), but that one rarely used
@@ -238,55 +239,15 @@ class DueCreditInjector(object):
                     # so let's assume that they were all processed already
                     self._processed_modules = set(sys.modules)
 
-                import_level_prefix = self._import_level_prefix
                 try:
                     self.__import_level += 1
-
                     mod = self._orig_import(name, *args, **kwargs)
-
-                    new_imported_modules = set(sys.modules.keys()) - self._processed_modules - self.__queue_to_process
-
-                    if new_imported_modules:
-                        lgr.log(4, "%s%d new modules were detected upon import of %s (level=%s)",
-                                import_level_prefix, len(new_imported_modules), name, level)
-                        #lgr.log(2, "%s%d new modules were detected: %s, upon import of %s (level=%s)",
-                        #        import_level_prefix, len(new_imported_modules), new_imported_modules, name, level)
-
-                    for imported_mod in new_imported_modules:
-                        if imported_mod in self.__queue_to_process:
-                            # we saw it already
-                            continue
-                        # lgr.log(1, "Name %r was imported as %r (path: %s). fromlist: %s, level: %s",
-                        #        name, mod.__name__, getattr(mod, '__path__', None), fromlist, level)
-                        # package
-                        package = imported_mod.split('.', 1)[0]
-                        if package != imported_mod \
-                                and package not in self._processed_modules \
-                                and package not in self.__queue_to_process:
-                            # if its parent package wasn't yet imported before
-                            lgr.log(3, "%sParent of %s, %s wasn't yet processed, doing now",
-                                    import_level_prefix, imported_mod, package)
-                            self.__queue_to_process.add(package)
-                        self.__queue_to_process.add(imported_mod)
+                    self._handle_fresh_imports(name, import_level_prefix, level)
                 finally:
                     self.__import_level -= 1
 
                 if self.__import_level == 0:
-                    # process the queue
-                    lgr.debug("Processing queue of imported %d modules", len(self.__queue_to_process))
-                    # We need first to process top-level modules etc, so delayed injections get picked up,
-                    # let's sort by the level
-                    queue_with_levels = sorted([(m.count('.'), m) for m in self.__queue_to_process])
-                    self.__processing_queue = True
-                    try:
-                        sorted_queue = [x[1] for x in queue_with_levels]
-                        while sorted_queue:
-                            mod_name = sorted_queue.pop(0)
-                            self.process(mod_name)
-                            self.__queue_to_process.remove(mod_name)
-                        assert(not len(self.__queue_to_process))
-                    finally:
-                        self.__processing_queue = False
+                    self._process_queue()
 
                 lgr.log(1, "%sReturning %s", import_level_prefix, mod)
                 return mod
@@ -307,6 +268,50 @@ class DueCreditInjector(object):
             lgr.warning("Seems that we are calling duecredit_importer twice."
                         " No harm is done but shouldn't happen")
 
+    def _handle_fresh_imports(self, name, import_level_prefix, level):
+        """Check which modules were imported since last point we checked and add them to the queue
+        """
+        new_imported_modules = set(sys.modules.keys()) - self._processed_modules - self.__queue_to_process
+        if new_imported_modules:
+            lgr.log(4, "%s%d new modules were detected upon import of %s (level=%s)",
+                    import_level_prefix, len(new_imported_modules), name, level)
+            # lgr.log(2, "%s%d new modules were detected: %s, upon import of %s (level=%s)",
+            #        import_level_prefix, len(new_imported_modules), new_imported_modules, name, level)
+        for imported_mod in new_imported_modules:
+            if imported_mod in self.__queue_to_process:
+                # we saw it already
+                continue
+            # lgr.log(1, "Name %r was imported as %r (path: %s). fromlist: %s, level: %s",
+            #        name, mod.__name__, getattr(mod, '__path__', None), fromlist, level)
+            # package
+            package = imported_mod.split('.', 1)[0]
+            if package != imported_mod \
+                    and package not in self._processed_modules \
+                    and package not in self.__queue_to_process:
+                # if its parent package wasn't yet imported before
+                lgr.log(3, "%sParent of %s, %s wasn't yet processed, doing now",
+                        import_level_prefix, imported_mod, package)
+                self.__queue_to_process.add(package)
+            self.__queue_to_process.add(imported_mod)
+
+    def _process_queue(self):
+        """Process the queue of collected imported modules
+        """
+        # process the queue
+        lgr.debug("Processing queue of imported %d modules", len(self.__queue_to_process))
+        # We need first to process top-level modules etc, so delayed injections get picked up,
+        # let's sort by the level
+        queue_with_levels = sorted([(m.count('.'), m) for m in self.__queue_to_process])
+        self.__processing_queue = True
+        try:
+            sorted_queue = [x[1] for x in queue_with_levels]
+            while sorted_queue:
+                mod_name = sorted_queue.pop(0)
+                self.process(mod_name)
+                self.__queue_to_process.remove(mod_name)
+            assert (not len(self.__queue_to_process))
+        finally:
+            self.__processing_queue = False
 
     #@staticmethod
     def deactivate(self):
