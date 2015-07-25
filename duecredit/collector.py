@@ -79,6 +79,11 @@ class Citation(object):
     def path(self):
         return self._path
 
+    @path.setter
+    def path(self, path):
+        # TODO: verify value, if we are not up for it -- just make _path public
+        self._path = path
+
     @property
     def entry(self):
         return self._entry
@@ -89,7 +94,7 @@ class Citation(object):
 
     @property
     def cites_module(self):
-        return self.path and ':' not in self.path
+        return not (self.path and ':' in self.path)
 
     @property
     def module(self):
@@ -177,6 +182,9 @@ class DueCreditCollector(object):
     @never_fail
     @borrowdoc(Citation, "__init__")
     def cite(self, entry, **kwargs):
+        # TODO: if cite is invoked but no path is provided -- we must figure it out
+        # I guess from traceback, otherwise how would we know later to associate it
+        # with modules???
         if isinstance(entry, DueCreditEntry):
             # new one -- add it
             self.add(entry)
@@ -195,6 +203,8 @@ class DueCreditCollector(object):
         if not citation.version:
             citation.version = kwargs.get('version', None)
         # TODO: update path and use here?
+        if not citation.path:
+            citation.path = kwargs.get('path', None)
 
         return citation
 
