@@ -108,7 +108,7 @@ class DueCreditInjector(object):
           Min (inclusive) / Max (exclusive) version of the module where this
           citation is applicable
         **kwargs
-          Keyword arguments to be passed into cite. Note that "level" will be automatically set
+          Keyword arguments to be passed into cite. Note that "path" will be automatically set
           if not provided
         """
         lgr.debug("Adding citation entry %s for %s:%s", _short_str(entry), modulename, obj)
@@ -117,6 +117,8 @@ class DueCreditInjector(object):
         if obj not in self._entry_records[modulename]:
             self._entry_records[modulename][obj] = []
         obj_entries = self._entry_records[modulename][obj]
+        if 'path' not in kwargs:
+            kwargs['path'] = modulename + ((":%s" % obj) if obj else "")
         obj_entries.append({'entry': entry,
                             'kwargs': kwargs,
                             'min_version': min_version,
@@ -193,7 +195,8 @@ class DueCreditInjector(object):
                     lgr.debug("Decorating %s:%s with %s", parent, obj_name, decorator)
                     setattr(parent, obj_name, decorator(obj))
                 else:
-                    lgr.log(3, "Not decorating %s:%s since obj_path is empty", parent, obj_name)
+                    lgr.log(3, "Citing directly %s:%s since obj_path is empty", parent, obj_name)
+                    self._collector.cite(entry.get_key(), **obj_entry_record['kwargs'])
 
         lgr.log(3, "Done processing injections for module %s", mod_name)
 
