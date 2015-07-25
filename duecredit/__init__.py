@@ -88,17 +88,19 @@ def _get_due(active=False):
 
 due = _get_due()
 
+# TODO: REDO without numpy so we don't pollute the modules space and interfer with injections/citations
+
 # be friendly on systems with ancient numpy -- no tests, but at least
 # importable
-try:
-    from numpy.testing import Tester as _Tester
-    test = _Tester().test
-    _bench = _Tester().bench
-    del _Tester
-except ImportError:
-    def test(*args, **kwargs):
-        raise RuntimeError('Need numpy >= 1.2 for duecredit.tests()')
-    test.__test__ = False
+# try:
+#     from numpy.testing import Tester as _Tester
+#     test = _Tester().test
+#     _bench = _Tester().bench
+#     del _Tester
+# except ImportError:
+#     def test(*args, **kwargs):
+#         raise RuntimeError('Need numpy >= 1.2 for duecredit.tests()')
+#    test.__test__ = False
 
 # Minimize default imports
 __all__ = ['Doi', 'BibTeX', 'Donate', 'due']
