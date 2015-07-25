@@ -69,7 +69,7 @@ def test_text_output():
     collector.cite(entry)
 
     strio = StringIO()
-    TextOutput(strio, collector).dump()
+    TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
     assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
     assert_true(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
@@ -96,7 +96,7 @@ def test_text_output_dump_formatting():
 
     # check we don't have anything output
     strio = StringIO()
-    TextOutput(strio, due).dump()
+    TextOutput(strio, due).dump(tags=['*'])
     value = strio.getvalue()
     assert_true('0 modules cited' in value, msg='value was {0}'.format(value))
     assert_true('0 functions cited' in value,
@@ -104,14 +104,13 @@ def test_text_output_dump_formatting():
 
     # now we call it -- check it prints stuff
     mymodule('magical', kwarg2=1)
-    TextOutput(strio, due).dump()
+    TextOutput(strio, due).dump(tags=['*'])
     value = strio.getvalue()
     assert_true('1 modules cited' in value, msg='value was {0}'.format(value))
-    assert_true('1 functions cited' in value,
-                msg='value was {0}'.format(value))
+    assert_true('1 functions cited' in value, msg='value was {0}'.format(value))
     assert_true('(v 0.0.16)' in value,
                 msg='value was {0}'.format(value))
-    assert_equal(len(value.split('\n')), 17, msg='value was {0}'.format(value))
+    assert_equal(len(value.split('\n')), 18, msg='value was {0}'.format(value))
 
     # verify that we have returned to previous state of filters
     import warnings

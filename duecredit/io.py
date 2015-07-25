@@ -6,7 +6,7 @@ from os.path import dirname, exists
 import pickle
 import requests
 import tempfile
-from six import PY2
+from six import PY2, itervalues, iteritems
 import warnings
 
 from .config import CACHE_DIR, DUECREDIT_FILE
@@ -58,42 +58,97 @@ class TextOutput(object):  # TODO some parent class to do what...?
         else:
             self.style = 'harvard1'
 
-    def dump(self):
-        citations_rendered = [(i+1, citation,
-            "[%d] " % (i+1) + get_text_rendering(citation, style=self.style))
-            for i, citation in enumerate(self.collector.citations.values())]
+    def dump(self, tags=None):
 
-        count_modules = 0
-        count_functions = 0
+        # TODO: all that configuration/options should be done outside
+        if not tags:
+            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference,implementation').split(',')
+        tags = set(tags)
+
+        citations = self.collector.citations
+        if tags != {'*'}:
+            # Filter out citations
+            citations = dict((k, c)
+                             for k, c in iteritems(citations)
+                             if tags.intersection(c.tags))
+
+
+        # Separate logic (model) from presentation (view).  Let's first create a "model"
+        # Collect all citations under their corresponding packages
+
+        # TODO: such logic/setup would not work if we want to allow citations for modules
+        # within packages, so we really need a 3 level reporting:  package / module / obj
+        cited_packages = {}
+        for citation in itervalues(citations):
+            package = citation.package
+            objname = citation.objname
+
+            if package not in cited_packages:
+                # list of two lists -- one citations for the package itself,
+                # another one will be also dictionary for citations for functions
+                cited_packages[package] = [[], {}]
+
+            if citation.cites_module is True:
+                cited_packages[package][0].append(citation)
+            else:
+                if objname not in cited_packages[package][1]:
+                    # initiate a list of citations for that object
+                    cited_packages[package][1][objname] = []
+                cited_packages[package][1][objname].append(citation)
+
+        # Now prune references to packages which had no citations ot internal functionality
+        # TODO: theoretically should be done before pruning based on tags so we still
+        # catch those which were used anyhow
+        for package, (package_citations, obj_citations) in list(iteritems(cited_packages)): # operate on a copy
+            # check if any citation is tagged as 'cite-on-import', so we
+            # always cite if it was imported
+            if any('cite-on-import' in c.tags for c in package_citations):
+                continue
+            if not obj_citations:
+                cited_packages.pop(package)
+
+        # Now we can "render" different views of our "model"
+        # Here for now just text BUT that is where we can "split" the logic and provide
+        # different renderings given the model -- text, rest, md, tex+latex, whatever
         self.fd.write('DueCredit Report:\n')
-        for refnr, citation, _ in citations_rendered:
-            if citation.cites_module:
-                count_modules += 1
-                this_module = citation.module
-                self.fd.write('- {0} (v {1}) [{2}]\n'.format(
-                    this_module,
-                    citation.version,
-                    refnr))
-                # TODO: make this better
-                for refnr_, citation_, _ in citations_rendered:
-                    # TODO -- extract module name and compare
-                    if this_module in citation_.path \
-                            and citation.path != citation_.path:
-                        count_functions += 1
-                        try:
-                            self.fd.write('  - {0} ({1}) [{2}]\n'.format(
-                                citation_.module,
-                                citation_.description,
-                                refnr_))
-                        except Exception as e:
-                            lgr.warning("CRAPPED HERE: %s" % (str(e)))
-                            continue
+
+        refnr = 1
+        citations_ordered = []
+
+        for package, (package_citations, obj_citations) in iteritems(cited_packages):
+            # package level citation
+            versions = sorted(map(str, set(r.version for r in package_citations)))
+            refnr = len(citations_ordered) + 1
+            self.fd.write('- {0} (v {1}) [{2}]\n'.format(
+                package,
+                ', '.join(versions),
+                ', '.join(str(x) for x in range(refnr, refnr+len(package_citations)))))
+            citations_ordered.extend(package_citations)
+
+
+            # function level citations
+            for obj, citations in iteritems(obj_citations):
+                # TODO -- there could be multiple, and they might have different
+                # description so must be groupped accordingly. For now just simply listing them
+                # all separately
+                for citation in citations:
+                    refnr = len(citations_ordered) + 1
+                    self.fd.write('  - {0} ({1}) [{2}]\n'.format(
+                        citation.path,
+                        citation.description,
+                        refnr))
+                    citations_ordered.extend(citations)
+
+        # Let's collect some stats now (before it was misleading since multiple citations
+        # could have been for the same package or object)
         self.fd.write('\n{0} modules cited\n{1} functions cited\n'.format(
-            count_modules, count_functions))
-        if count_modules or count_functions:
-            self.fd.write('References\n' + '-' * 10 + '\n')
-        self.fd.write('\n'.join([c[-1] for c in citations_rendered]))
-        self.fd.write('\n')
+            len(cited_packages), sum(len(x[1]) for x in itervalues(cited_packages))))
+        if citations_ordered:
+            self.fd.write('\nReferences\n' + '-' * 10 + '\n')
+            for i, citation in enumerate(citations_ordered):
+                #import pdb; pdb.set_trace()
+                self.fd.write('\n'"[%d] " % (i+1) + get_text_rendering(citation, style=self.style))
+            self.fd.write('\n')
 
 def get_text_rendering(citation, style='harvard1'):
     # TODO: smth fked up smwhere

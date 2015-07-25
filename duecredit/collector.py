@@ -53,6 +53,10 @@ class Citation(object):
              the method
           - "edu" references to tutorials, textbooks and other materials useful to learn
             more
+          - "cite-on-import" for a module citation would make that module citeable even
+            without internal duecredited functionality inoked.  Should be used only for
+            core packages whenever it is reasonable to assume that its import constitute
+            its use (e.g. numpy)
         """
         self._entry = entry
         self._description = description
@@ -94,13 +98,32 @@ class Citation(object):
 
     @property
     def cites_module(self):
-        return not (self.path and ':' in self.path)
+        if not self.path:
+            return None
+        return not (':' in self.path)
 
     @property
     def module(self):
         if not self.path:
             return None
         return self.path.split(':', 1)[0]
+
+    @property
+    def package(self):
+        module = self.module
+        if not module:
+            return None
+        return module.split('.', 1)[0]
+
+    @property
+    def objname(self):
+        if not self.path:
+            return None
+        spl = self.path.split(':', 1)
+        if len(spl) > 1:
+            return spl[1]
+        else:
+            return None
 
     def __contains__(self, entry):
         """Checks if provided entry 'contained' in this one given its path
