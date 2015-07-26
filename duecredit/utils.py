@@ -160,6 +160,10 @@ from distutils.version import StrictVersion, LooseVersion
 class UnknownVersion:
     """For internal use
     """
+
+    def __str__(self):
+        return "UNKNOWN"
+
     def __cmp__(self, other):
         if other is self:
             return 0
