@@ -1,7 +1,7 @@
 [run]
 branch = True
 source = duecredit
-include = */duecredit/*
-omit =
-    */duecredit/external/*
+include = 
+  duecredit/*
+  examples/*
 
