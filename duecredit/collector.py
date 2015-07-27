@@ -12,13 +12,13 @@ import os
 import sys
 from functools import wraps
 
-from six import iteritems
+from six import iteritems, itervalues
 
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
-from .utils import never_fail, borrowdoc
+from .utils import never_fail, borrowdoc, external_versions
 
 import logging
 lgr = logging.getLogger('duecredit.collector')
@@ -223,11 +223,29 @@ class DueCreditCollector(object):
 
         citation = self.citations[entry_key]
         citation.count += 1
-        if not citation.version:
-            citation.version = kwargs.get('version', None)
         # TODO: update path and use here?
         if not citation.path:
             citation.path = kwargs.get('path', None)
+
+        # TODO: theoretically version shouldn't differ if we don't preload previous results
+        if not citation.version:
+            version = kwargs.get('version', None)
+
+            if not version and citation.path:
+                modname = citation.path.split('.', 1)[0]
+
+            if '.' in modname:
+                package = modname.split('.', 1)[0]
+            else:
+                package = modname
+
+            # package_loaded = sys.modules.get(package)
+            # if package_loaded:
+            #     # find the citation for that module
+            #     for citation in itervalues(self.citations):
+            #         if citation.package == package \
+            #                 and not citation.version:
+            citation.version = external_versions[package]
 
         return citation
 
@@ -290,23 +308,22 @@ class DueCreditCollector(object):
         """
         def func_wrapper(func):
             conditions = kwargs.pop('conditions', {})
-            if 'path' not in kwargs:
+            path = kwargs.get('path', None)
+            if not path:
                 # deduce path from the actual function which was decorated
-                # TODO: must include class name
-                module_ = func.__module__
-                # TODO: might make use of inspect.getmro
-                # see e.g.
-                # http://stackoverflow.com/questions/961048/get-class-that-defined-method
-                lgr.debug("Decorating func %s within module %s" % (func.__name__, module_))
-                kwargs['path'] = '%s:%s' % (module_, func.__name__)
-                # TODO: unittest for all the __version__ madness
-                module_loaded = sys.modules.get(module_)
-                if module_loaded and hasattr(module_loaded, '__version__'):
-                    # find the citation for that module
-                    for citation in self.citations:
-                        if citation.module == module_ \
-                                and citation.version is None:
-                            citation.version = module_loaded.__version__
+                # TODO: must include class name  but can't !!!???
+                modname = func.__module__
+                path = kwargs['path'] = '%s:%s' % (modname, func.__name__)
+            else:
+                # TODO: we indeed need to separate path logic outside
+                modname = path.split(':', 1)[0]
+
+
+            # TODO: might make use of inspect.getmro
+            # see e.g.
+            # http://stackoverflow.com/questions/961048/get-class-that-defined-method
+            lgr.debug("Decorating func %s within module %s" % (func.__name__, modname))
+            # TODO: unittest for all the __version__ madness
 
             # TODO: check if we better use wrapt module which provides superior "correctness"
             #       of decorating.  vcrpy uses wrapt, and that thing seems to wrap
@@ -314,7 +331,7 @@ class DueCreditCollector(object):
             def cite_wrapper(*fargs, **fkwargs):
                 try:
                     if not conditions \
-                        or self._args_match_conditions(conditions, *fargs, **fkwargs):
+                            or self._args_match_conditions(conditions, *fargs, **fkwargs):
                         citation = self.cite(*args, **kwargs)
                 except Exception as e:
                     lgr.warning("Failed to cite due to %s" % (e,))

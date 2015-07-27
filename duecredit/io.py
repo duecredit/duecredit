@@ -117,7 +117,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
 
         for package, (package_citations, obj_citations) in iteritems(cited_packages):
             # package level citation
-            versions = sorted(map(str, set(r.version for r in package_citations)))
+            versions = sorted(map(str, set(str(r.version) for r in package_citations)))
             refnr = len(citations_ordered) + 1
             self.fd.write('- {0} (v {1}) [{2}]\n'.format(
                 package,
@@ -146,7 +146,6 @@ class TextOutput(object):  # TODO some parent class to do what...?
         if citations_ordered:
             self.fd.write('\nReferences\n' + '-' * 10 + '\n')
             for i, citation in enumerate(citations_ordered):
-                #import pdb; pdb.set_trace()
                 self.fd.write('\n'"[%d] " % (i+1) + get_text_rendering(citation, style=self.style))
             self.fd.write('\n')
 

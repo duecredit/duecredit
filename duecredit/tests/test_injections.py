@@ -19,6 +19,7 @@ from duecredit.entries import BibTeX, Doi
 
 from six import viewvalues
 from ..injections.injector import DueCreditInjector, find_object, get_modules_for_injection
+from .. import __version__
 
 from nose import SkipTest
 from nose.tools import assert_equal
@@ -36,7 +37,7 @@ class TestActiveInjector(object):
         self._cleanup_modules()
         self.due = DueCreditCollector()
         self.injector = DueCreditInjector(collector=self.due)
-        self.injector.activate(retrospect=False) # numpy might be already loaded... TODO
+        self.injector.activate(retrospect=False)  # numpy might be already loaded...
 
     def teardown(self):
         assert_false(__builtin__.__import__ is _orig__import__)
@@ -80,6 +81,11 @@ class TestActiveInjector(object):
 
         # TODO: there must be a cleaner way to get first value
         citation = list(viewvalues(self.due.citations))[0]
+        # TODO: ATM we don't allow versioning of the submodules -- we should
+        # assert_equal(citation.version, '0.5')
+        # ATM it will be the duecredit's version
+        assert_equal(citation.version, __version__)
+
         assert(citation.tags == ['implementation', 'very custom'])
 
     def test_simple_injection(self):
