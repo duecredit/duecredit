@@ -143,3 +143,14 @@ def test_no_double_activation():
 def test_get_modules_for_injection():
     assert_equal(get_modules_for_injection(), ['mod_numpy', 'mod_scipy',
                                                'mod_sklearn'])
+
+def test_cover_our_injections():
+    # this one tests only import/syntax/api for the injections
+    due = DueCreditCollector()
+    inj = DueCreditInjector(collector=due)
+    from duecredit.injections import mod_numpy
+    mod_numpy.inject(inj)
+    from duecredit.injections import mod_scipy
+    mod_scipy.inject(inj)
+    from duecredit.injections import mod_sklearn
+    mod_sklearn.inject(inj)
