@@ -20,8 +20,14 @@ duecredit 101
 =============
 
 You can already start "registering" citations using duecredit in your
-software.  duecredit will remain an optional dependency, i.e. your software
-will work correctly even without duecredit installed.  For that
+Python modules and even registering citations (we call this approach "injections")
+for modules which do not (yet) use duecredit.  duecredit will remain an optional
+dependency, i.e. your software will work correctly even without duecredit installed.
+
+"Native" use of duecredit (recommended)
+---------------------------------------
+
+For using duecredit in your software
 
 1. copy `duecredit/stub.py` to your codebase, e.g.
 
@@ -46,51 +52,97 @@ will work correctly even without duecredit installed.  For that
          def pushit():
              ...
 
-3. By default `duecredit` does exactly nothing. Then whenever anyone
-   runs their analysis which uses your code and sets
-   `DUECREDIT_ENABLE=yes` environment variable, and invokes any of the
-   cited function/methods, at the end of the run all collected
-   bibliography will be presented to the screen and pickled into
-   `.duecredit.p` file in current directory.  Incremental runs of
-   various software would keep enriching that file.  Then you can use
-   `duecredit summary` command to show that information again (stored
-   in `.duecredit.p` file) or export it as a BibTeX file ready for
-   reuse.
+Add injections for other existing modules
+-----------------------------------------
+
+We hope that eventually this somewhat cruel approach will not be necessary.  But
+until other packages support duecredit "natively" we have provided a way to "inject"
+citations for modules and/or functions and methods via injections:  citations will be
+added to the corresponding functionality upon those modules import.
+
+All injections are collected under
+[duecredit/injections](https://github.com/duecredit/duecredit/tree/master/duecredit/injections).
+See any file there with `mod_` prefix for a complete example.  But
+overall it is just a regular Python module defining a function
+`inject(injector)` which will then add new entries to the injector,
+which will in turn add those entries to the duecredit whenever the
+corresponding module gets imported.
 
 
 User-view
 ---------
 
-Then upon running the code citing any papers, `.duecredit.p` file will get
-assembled to be queried later, e.g.:
+By default `duecredit` does exactly nothing -- all decorators do not
+decorate, all `cite` functions just return, so there should be no fear
+that it would break anything. Then whenever anyone runs their analysis
+which uses your code and sets `DUECREDIT_ENABLE=yes` environment
+variable, and invokes any of the cited function/methods, at the end of
+the run all collected bibliography will be presented to the screen and
+pickled into `.duecredit.p` file in current directory:
 
-    $> duecredit summary --format=bibtex
-    @article{Hanke_2009, title={PyMVPA: a Python Toolbox for Multivariate Pattern Analysis of fMRI Data}, volume={7}, ISSN={1559-0089}, url={http://dx.doi.org/10.1007/s12021-008-9041-y}, DOI={10.1007/s12021-008-9041-y}, number={1}, journal={Neuroinform}, publisher={Springer Science + Business Media}, author={Hanke, Michael and Halchenko, Yaroslav O. and Sederberg, Per B. and Hanson, Stephen José and Haxby, James V. and Pollmann, Stefan}, year={2009}, month={Jan}, pages={37–53}}
-    @INPROCEEDINGS{breiman2001,
-        author = {Leo Breiman},
-        title = {Random Forests},
-        booktitle = {Machine Learning},
-        year = {2001},
-        pages = {5--32}
-    }
-    ...
-
-    $> duecredit summary
+    $> DUECREDIT_ENABLE=True python examples/example_scipy.py
+    I: Simulating 4 blobs
+    I: Done clustering 4 blobs
     DueCredit Report:
-    - mvpa2 (v None) [1]
-      - mvpa2.clfs.transerror._call (Bayesian hypothesis testing) [4]
-    - sklearn (v None) [3]
-      - sklearn.ensemble.forest.fit (None) [2]
+    - scipy (v 0.14.1) [1]
+      - scipy.cluster.hierarchy:linkage (Single linkage hierarchical clustering) [2]
+    - numpy (v 1.8.2) [3]
 
     2 modules cited
-    2 functions cited
+    1 functions cited
+
     References
     ----------
-    [1] Hanke, M. et al., 2009. PyMVPA: a Python Toolbox for Multivariate Pattern Analysis of fMRI Data. Neuroinform, 7(1), pp.37–53.
-    [2] Breiman, L., 2001. Random Forests. In Machine Learning. pp. 5–32.
+
+    [1] Jones, E. et al., 2001. SciPy: Open source scientific tools for Python.
+    [2] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link
+        cluster method. The Computer Journal, 16(1), pp.30–34.
+    [3] Van Der Walt, S., Colbert, S.C. & Varoquaux, G., 2011. The
+        NumPy array: a structure for efficient numerical
+		computation. Computing in Science & Engineering, 13(2), pp.22–30.
+
+Incremental runs of various software would keep enriching that file.
+Then you can use `duecredit summary` command to show that information
+again (stored in `.duecredit.p` file) or export it as a BibTeX file
+ready for reuse, e.g.:
+
+    $> venv/bin/duecredit summary --format=bibtex
+    @book{sokal1958statistical,
+            author = {Sokal, R R and Michener, C D and {University of Kansas}},
+            title = {{A Statistical Method for Evaluating Systematic Relationships}},
+            publisher = {University of Kansas},
+            year = {1958},
+            series = {University of Kansas science bulletin}
+        }
+    @book{jain1988algorithms,
+            title={Algorithms for clustering data},
+            author={Jain, Anil K and Dubes, Richard C},
+            year={1988},
+            publisher={Prentice-Hall, Inc.}
+        }
     ...
 
 
+and if by default only references for "implementation" are listed, we
+can enable listing of references for other tags as well (e.g. "edu"
+depicting instructional materials -- textbooks etc on the topic):
+
+    $> DUECREDIT_REPORT_TAGS=* duecredit summary
+    DueCredit Report:
+    - scipy (v 0.14.1) [1, 2, 3, 4, 5, 6, 7, 8]
+      - scipy.cluster.hierarchy:linkage (Single linkage hierarchical clustering) [9]
+    - numpy (v 1.8.2) [10]
+
+    2 modules cited
+    1 functions cited
+
+    References
+    ----------
+
+    [1] Sokal, R.R., Michener, C.D. & University of Kansas, 1958. A Statistical Method for Evaluating Systematic Relationships, University of Kansas.
+    [2] Jain, A.K. & Dubes, R.C., 1988. Algorithms for clustering data, Prentice-Hall, Inc..
+    [3] Johnson, S.C., 1967. Hierarchical clustering schemes. Psychometrika, 32(3), pp.241–254.
+    ...
 
 
 Ultimate goals
@@ -135,3 +187,13 @@ developments.  Coupled with a solution for "prima ballerina" problem,
 more contributions will flow into the core/foundational projects
 making new methodological developments readily available to even wider
 audiences without proliferation of the low quality scientific software.
+
+
+Similar/related projects
+========================
+
+[sempervierns](https://github.com/njsmith/sempervirens) -- *an
+experimental prototype for gathering anonymous, opt-in usage data for
+open scientific software*.  Eventually in duecredit we aim either to
+provide similar functionality (since we are collecting such
+information as well) or just interface/report to sempervierns.
