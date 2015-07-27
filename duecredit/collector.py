@@ -234,18 +234,19 @@ class DueCreditCollector(object):
             if not version and citation.path:
                 modname = citation.path.split('.', 1)[0]
 
-            if '.' in modname:
-                package = modname.split('.', 1)[0]
-            else:
-                package = modname
+                if '.' in modname:
+                    package = modname.split('.', 1)[0]
+                else:
+                    package = modname
 
-            # package_loaded = sys.modules.get(package)
-            # if package_loaded:
-            #     # find the citation for that module
-            #     for citation in itervalues(self.citations):
-            #         if citation.package == package \
-            #                 and not citation.version:
-            citation.version = external_versions[package]
+                # package_loaded = sys.modules.get(package)
+                # if package_loaded:
+                #     # find the citation for that module
+                #     for citation in itervalues(self.citations):
+                #         if citation.package == package \
+                #                 and not citation.version:
+                version = external_versions[package]
+            citation.version = version
 
         return citation
 
