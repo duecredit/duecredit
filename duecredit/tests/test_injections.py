@@ -137,6 +137,7 @@ def test_no_double_activation():
         injector.activate()
         assert_false(__builtin__.__import__ is orig__import__)
         duecredited__import__ = __builtin__.__import__
+        # TODO: catch/analyze/swallow warning
         injector.activate()
         assert_true(__builtin__.__import__ is duecredited__import__) # we didn't decorate again
     finally:
@@ -157,6 +158,11 @@ def test_cover_our_injections():
     mod_scipy.inject(inj)
     from duecredit.injections import mod_sklearn
     mod_sklearn.inject(inj)
+
+def test_no_harm_from_deactivate():
+    # if we have not activated one -- shouldn't blow if we deactivate it
+    # TODO: catch warning being spitted out
+    DueCreditInjector().deactivate()
 
 def test_injector_del():
     orig__import__ = __builtin__.__import__
