@@ -59,6 +59,7 @@ def find_object(mod, path):
         obj = getattr(parent, obj_name)
     return parent, obj_name, obj
 
+_very_orig_import = __builtin__.__import__
 
 class DueCreditInjector(object):
     """Takes care about "injecting" duecredit references into 3rd party modules upon their import
@@ -68,6 +69,10 @@ class DueCreditInjector(object):
     for a corresponding package only whenever corresponding top-level module gets
     imported.
     """
+
+    # Made as a class variable to assure being singleton and available upon del
+    _orig_import = None
+
     def __init__(self, collector=None):
         if collector is None:
             from duecredit import due
@@ -75,7 +80,6 @@ class DueCreditInjector(object):
         self._collector = collector
         self._delayed_injections = {}
         self._entry_records = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
-        self._orig_import = None
         self._processed_modules = set()
         # We need to process modules only after we are done with all nested imports, otherwise we
         # might be trying to prcess them too early -- whenever they are not yet linked to their
@@ -212,9 +216,9 @@ class DueCreditInjector(object):
             # for paranoid Yarik so we have assurance we are not somehow
             # overriding our decorator
             if hasattr(__builtin__.__import__, '__duecredited__'):
-                raise RuntimeError("__import__ is already duecredited decorated")
+                raise RuntimeError("__import__ is already duecredited")
 
-            self._orig_import = __builtin__.__import__
+            DueCreditInjector._orig_import = __builtin__.__import__
 
             @wraps(__builtin__.__import__)
             def __import(name, *args, **kwargs):
@@ -322,10 +326,13 @@ class DueCreditInjector(object):
 
         lgr.debug("Assigning original importer")
         __builtin__.__import__ = self._orig_import
-        self._orig_import = None
+        DueCreditInjector._orig_import = None
 
     def __del__(self):
         if self._orig_import is not None:
             self.deactivate()
-            super(DueCreditInjector, self).__del__()
+        try:
+            super(self.__class__, self)._del__()
+        except Exception:
+            pass
 

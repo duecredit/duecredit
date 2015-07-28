@@ -7,8 +7,12 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
+import gc
 import sys
-if sys.version_info < (3,):
+
+from six import viewvalues, PY2
+
+if PY2:
     import __builtin__
 else:
     import builtins as __builtin__
@@ -17,7 +21,6 @@ _orig__import__ = __builtin__.__import__
 from duecredit.collector import DueCreditCollector, InactiveDueCreditCollector
 from duecredit.entries import BibTeX, Doi
 
-from six import viewvalues
 from ..injections.injector import DueCreditInjector, find_object, get_modules_for_injection
 from .. import __version__
 
@@ -154,3 +157,24 @@ def test_cover_our_injections():
     mod_scipy.inject(inj)
     from duecredit.injections import mod_sklearn
     mod_sklearn.inject(inj)
+
+def test_injector_del():
+    orig__import__ = __builtin__.__import__
+    try:
+        due = DueCreditCollector()
+        inj = DueCreditInjector(collector=due)
+        del inj   # delete inactive
+        assert_true(__builtin__.__import__ is orig__import__)
+        inj = DueCreditInjector(collector=due)
+        inj.activate(retrospect=False)
+        assert_false(__builtin__.__import__ is orig__import__)
+        assert_false(inj._orig_import is None)
+        del inj   # delete active but not used
+        inj = None
+        gc.collect()  # To cause __del__
+        if PY2:
+            # TODO: for some reason above mambo doesn't cause __del__ being invoked :-/ figure it out
+            assert_true(__builtin__.__import__ is orig__import__)
+        import abc   # and new imports work just fine
+    finally:
+        __builtin__.__import__ = orig__import__
