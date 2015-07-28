@@ -218,7 +218,8 @@ class DueCreditInjector(object):
 
             @wraps(__builtin__.__import__)
             def __import(name, *args, **kwargs):
-                if self.__processing_queue:
+                if self.__processing_queue or name in self._processed_modules or name in self.__queue_to_process:
+                    lgr.debug("Performing undecorated import of %s", name)
                     # return right away without any decoration in such a case
                     return self._orig_import(name, *args, **kwargs)
                 import_level_prefix = self._import_level_prefix
