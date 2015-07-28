@@ -192,7 +192,7 @@ audiences without proliferation of the low quality scientific software.
 Similar/related projects
 ========================
 
-[sempervierns](https://github.com/njsmith/sempervirens) -- *an
+[sempervirens](https://github.com/njsmith/sempervirens) -- *an
 experimental prototype for gathering anonymous, opt-in usage data for
 open scientific software*.  Eventually in duecredit we aim either to
 provide similar functionality (since we are collecting such
