@@ -112,17 +112,19 @@ class TextOutput(object):  # TODO some parent class to do what...?
         # different renderings given the model -- text, rest, md, tex+latex, whatever
         self.fd.write('DueCredit Report:\n')
 
-        refnr = 1
+        refnr = 0
         citations_ordered = []
 
         for package, (package_citations, obj_citations) in iteritems(cited_packages):
             # package level citation
             versions = sorted(map(str, set(str(r.version) for r in package_citations)))
-            refnr = len(citations_ordered) + 1
+            refnr += 1
             self.fd.write('- {0} (v {1}) [{2}]\n'.format(
                 package,
                 ', '.join(versions),
                 ', '.join(str(x) for x in range(refnr, refnr+len(package_citations)))))
+            # update refnr in case there are multiple citations for the package
+            refnr += len(package_citations) - 1
             citations_ordered.extend(package_citations)
 
 
@@ -132,12 +134,12 @@ class TextOutput(object):  # TODO some parent class to do what...?
                 # description so must be groupped accordingly. For now just simply listing them
                 # all separately
                 for citation in citations:
-                    refnr = len(citations_ordered) + 1
+                    refnr += 1
                     self.fd.write('  - {0} ({1}) [{2}]\n'.format(
                         citation.path,
                         citation.description,
                         refnr))
-                    citations_ordered.extend(citations)
+                citations_ordered.extend(citations)
 
         # Let's collect some stats now (before it was misleading since multiple citations
         # could have been for the same package or object)
