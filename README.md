@@ -196,4 +196,4 @@ Similar/related projects
 experimental prototype for gathering anonymous, opt-in usage data for
 open scientific software*.  Eventually in duecredit we aim either to
 provide similar functionality (since we are collecting such
-information as well) or just interface/report to sempervierns.
+information as well) or just interface/report to sempervirens.
