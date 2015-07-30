@@ -3,30 +3,28 @@ from ..entries import BibTeX, DueCreditEntry
 from ..io import TextOutput, PickleOutput, import_doi
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
     assert_true
-from six import PY2
+from six.moves import StringIO
+from six import text_type
 
 import sys
 import pickle
 import tempfile
 from .test_collector import _sample_bibtex, _sample_bibtex2
-import vcr
 
-if PY2:
-    from StringIO import StringIO
-else:
-    from io import StringIO
+try:
+    import vcr
 
-@vcr.use_cassette()
-def test_import_doi():
-    doi_good = '10.1038/nrd842'
-    if PY2:
-        target_type = unicode
-    else:
-        target_type = str
-    assert_is_instance(import_doi(doi_good), target_type)
+    @vcr.use_cassette()
+    def test_import_doi():
+        doi_good = '10.1038/nrd842'
+        assert_is_instance(import_doi(doi_good), text_type)
 
-    doi_bad = 'fasljfdldaksj'
-    assert_raises(ValueError, import_doi, doi_bad)
+        doi_bad = 'fasljfdldaksj'
+        assert_raises(ValueError, import_doi, doi_bad)
+
+except ImportError:
+    # no vcr, and that is in 2015!
+    pass
 
 
 def test_pickleoutput():
