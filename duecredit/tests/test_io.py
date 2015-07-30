@@ -5,6 +5,8 @@ from nose.tools import assert_equal, assert_is_instance, assert_raises, \
     assert_true
 from six import PY2
 
+import random
+import re
 import sys
 import pickle
 import tempfile
@@ -112,6 +114,82 @@ def test_text_output_dump_formatting():
                 msg='value was {0}'.format(value))
     assert_equal(len(value.split('\n')), 18, msg='value was {0}'.format(value))
 
+    # test we get the reference numbering right
+    samples_bibtex = [_generate_sample_bibtex() for x in range(5)]
+    # this sucks but at the moment it's the only way to have multiple
+    # references for a function
+
+    @due.dcite(BibTeX(samples_bibtex[0]), description='another solution',
+               path='myothermodule', version='0.0.666')
+    def myothermodule(arg1, kwarg2="blah"):
+        """docstring"""
+        assert_equal(arg1, "magical")
+        assert_equal(kwarg2, 1)
+
+        @due.dcite(BibTeX(samples_bibtex[1]), description='solution to life',
+                   path='myothermodule:myotherfunction')
+        @due.dcite(BibTeX(samples_bibtex[2]), description='solution to life',
+                   path='myothermodule:myotherfunction')
+        @due.dcite(BibTeX(samples_bibtex[3]), description='solution to life',
+                   path='myothermodule:myotherfunction')
+        @due.dcite(BibTeX(samples_bibtex[4]), description='solution to life',
+                   path='myothermodule:myotherfunction')
+        # XXX: atm cross-referencing doesn't work
+        # @due.dcite(BibTeX(_sample_bibtex2), description='solution to life',
+        #           path='myothermodule:myotherfunction')
+        def myotherfunction(arg42):
+            pass
+
+        myotherfunction('argh')
+        return "load"
+
+    myothermodule('magical', kwarg2=1)
+    strio = StringIO()
+    TextOutput(strio, due).dump(tags=['*'])
+    value = strio.getvalue()
+    lines = value.split('\n')
+
+    citation_numbers = []
+    reference_numbers = []
+    references = []
+    for line in lines:
+        match_citation = re.search('(\[[0-9]\])$', line)
+        match_reference = re.search('^(\[[0-9]\])', line)
+        if match_citation:
+            citation_numbers.append(match_citation.group())
+        elif match_reference:
+            reference_numbers.append(match_reference.group())
+            references.append(line.replace(match_reference.group(), ""))
+
+    assert_equal(citation_numbers, reference_numbers)
+    assert_equal(len(set(references)), len(citation_numbers))
     # verify that we have returned to previous state of filters
     import warnings
     assert_true(('ignore', None, UserWarning, None, 0) not in warnings.filters)
+
+def _generate_sample_bibtex():
+    """
+    Generate a random sample bibtex to test multiple references
+    """
+    letters = 'abcdefghilmnopqrstuvxz'
+    numbers = '0123456789'
+    letters_numbers = letters + letters.upper() + numbers
+    letters_numbers_spaces = letters_numbers + ' '
+
+    key = "".join(random.sample(letters_numbers, 7))
+    title = "".join(random.sample(letters_numbers_spaces, 20))
+    journal = "".join(random.sample(letters_numbers_spaces, 20))
+    publisher = "".join(random.sample(letters_numbers_spaces, 10))
+    author = "".join(random.sample(letters, 6)) + ', ' + \
+             "".join(random.sample(letters, 4))
+    year = "".join(random.sample(numbers, 4))
+
+    elements = [('title', title), ('journal', journal),
+                ('publisher', publisher), ('author', author),
+                ('year', year)]
+
+    sample_bibtex = "@ARTICLE{%s,\n" % key
+    for string, value in elements:
+        sample_bibtex += "%s={%s},\n" % (string, value)
+    sample_bibtex += "}"
+    return sample_bibtex
