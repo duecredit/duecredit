@@ -177,10 +177,9 @@ def test_injector_del():
         assert_false(inj._orig_import is None)
         del inj   # delete active but not used
         inj = None
+        __builtin__.__import__ = None # We need to do that since otherwise gc will not pick up inj
         gc.collect()  # To cause __del__
-        if PY2:
-            # TODO: for some reason above mambo doesn't cause __del__ being invoked :-/ figure it out
-            assert_true(__builtin__.__import__ is orig__import__)
+        assert_true(__builtin__.__import__ is orig__import__)
         import abc   # and new imports work just fine
     finally:
         __builtin__.__import__ = orig__import__
