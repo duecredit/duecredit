@@ -30,5 +30,5 @@ def inject(injector):
         publisher={AIP Publishing}
         }
     """),
-    tags=['reference', 'cite-on-import'],
+    tags=['reference', 'cite-on-use'],
     description="Scientific tools library")

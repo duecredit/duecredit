@@ -100,9 +100,9 @@ class TextOutput(object):  # TODO some parent class to do what...?
         # TODO: theoretically should be done before pruning based on tags so we still
         # catch those which were used anyhow
         for package, (package_citations, obj_citations) in list(iteritems(cited_packages)): # operate on a copy
-            # check if any citation is tagged as 'cite-on-import', so we
+            # check if any citation is tagged as 'cite-on-use', so we
             # always cite if it was imported
-            if any('cite-on-import' in c.tags for c in package_citations):
+            if any('cite-on-use' in c.tags for c in package_citations):
                 continue
             if not obj_citations:
                 cited_packages.pop(package)
