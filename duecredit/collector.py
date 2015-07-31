@@ -57,6 +57,8 @@ class Citation(object):
             without internal duecredited functionality invoked.  Should be used only for
             core packages whenever it is reasonable to assume that its import constitute
             its use (e.g. numpy)
+          - "donate" should be commonly used with Url entries to point to the websites
+            describing how to contribute some funds to the referenced project
         """
         self._entry = entry
         self._description = description

@@ -14,7 +14,7 @@ its functionality
 
 import os
 
-from .entries import Doi, BibTeX, Donate
+from .entries import Doi, BibTeX, Url
 from .version import __version__, __release_date__
 
 from .log import lgr
@@ -103,4 +103,4 @@ due = _get_due()
 #    test.__test__ = False
 
 # Minimize default imports
-__all__ = ['Doi', 'BibTeX', 'Donate', 'due']
+__all__ = ['Doi', 'BibTeX', 'Url', 'due']
