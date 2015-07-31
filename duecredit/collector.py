@@ -54,7 +54,7 @@ class Citation(object):
           - "edu" references to tutorials, textbooks and other materials useful to learn
             more
           - "cite-on-import" for a module citation would make that module citeable even
-            without internal duecredited functionality inoked.  Should be used only for
+            without internal duecredited functionality invoked.  Should be used only for
             core packages whenever it is reasonable to assume that its import constitute
             its use (e.g. numpy)
         """
