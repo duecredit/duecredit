@@ -43,7 +43,8 @@ class TestActiveInjector(object):
         self.injector.activate(retrospect=False)  # numpy might be already loaded...
 
     def teardown(self):
-        assert_false(__builtin__.__import__ is _orig__import__)
+        # gc might not pick up inj after some tests complete
+        # so we will always deactivate explicitly
         self.injector.deactivate()
         assert_true(__builtin__.__import__ is _orig__import__)
         self._cleanup_modules()
