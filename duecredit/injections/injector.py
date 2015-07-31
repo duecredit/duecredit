@@ -242,11 +242,18 @@ class DueCreditInjector(object):
                     # so let's assume that they were all processed already
                     self._processed_modules = set(sys.modules)
 
+                mod = None
                 try:
                     self.__import_level += 1
                     # TODO: safe-guard all our logic so
                     # if anything goes wrong post-import -- we still return imported module
-                    mod = self._orig_import(name, *args, **kwargs)
+                    if self._orig_import:
+                        mod = self._orig_import(name, *args, **kwargs)
+                    else:
+                        lgr.error("For some reason self._orig_import is None"
+                                  ". Importing using stock importer to mitigate")
+                        mod = _very_orig_import(name, *args, **kwargs)
+
                     self._handle_fresh_imports(name, import_level_prefix, level)
                 finally:
                     self.__import_level -= 1

@@ -43,7 +43,8 @@ class TestActiveInjector(object):
         self.injector.activate(retrospect=False)  # numpy might be already loaded...
 
     def teardown(self):
-        assert_false(__builtin__.__import__ is _orig__import__)
+        # gc might not pick up inj after some tests complete
+        # so we will always deactivate explicitly
         self.injector.deactivate()
         assert_true(__builtin__.__import__ is _orig__import__)
         self._cleanup_modules()
@@ -177,10 +178,9 @@ def test_injector_del():
         assert_false(inj._orig_import is None)
         del inj   # delete active but not used
         inj = None
+        __builtin__.__import__ = None # We need to do that since otherwise gc will not pick up inj
         gc.collect()  # To cause __del__
-        if PY2:
-            # TODO: for some reason above mambo doesn't cause __del__ being invoked :-/ figure it out
-            assert_true(__builtin__.__import__ is orig__import__)
+        assert_true(__builtin__.__import__ is orig__import__)
         import abc   # and new imports work just fine
     finally:
         __builtin__.__import__ = orig__import__
