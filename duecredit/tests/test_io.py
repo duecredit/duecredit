@@ -133,8 +133,8 @@ def test_text_output_dump_formatting():
         @due.dcite(BibTeX(samples_bibtex[4]), description='solution to life',
                    path='myothermodule:myotherfunction')
         # XXX: atm cross-referencing doesn't work
-        # @due.dcite(BibTeX(_sample_bibtex2), description='solution to life',
-        #           path='myothermodule:myotherfunction')
+        @due.dcite(BibTeX(_sample_bibtex2), description='solution to life',
+                   path='myothermodule:myotherfunction')
         def myotherfunction(arg42):
             pass
 
@@ -159,8 +159,9 @@ def test_text_output_dump_formatting():
             reference_numbers.append(match_reference.group())
             references.append(line.replace(match_reference.group(), ""))
 
-    assert_equal(citation_numbers, reference_numbers)
-    assert_equal(len(set(references)), len(citation_numbers))
+    assert_equal(set(citation_numbers), set(reference_numbers))
+    assert_equal(len(set(references)), len(set(citation_numbers)))
+    assert_equal(len(citation_numbers), 8)
     # verify that we have returned to previous state of filters
     import warnings
     assert_true(('ignore', None, UserWarning, None, 0) not in warnings.filters)
