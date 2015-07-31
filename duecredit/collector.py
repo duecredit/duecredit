@@ -37,7 +37,7 @@ class Citation(object):
           The entry to use, either identified by its id or a new one (to be added)
         description: str, optional
           Description of what this functionality provides
-        path: str, optional
+        path: str
           Path to the object which this citation associated with.  Format is
           "module[.submodules][:[class.]method]", i.e. ":" is used to separate module
           path from the path within the module.
@@ -62,6 +62,8 @@ class Citation(object):
           - "donate" should be commonly used with Url entries to point to the websites
             describing how to contribute some funds to the referenced project
         """
+        if path is None:
+            raise ValueError('Must specify path')
         self._entry = entry
         self._description = description
         # We might want extract all the relevant functionality into a separate class
@@ -219,25 +221,21 @@ class DueCreditCollector(object):
         # TODO: if cite is invoked but no path is provided -- we must figure it out
         # I guess from traceback, otherwise how would we know later to associate it
         # with modules???
+        path = kwargs.get('path', None)
+        if path is None:
+            raise ValueError('path must be provided')
+
         if isinstance(entry, DueCreditEntry):
             # new one -- add it
             self.add(entry)
-            entry_ = entry
+            entry_ = self._entries[entry.get_key()]
         else:
             entry_ = self._entries[entry]
         entry_key = entry_.get_key()
 
-        # TODO: we must allow the same entry be present in multiple citations, so
-        # RF to do so
-        if entry_key not in self.citations:
-            self.citations[entry_key] = Citation(entry_, **kwargs)
-
-        citation = self.citations[entry_key]
-        citation.count += 1
-        # TODO: update path and use here?
-        if not citation.path:
-            citation.path = kwargs.get('path', None)
-
+        citation = Citation(entry_, **kwargs)
+        # update entry count
+        entry_.count += 1
         # TODO: theoretically version shouldn't differ if we don't preload previous results
         if not citation.version:
             version = kwargs.get('version', None)
@@ -258,6 +256,8 @@ class DueCreditCollector(object):
                 #                 and not citation.version:
                 version = external_versions[package]
             citation.version = version
+
+        self.citations[(path, entry_key)] = citation
 
         return citation
 

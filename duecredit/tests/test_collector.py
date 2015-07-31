@@ -99,7 +99,7 @@ def test_dcite_method():
         active = isinstance(due, DueCreditCollector)
         due.add(BibTeX(_sample_bibtex))
 
-        @due.dcite("XXX0")
+        @due.dcite("XXX0", path='method')
         def method(arg1, kwarg2="blah"):
             """docstring"""
             assert_equal(arg1, "magical")
@@ -107,7 +107,7 @@ def test_dcite_method():
             return "load"
 
         class SomeClass(object):
-            @due.dcite("XXX0")
+            @due.dcite("XXX0", path='someclass:method')
             def method(self, arg1, kwarg2="blah"):
                 """docstring"""
                 assert_equal(arg1, "magical")
@@ -123,21 +123,22 @@ def test_dcite_method():
         if active:
             assert_equal(len(due.citations), 1)
             assert_equal(len(due._entries), 1)
-            citation = due.citations["XXX0"]
-            assert_equal(citation.count, 1)
+            citation = due.citations[("method", "XXX0")]
+            assert_equal(due._entries['XXX0'].count, 1)
             # TODO: this is probably incomplete path but unlikely we would know
             # any better
-            assert_equal(citation.path, "duecredit.tests."
-                                         "test_collector:method")
+            assert_equal(citation.path, "method")
 
         instance = SomeClass()
         yield _test_dcite_basic, due, instance.method
 
         if active:
-            assert_equal(len(due.citations), 1)
+            assert_equal(len(due.citations), 2)
             assert_equal(len(due._entries), 1)
-            assert_equal(citation.count, 2)
+            assert_equal(due._entries['XXX0'].count, 2)
             # TODO: we should actually get path/counts pairs so here
+            citation = due.citations[("someclass:method", "XXX0")]
+            assert_equal(citation.path, "someclass:method")
             # it is already a different path
 
             # And we explicitly stated that module need to be cited
@@ -192,8 +193,10 @@ def test_dcite_match_conditions():
     due = DueCreditCollector()
     due.add(BibTeX(_sample_bibtex))
 
-    @due.dcite("XXX0", conditions={(1, "kwarg2"): {"blah", "DC_DEFAULT"}})
-    @due.dcite(Doi(_sample_doi), conditions={(1, "kwarg2"): {"boo"}})
+    @due.dcite("XXX0", path='method',
+               conditions={(1, "kwarg2"): {"blah", "DC_DEFAULT"}})
+    @due.dcite(Doi(_sample_doi), path='method',
+               conditions={(1, "kwarg2"): {"boo"}})
     def method(arg1, kwarg2="blah"):
         """docstring"""
         assert_equal(arg1, "magical")
@@ -210,23 +213,23 @@ def test_dcite_match_conditions():
 
     assert_equal(len(due.citations), 1)
     assert_equal(len(due._entries), 1)
-    citation = due.citations["XXX0"]
-    assert_equal(citation.count, 1)
+    entry = due._entries['XXX0']
+    assert_equal(entry.count, 1)
 
     # Cause the same citation
     assert_equal(method("magical", "blah"), "load blah")
     # Nothing should change
     assert_equal(len(due.citations), 1)
     assert_equal(len(due._entries), 1)
-    citation = due.citations["XXX0"]
-    assert_equal(citation.count, 2)  # Besides the count
+    assert_equal(entry.count, 2)  # Besides the count
 
     # Now cause new citation given another value
     assert_equal(method("magical", "boo"), "load boo")
     assert_equal(len(due.citations), 2)
     assert_equal(len(due._entries), 2)
-    assert_equal(due.citations["XXX0"].count, 2)  # Count should stay the same for XXX0
-    assert_equal(due.citations[_sample_doi].count, 1) # And we got one new counted
+    assert_equal(entry.count, 2)  # Count should stay the same for XXX0
+    assert_equal(due._entries[_sample_doi].count, 1) # And we got one new
+    # counted
 
 
 
@@ -234,7 +237,7 @@ def test_get_output_handler_method():
     with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'pickle'}):
         entry = BibTeX(_sample_bibtex)
         collector = DueCreditCollector()
-        collector.cite(entry)
+        collector.cite(entry, path='module')
 
         with tempfile.NamedTemporaryFile() as f:
             summary = CollectorSummary(collector, fn=f.name)

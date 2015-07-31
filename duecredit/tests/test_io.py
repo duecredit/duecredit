@@ -45,7 +45,7 @@ def test_pickleoutput():
                    "pages={491-492}\n}")
     collector_ = DueCreditCollector()
     collector_.add(entry)
-    collector_.cite(entry)
+    collector_.cite(entry, path='module')
 
     # test it doesn't puke with an empty collector
     collectors = [collector_, DueCreditCollector()]
@@ -66,7 +66,7 @@ def test_pickleoutput():
 def test_text_output():
     entry = BibTeX(_sample_bibtex)
     collector = DueCreditCollector()
-    collector.cite(entry)
+    collector.cite(entry, path='module')
 
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
