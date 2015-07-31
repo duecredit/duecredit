@@ -60,6 +60,7 @@ def _get_active_due():
 
     # Wrapper to create and dump summary... passing method doesn't work:
     #  probably removes instance too early
+    @never_fail
     def crap():
         _due_summary = CollectorSummary(due_)
         _due_summary.dump()
