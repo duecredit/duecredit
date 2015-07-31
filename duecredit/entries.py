@@ -63,9 +63,9 @@ class Doi(DueCreditEntry):
         self.doi = doi
         # TODO
 
-# TODO: rename to URL,  "donate" should become a tag
-class Donate(DueCreditEntry):
+
+class Url(DueCreditEntry):
     def __init__(self, url, key=None):
-        super(Donate, self).__init__(url, key)
+        super(Url, self).__init__(url, key)
         self.url = url
 

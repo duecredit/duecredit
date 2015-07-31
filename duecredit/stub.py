@@ -27,7 +27,7 @@ License:
 Originally a part of the duecredit, which is distributed under BSD-2 license.
 """
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 class InactiveDueCreditCollector(object):
     """Just a stub at the Collector which would not do anything"""
@@ -59,4 +59,4 @@ except Exception as e:
             "Failed to import duecredit due to %s" % str(e))
     # Initiate due stub
     due = InactiveDueCreditCollector()
-    BibTeX = Doi = Donate = _donothing_func
+    BibTeX = Doi = Url = _donothing_func
