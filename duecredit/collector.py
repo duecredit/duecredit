@@ -19,10 +19,12 @@ from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
 from .utils import never_fail, borrowdoc, external_versions
+from collections import namedtuple
 
 import logging
 lgr = logging.getLogger('duecredit.collector')
 
+CitationKey = namedtuple('CitationKey', ['path', 'entry_key'])
 
 class Citation(object):
     """Encapsulates citations and information on their use"""
@@ -257,7 +259,7 @@ class DueCreditCollector(object):
                 version = external_versions[package]
             citation.version = version
 
-        self.citations[(path, entry_key)] = citation
+        self.citations[CitationKey(path, entry_key)] = citation
 
         return citation
 
