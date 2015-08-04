@@ -53,7 +53,7 @@ class Citation(object):
              the method
           - "edu" references to tutorials, textbooks and other materials useful to learn
             more
-          - "cite-on-use" for a module citation would make that module citeable even
+          - "cite-module" for a module citation would make that module citeable even
             without internal duecredited functionality invoked.  Should be used only for
             core packages whenever it is reasonable to assume that its import constitute
             its use (e.g. numpy)
