@@ -18,7 +18,7 @@ from glob import glob
 import sys
 from functools import wraps
 
-from .. import lgr
+from ..log import lgr
 
 from six import iteritems
 if sys.version_info < (3,):
