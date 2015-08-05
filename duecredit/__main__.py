@@ -47,6 +47,8 @@ def main(argv=None):
     try:
         opts, prog_argv = getopt.getopt(argv[1:], "", ["help", "version"])
         # TODO: support options for whatever we would support ;)
+        # probably needs to hook in somehow into commands/options available
+        # under cmdline/
     except getopt.error as msg:
         sys.stderr.write("%s: %s\n" % (sys.argv[0], msg))
         sys.stderr.write("Try `%s --help' for more information\n"
