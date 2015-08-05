@@ -113,6 +113,7 @@ def test_dcite_method():
                 assert_equal(arg1, "magical")
                 assert_equal(kwarg2, 1)
                 return "load"
+
         if active:
             assert_equal(due.citations, {})
             assert_equal(len(due._entries), 1)
@@ -138,6 +139,29 @@ def test_dcite_method():
             assert_equal(citation.count, 2)
             # TODO: we should actually get path/counts pairs so here
             # it is already a different path
+
+            # And we explicitly stated that module need to be cited
+            assert_true(citation.cite_module)
+
+
+        class SomeClass2(object):
+            @due.dcite("XXX0", path="some.module.without.method")
+            def method2(self, arg1, kwarg2="blah"):
+                assert_equal(arg1, "magical")
+                return "load"
+
+        # and a method pointing to the module
+        instance2 = SomeClass()
+
+        yield _test_dcite_basic, due, instance2.method
+        if active:
+            assert_equal(len(due.citations), 1)
+            assert_equal(len(due._entries), 1) # the same entry
+            assert_equal(citation.count, 3)
+            # TODO: we should actually get path/counts pairs so here
+            # it is already a different path
+            # And we still explicitly stated that module need to be cited
+            assert_true(citation.cite_module)
 
 def _test_args_match_conditions(conds):
     args_match_conditions = DueCreditCollector._args_match_conditions

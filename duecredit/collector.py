@@ -27,7 +27,8 @@ lgr = logging.getLogger('duecredit.collector')
 class Citation(object):
     """Encapsulates citations and information on their use"""
 
-    def __init__(self, entry, description=None, path=None, version=None, tags=['implementation']):
+    def __init__(self, entry, description=None, path=None, version=None,
+                 cite_module=False, tags=['implementation']):
         """Cite a reference
 
         Parameters
@@ -42,6 +43,11 @@ class Citation(object):
           path from the path within the module.
         version: str or tuple, version
           Version of the beast (e.g. of the module) where applicable
+        cite_module: bool, optional
+          If it is a module citation, setting it to True would make that module citeable
+          even without internal duecredited functionality invoked.  Should be used only for
+          core packages whenever it is reasonable to assume that its import constitute
+          its use (e.g. numpy)
         tags: list of str, optional
           Add tags for the reference for this method.  Some tags have associated
           semantics in duecredit, e.g.
@@ -53,10 +59,6 @@ class Citation(object):
              the method
           - "edu" references to tutorials, textbooks and other materials useful to learn
             more
-          - "cite-on-import" for a module citation would make that module citeable even
-            without internal duecredited functionality invoked.  Should be used only for
-            core packages whenever it is reasonable to assume that its import constitute
-            its use (e.g. numpy)
           - "donate" should be commonly used with Url entries to point to the websites
             describing how to contribute some funds to the referenced project
         """
@@ -64,6 +66,7 @@ class Citation(object):
         self._description = description
         # We might want extract all the relevant functionality into a separate class
         self._path = path
+        self._cite_module = cite_module
         self.count = 0
         self.tags = tags or []
         self.version = version
@@ -74,6 +77,8 @@ class Citation(object):
             args.append("description={0}".format(repr(self._description)))
         if self._path:
             args.append("path={0}".format(repr(self._path)))
+        if self._cite_module:
+            args.append("cite_module={0}".format(repr(self._cite_module)))
 
         if args:
             args = ", ".join(args)
@@ -84,6 +89,10 @@ class Citation(object):
     @property
     def path(self):
         return self._path
+
+    @property
+    def cite_module(self):
+        return self._cite_module
 
     @path.setter
     def path(self, path):
@@ -321,6 +330,11 @@ class DueCreditCollector(object):
                 # TODO: we indeed need to separate path logic outside
                 modname = path.split(':', 1)[0]
 
+            # if decorated function was invoked, it means that we need
+            # to cite that even if it is a module. But do not override
+            # value if user explicitely stated
+            if 'cite_module' not in kwargs:
+                kwargs['cite_module'] = True
 
             # TODO: might make use of inspect.getmro
             # see e.g.
