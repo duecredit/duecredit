@@ -13,6 +13,7 @@ its functionality
 """
 
 import os
+import atexit
 
 from .entries import Doi, BibTeX, Url
 from .version import __version__, __release_date__
@@ -58,36 +59,64 @@ def _get_active_due():
     else:
         due_ = DueCreditCollector()
 
-    # Wrapper to create and dump summary... passing method doesn't work:
-    #  probably removes instance too early
-    @never_fail
-    def crap():
-        _due_summary = CollectorSummary(due_)
-        _due_summary.dump()
-
-    atexit.register(crap)
-
-    # Deal with injector
-    from .injections import DueCreditInjector
-    injector = DueCreditInjector(collector=due_)
-    injector.activate()
     return due_
 
-def _get_due(active=False):
-    """Returns "due" Collector (real or a stub) and sets up dumping atexit for active one
+
+class DueSwitch(object):
+    """Adapter between two types of collectors -- Inactive and Active
+
+    Once activated though, cannot be fully deactivated since it would inject
+    duecredit decorators and register an event atexit.
     """
+    def __init__(self, inactive, active, activate=False):
+        self.__active = None
+        self.__collectors = {False: inactive, True: active}
+        self.__activations_done = False
+        self.activate(activate)
 
-    # Rebind the collector's methods to the module here
-    due_ = None
-    if active or _get_duecredit_enable():
-        due_ = _get_active_due()
+    def __prepare_exit_and_injections(self):
+        # Wrapper to create and dump summary... passing method doesn't work:
+        #  probably removes instance too early
+        @never_fail
+        def crap():
+            from duecredit.collector import CollectorSummary
+            _due_summary = CollectorSummary(self.__collectors[True])
+            _due_summary.dump()
 
-    # if not active or failed to activate
-    if due_ is None:
-        due_ = _get_inactive_due()
-    return due_
+        atexit.register(crap)
 
-due = _get_due()
+        # Deal with injector
+        from .injections import DueCreditInjector
+        injector = DueCreditInjector(collector=self.__collectors[True])
+        injector.activate()
+
+    @never_fail
+    def activate(self, activate):
+        # 1st step -- if activating/deactivating switch between the two collectors
+        if self.__active is not activate:
+            # we need to switch the state
+            #import pdb; pdb.set_trace()
+            is_public = lambda x: not x.startswith('_')
+            # Clean up current bindings first
+            for k in filter(is_public, dir(self)):
+                if not k == 'activate':
+                    delattr(self, k)
+
+            new_due = self.__collectors[activate]
+            for k in filter(is_public, dir(new_due)):
+                setattr(self, k, getattr(new_due, k))
+
+        # 2nd -- if activating, we might still need to have activations done
+        if activate and not self.__activations_done:
+            try:
+                self.__prepare_exit_and_injections()
+            except Exception as e:
+                lgr.error("Failed to prepare injections etc: %s" % str(e))
+            finally:
+                self.__activations_done = True
+
+
+due = DueSwitch(_get_inactive_due(), _get_active_due(), _get_duecredit_enable())
 
 # TODO: REDO without numpy so we don't pollute the modules space and interfer with injections/citations
 
