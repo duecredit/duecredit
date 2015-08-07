@@ -68,16 +68,21 @@ class DueSwitch(object):
         self.__activations_done = False
         self.activate(activate)
 
+    @property
+    def active(self):
+        return self.__active
+
+    @never_fail
+    def _dump_collector_summary(self):
+        from duecredit.collector import CollectorSummary
+        due_summary = CollectorSummary(self.__collectors[True])
+        due_summary.dump()
+
     def __prepare_exit_and_injections(self):
         # Wrapper to create and dump summary... passing method doesn't work:
         #  probably removes instance too early
-        @never_fail
-        def crap():
-            from duecredit.collector import CollectorSummary
-            _due_summary = CollectorSummary(self.__collectors[True])
-            _due_summary.dump()
 
-        atexit.register(crap)
+        atexit.register(self._dump_collector_summary)
 
         # Deal with injector
         from .injections import DueCreditInjector
@@ -85,20 +90,21 @@ class DueSwitch(object):
         injector.activate()
 
     @never_fail
-    def activate(self, activate):
+    def activate(self, activate=True):
         # 1st step -- if activating/deactivating switch between the two collectors
         if self.__active is not activate:
             # we need to switch the state
-            #import pdb; pdb.set_trace()
             is_public = lambda x: not x.startswith('_')
             # Clean up current bindings first
             for k in filter(is_public, dir(self)):
-                if not k == 'activate':
+                if k not in ('activate', 'active'):
                     delattr(self, k)
 
             new_due = self.__collectors[activate]
             for k in filter(is_public, dir(new_due)):
                 setattr(self, k, getattr(new_due, k))
+
+            self.__active = activate
 
         # 2nd -- if activating, we might still need to have activations done
         if activate and not self.__activations_done:
