@@ -25,4 +25,4 @@ def setup_parser(parser):
 def run(args):
     import duecredit
     raise NotImplementedError("Just use nosetests duecredit for now")
-    duecredit.test()
+    #duecredit.test()
