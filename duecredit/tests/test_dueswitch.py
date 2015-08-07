@@ -7,7 +7,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-from mock import patch, call
+from mock import patch
 import atexit
 
 from nose import SkipTest
@@ -28,5 +28,5 @@ def test_dueswitch_activate(mock_register, mock_activate):
         mock_register.assert_not_called()
         raise SkipTest("due is already active, can't test more at this point")
     # was not active, so should have called activate of the injector class
-    mock_activate.assert_called_once_with()#([call()])
+    mock_activate.assert_called_once_with()
     mock_register.assert_called_once_with(due._dump_collector_summary)

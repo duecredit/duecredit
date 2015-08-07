@@ -12,8 +12,7 @@ import sys
 from . import due, __version__
 from .log import lgr
 
-def usage(outfile):
-    executable = sys.argv[0]
+def usage(outfile, executable=sys.argv[0]):
     if '__main__.py' in executable:
         # That was -m duecredit way to launch
         executable = "%s -m duecredit" % sys.executable
@@ -60,7 +59,7 @@ def main(argv=None):
     # Borrowing up on from trace.py
     for opt, val in opts:
         if opt == "--help":
-            usage(sys.stdout)
+            usage(sys.stdout, executable=argv[0])
             sys.exit(0)
 
         if opt == "--version":
@@ -87,6 +86,7 @@ def main(argv=None):
         # TODO: see if we could hide our presence from the final tracebacks if execution fails
     except IOError as err:
         lgr.error("Cannot run file %r because: %s" % (sys.argv[0], err))
+        sys.exit(1)
     except SystemExit:
         pass
 
