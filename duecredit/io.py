@@ -72,71 +72,94 @@ class TextOutput(object):  # TODO some parent class to do what...?
                              for k, c in iteritems(citations)
                              if tags.intersection(c.tags))
 
-        packages = defaultdict(list)
-        modules = defaultdict(list)
-        objects = defaultdict(list)
+        packages = {}
+        modules = {}
+        objects = {}
 
+        for key in ('citations', 'entry_keys'):
+            packages[key] = defaultdict(list)
+            modules[key] = defaultdict(list)
+            objects[key] = defaultdict(list)
+
+        # for each path store both a list of entry keys and of citations
         for (path, entry_key), citation in iteritems(citations):
             if ':' in path:
-                objects[path].append(citation)
+                objects['citations'][path].append(citation)
+                objects['entry_keys'][path].append(entry_key)
             elif '.' in path:
-                modules[path].append(citation)
+                modules['citations'][path].append(citation)
+                modules['entry_keys'][path].append(entry_key)
             else:
-                packages[path].append(citation)
-
+                packages['citations'][path].append(citation)
+                packages['entry_keys'][path].append(entry_key)
         return packages, modules, objects
 
     def dump(self, tags=None):
-
         # get 'model' of citations
-        cited_packages, cited_modules, cited_objects = self._model_citations(tags)
+        packages, modules, objects = self._model_citations(tags)
+
+        citations_ordered = []
+        # set up view
+        keys2refnr = defaultdict(int)  # mapping key -> ref nr
+        refnr = 1
+
+        # package level
+        for package in sorted(packages['entry_keys']):
+            for entry_key in packages['entry_keys'][package]:
+                if entry_key not in keys2refnr:
+                    keys2refnr[entry_key] = refnr
+                    refnr += 1
+            citations_ordered.append(package)
+            # module level
+            for module in sorted(filter(lambda x: package + '.' in x, modules['entry_keys'])):
+                for entry_key_mod in modules['entry_keys'][module]:
+                    if entry_key_mod not in keys2refnr:
+                        keys2refnr[entry_key_mod] = refnr
+                        refnr += 1
+                citations_ordered.append(module)
+            # object level
+            for obj in sorted(filter(lambda x: package + '.' in x, objects['entry_keys'])):
+                for entry_key_obj in objects['entry_keys'][obj]:
+                    if entry_key_obj not in keys2refnr:
+                        keys2refnr[entry_key_obj] = refnr
+                        refnr += 1
+                citations_ordered.append(obj)
 
         # Now we can "render" different views of our "model"
         # Here for now just text BUT that is where we can "split" the logic and provide
         # different renderings given the model -- text, rest, md, tex+latex, whatever
         self.fd.write('DueCredit Report:\n')
 
-        refnr = 1
-        citations_ordered = []
-
-        def print_cited_object(cited_dict, objname):
-            versions = sorted(map(str, set(str(r.version) for r in cited_dict[objname])))
-            self.fd.write('- {0} (v {1}) [{2}]\n'.format(
-                objname,
-                ', '.join(versions),
-                ', '.join(str(x) for x in range(refnr, refnr + len(cited_dict[objname])))))
-
-        # package level
-        for package in sorted(cited_packages.keys()):
-            print_cited_object(cited_packages, package)
-            refnr += len(cited_packages[package])
-            citations_ordered.extend(cited_packages[package])
-
-            # module level
-            for module in sorted(filter(lambda x: package in x, cited_modules.keys())):
+        for path in citations_ordered:
+            if ':' in path:
                 self.fd.write('  ')
-                print_cited_object(cited_modules, module)
-                refnr += len(cited_modules[module])
-                citations_ordered.extend(cited_modules[module])
-
-            # object level
-            for obj in sorted(filter(lambda x: package in x, cited_objects.keys())):
+                citations = objects['citations'][path]
+                entry_keys = objects['entry_keys'][path]
+            elif '.' in path:
                 self.fd.write('  ')
-                print_cited_object(cited_objects, obj)
-                refnr += len(cited_objects[obj])
-                citations_ordered.extend(cited_objects[obj])
+                citations = modules['citations'][path]
+                entry_keys = modules['entry_keys'][path]
+            else:
+                citations = packages['citations'][path]
+                entry_keys = packages['entry_keys'][path]
+            versions = sorted(map(str, set(str(r.version) for r in citations)))
+            refnrs = sorted([str(keys2refnr[entry_key]) for entry_key in entry_keys])
+            self.fd.write('- {0} (v {1}) [{2}]\n'.format(path, ' '.join(versions), ', '.join(refnrs)))
 
         # Print out some stats
         obj_names = ('packages', 'modules', 'functions')
-        n_citations = map(len, (cited_packages, cited_modules, cited_objects))
+        n_citations = map(len, (packages['citations'], modules['citations'], objects['citations']))
         for citation_type, n in zip(obj_names, n_citations):
             self.fd.write('\n{0} {1} cited'.format(n, citation_type))
 
-        if citations_ordered:
+        if keys2refnr:
+            citations_fromentrykey = self.collector.citations_fromentrykey()
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
-            for i, citation in enumerate(citations_ordered):
-                self.fd.write('\n[{0}] '.format(i+1))
-                self.fd.write(get_text_rendering(citation, style=self.style))
+            # collect all the entries used
+            refnr2keys = sorted([(nr, keys) for keys, nr in iteritems(keys2refnr)])
+            for nr, key in refnr2keys:
+                self.fd.write('\n[{0}] '.format(nr))
+                self.fd.write(get_text_rendering(citations_fromentrykey[key], style=self.style))
             self.fd.write('\n')
 
 def get_text_rendering(citation, style='harvard1'):

@@ -263,6 +263,17 @@ class DueCreditCollector(object):
 
         return citation
 
+    def citations_fromentrykey(self):
+        """Return a dictionary with the current citations indexed by the entry key"""
+        citations = self.citations
+        citations_key = dict()
+        for (path, entry_key), citation in iteritems(citations):
+            if entry_key not in citations_key:
+                citations_key[entry_key] = citation
+
+        return citations_key
+
+
     @staticmethod
     def _args_match_conditions(conditions, *fargs, **fkwargs):
         """Helper to identify when to trigger citation given parameters to the function call
