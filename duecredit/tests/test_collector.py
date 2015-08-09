@@ -156,9 +156,8 @@ def test_dcite_method():
 
         yield _test_dcite_basic, due, instance2.method
         if active:
-            assert_equal(len(due.citations), 1)
+            assert_equal(len(due.citations), 2)  # different paths
             assert_equal(len(due._entries), 1) # the same entry
-            assert_equal(citation.count, 3)
             # TODO: we should actually get path/counts pairs so here
             # it is already a different path
             # And we still explicitly stated that module need to be cited

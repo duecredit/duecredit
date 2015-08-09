@@ -71,7 +71,6 @@ class Citation(object):
         # We might want extract all the relevant functionality into a separate class
         self._path = path
         self._cite_module = cite_module
-        self.count = 0
         self.tags = tags or []
         self.version = version
 
