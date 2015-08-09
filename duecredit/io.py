@@ -111,14 +111,14 @@ class TextOutput(object):  # TODO some parent class to do what...?
                     refnr += 1
             citations_ordered.append(package)
             # module level
-            for module in sorted(filter(lambda x: package + '.' in x, modules['entry_keys'])):
+            for module in sorted(filter(lambda x: package in x, modules['entry_keys'])):
                 for entry_key_mod in modules['entry_keys'][module]:
                     if entry_key_mod not in keys2refnr:
                         keys2refnr[entry_key_mod] = refnr
                         refnr += 1
                 citations_ordered.append(module)
             # object level
-            for obj in sorted(filter(lambda x: package + '.' in x, objects['entry_keys'])):
+            for obj in sorted(filter(lambda x: package in x, objects['entry_keys'])):
                 for entry_key_obj in objects['entry_keys'][obj]:
                     if entry_key_obj not in keys2refnr:
                         keys2refnr[entry_key_obj] = refnr

@@ -132,7 +132,6 @@ def test_text_output_dump_formatting():
                    path='myothermodule:myotherfunction')
         @due.dcite(BibTeX(samples_bibtex[4]), description='solution to life',
                    path='myothermodule:myotherfunction')
-        # XXX: atm cross-referencing doesn't work
         @due.dcite(BibTeX(_sample_bibtex2), description='solution to life',
                    path='myothermodule:myotherfunction')
         def myotherfunction(arg42):
@@ -151,12 +150,12 @@ def test_text_output_dump_formatting():
     reference_numbers = []
     references = []
     for line in lines:
-        match_citation = re.search('(\[[0-9]\])$', line)
-        match_reference = re.search('^(\[[0-9]\])', line)
+        match_citation = re.search('\[(.+)\]$', line)
+        match_reference = re.search('^\[([0-9])\]', line)
         if match_citation:
-            citation_numbers.append(match_citation.group())
+            citation_numbers.extend(match_citation.group(1).split(', '))
         elif match_reference:
-            reference_numbers.append(match_reference.group())
+            reference_numbers.append(match_reference.group(1))
             references.append(line.replace(match_reference.group(), ""))
 
     assert_equal(set(citation_numbers), set(reference_numbers))
