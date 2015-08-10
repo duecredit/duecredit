@@ -132,15 +132,14 @@ class TextOutput(object):  # TODO some parent class to do what...?
         for path in citations_ordered:
             if ':' in path:
                 self.fd.write('  ')
-                citations = objects['citations'][path]
-                entry_keys = objects['entry_keys'][path]
+                target_dict = objects
             elif '.' in path:
                 self.fd.write('  ')
-                citations = modules['citations'][path]
-                entry_keys = modules['entry_keys'][path]
+                target_dict = modules
             else:
-                citations = packages['citations'][path]
-                entry_keys = packages['entry_keys'][path]
+                target_dict = packages
+            citations = target_dict['citations'][path]
+            entry_keys = target_dict['entry_keys'][path]
             versions = sorted(map(str, set(str(r.version) for r in citations)))
             refnrs = sorted([str(keys2refnr[entry_key]) for entry_key in entry_keys])
             self.fd.write('- {0} (v {1}) [{2}]\n'.format(path, ' '.join(versions), ', '.join(refnrs)))
