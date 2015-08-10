@@ -73,6 +73,7 @@ class Citation(object):
         self._cite_module = cite_module
         self.tags = tags or []
         self.version = version
+        self.count = 0
 
     def __repr__(self):
         args = [repr(self._entry)]
@@ -237,9 +238,13 @@ class DueCreditCollector(object):
         else:
             entry_ = self._entries[entry]
 
-        citation = Citation(entry_, **kwargs)
-        # update entry count
-        entry_.count += 1
+        entry_key = entry_.get_key()
+        if (path, entry_key) not in self.citations:
+           self.citations[(path, entry_key)]  = Citation(entry_, **kwargs)
+        citation = self.citations[(path, entry_key)]
+        # update citation count
+        citation.count += 1
+
         # TODO: theoretically version shouldn't differ if we don't preload previous results
         if not citation.version:
             version = kwargs.get('version', None)
@@ -260,8 +265,6 @@ class DueCreditCollector(object):
                 #                 and not citation.version:
                 version = external_versions[package]
             citation.version = version
-
-        self.citations[citation.key] = citation
 
         return citation
 

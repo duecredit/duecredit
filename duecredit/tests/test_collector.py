@@ -124,7 +124,7 @@ def test_dcite_method():
             assert_equal(len(due.citations), 1)
             assert_equal(len(due._entries), 1)
             citation = due.citations[("method", "XXX0")]
-            assert_equal(due._entries['XXX0'].count, 1)
+            assert_equal(citation.count, 1)
             # TODO: this is probably incomplete path but unlikely we would know
             # any better
             assert_equal(citation.path, "method")
@@ -135,11 +135,10 @@ def test_dcite_method():
         if active:
             assert_equal(len(due.citations), 2)
             assert_equal(len(due._entries), 1)
-            assert_equal(due._entries['XXX0'].count, 2)
             # TODO: we should actually get path/counts pairs so here
             citation = due.citations[("someclass:method", "XXX0")]
             assert_equal(citation.path, "someclass:method")
-            # it is already a different path
+            assert_equal(citation.count, 1)
 
             # And we explicitly stated that module need to be cited
             assert_true(citation.cite_module)
@@ -213,22 +212,21 @@ def test_dcite_match_conditions():
     assert_equal(len(due.citations), 1)
     assert_equal(len(due._entries), 1)
     entry = due._entries['XXX0']
-    assert_equal(entry.count, 1)
+    assert_equal(due.citations[('method', 'XXX0')].count, 1)
 
     # Cause the same citation
     assert_equal(method("magical", "blah"), "load blah")
     # Nothing should change
     assert_equal(len(due.citations), 1)
     assert_equal(len(due._entries), 1)
-    assert_equal(entry.count, 2)  # Besides the count
+    assert_equal(due.citations[('method', 'XXX0')].count, 2) # Besides the count
 
     # Now cause new citation given another value
     assert_equal(method("magical", "boo"), "load boo")
     assert_equal(len(due.citations), 2)
     assert_equal(len(due._entries), 2)
-    assert_equal(entry.count, 2)  # Count should stay the same for XXX0
-    assert_equal(due._entries[_sample_doi].count, 1) # And we got one new
-    # counted
+    assert_equal(due.citations[('method', 'XXX0')].count, 2) # Count should stay the same for XXX0
+    assert_equal(due.citations[('method', 'a.b.c/1.2.3')].count, 1) # but we get a new one
 
 
 

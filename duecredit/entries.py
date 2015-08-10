@@ -14,7 +14,6 @@ class DueCreditEntry(object):
     def __init__(self, rawentry, key=None):
         self._rawentry = rawentry
         self._key = key or rawentry.lower()
-        self.count = 0
 
     def get_key(self):
         return self._key
