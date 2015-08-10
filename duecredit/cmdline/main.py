@@ -17,7 +17,8 @@ import logging
 import sys
 import textwrap
 
-from .. import __version__, lgr
+from .. import __version__
+from ..log import lgr
 
 import duecredit.cmdline as duecmd
 from . import helpers

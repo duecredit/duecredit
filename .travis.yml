@@ -23,7 +23,7 @@ install:
   - pip install -e .
 
 script:
-  - nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO
+  - nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO -v
   - python setup.py install  # test installation
 
 after_success:
