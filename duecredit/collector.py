@@ -240,7 +240,7 @@ class DueCreditCollector(object):
 
         entry_key = entry_.get_key()
         if (path, entry_key) not in self.citations:
-           self.citations[(path, entry_key)]  = Citation(entry_, **kwargs)
+           self.citations[(path, entry_key)] = Citation(entry_, **kwargs)
         citation = self.citations[(path, entry_key)]
         # update citation count
         citation.count += 1
