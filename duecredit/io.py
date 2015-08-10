@@ -84,14 +84,13 @@ class TextOutput(object):  # TODO some parent class to do what...?
         # for each path store both a list of entry keys and of citations
         for (path, entry_key), citation in iteritems(citations):
             if ':' in path:
-                objects['citations'][path].append(citation)
-                objects['entry_keys'][path].append(entry_key)
+                target_dict = objects
             elif '.' in path:
-                modules['citations'][path].append(citation)
-                modules['entry_keys'][path].append(entry_key)
+                target_dict = modules
             else:
-                packages['citations'][path].append(citation)
-                packages['entry_keys'][path].append(entry_key)
+                target_dict = packages
+            target_dict['citations'][path].append(citation)
+            target_dict['entry_keys'][path].append(entry_key)
         return packages, modules, objects
 
     def dump(self, tags=None):
