@@ -35,19 +35,19 @@ def inject(injector):
 
     # sklearn.cluster.affinity_propagation_
     injector.add('sklearn.cluster.affinity_propagation_', None, Doi('10.1126/science.1136800'),
-                 description="Affinity propagation clustering algorithm", tags=['reference'])
+                 description="Affinity propagation clustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.bicluster
     injector.add('sklearn.cluster.bicluster', 'SpectralCoclustering', Doi('10.1.1.140.301'),
-                 description="Spectral Coclustering algorithm", tags=['reference'])
+                 description="Spectral Coclustering algorithm", tags=['implementation'])
     injector.add('sklearn.cluster.bicluster', 'SpectralBiclustering', Doi('10.1.1.135.1608'),
-                 description="Spectral Biclustering algorithm", tags=['reference'])
+                 description="Spectral Biclustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.birch
     injector.add('sklearn.cluster.birch', 'Birch', Doi('10.1145/233269.233324'),
-                 description="BIRCH clustering algorithm", tags=['reference'])
+                 description="BIRCH clustering algorithm", tags=['implementation'])
     injector.add('sklearn.cluster.birch', 'Birch', Url('https://code.google.com/p/jbirch/'),
-                 description="Java implementation of BIRCH clustering algorithm", tags=['implementation'])
+                 description="Java implementation of BIRCH clustering algorithm", tags=['another-implementation'])
 
     # sklearn.cluster.dbscan_
     injector.add('sklearn.cluster.dbscan_', 'dbscan',
@@ -59,18 +59,18 @@ def inject(injector):
   number={34},
   pages={226--231},
   year={1996}
-}"""), description="dbscan clustering algorithm", tags=['reference'])
+}"""), description="dbscan clustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.mean_shift_
     injector.add('sklearn.cluster.mean_shift_', 'MeanShift', Doi('10.1109/34.1000236'),
-                 description="Mean shift clustering algorithm", tags=['reference'])
+                 description="Mean shift clustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.spectral
     injector.add('sklearn.cluster.spectral', 'discretize', Doi('10.1109/ICCV.2003.1238361'),
                  description="Multiclass spectral clustering", tags=['reference'])
     injector.add('sklearn.cluster.spectral', 'spectral_clustering', Doi('10.1.1.160.2324'),
-                 description="Spectral clustering", tags=['reference'])
+                 description="Spectral clustering", tags=['implementation'])
     injector.add('sklearn.cluster.spectral', 'spectral_clustering', Doi('10.1.1.165.9323'),
-                 description="Spectral clustering", tags=['reference'])
+                 description="Spectral clustering", tags=['implementation'])
 
 
