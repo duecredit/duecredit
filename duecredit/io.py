@@ -62,7 +62,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
 
         # TODO: all that configuration/options should be done outside
         if not tags:
-            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference,implementation').split(',')
+            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
         tags = set(tags)
 
         citations = self.collector.citations
