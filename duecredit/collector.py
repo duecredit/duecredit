@@ -49,14 +49,15 @@ class Citation(object):
           core packages whenever it is reasonable to assume that its import constitute
           its use (e.g. numpy)
         tags: list of str, optional
-          Add tags for the reference for this method.  Some tags have associated
-          semantics in duecredit, e.g.
+          Tags to associate with the given code/reference combination.  Some tags have
+          associated semantics in duecredit, e.g.
           - "implementation" [default] tag describes as an implementation of the cited
-             method
-          - "reference" tag describes as the original implementation of
-            the cited method
+            method
+          - "reference-implementation" tag describes as the original implementation (ideally
+            by the authors of the paper) of the cited method
+          - "another-implementation" tag describes some other implementation of the method
           - "use" tag points to publications demonstrating a worthwhile noting use
-             the method
+            the method
           - "edu" references to tutorials, textbooks and other materials useful to learn
             more
           - "donate" should be commonly used with Url entries to point to the websites
