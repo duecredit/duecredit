@@ -157,6 +157,10 @@ class Citation(object):
         else:
             return entry.path.startswith(self.path + '.')
 
+    @property
+    def key(self):
+        return CitationKey(self.path, self.entry.get_key())
+
 
 class DueCreditCollector(object):
     """Collect the references
@@ -232,7 +236,6 @@ class DueCreditCollector(object):
             entry_ = self._entries[entry.get_key()]
         else:
             entry_ = self._entries[entry]
-        entry_key = entry_.get_key()
 
         citation = Citation(entry_, **kwargs)
         # update entry count
@@ -258,7 +261,7 @@ class DueCreditCollector(object):
                 version = external_versions[package]
             citation.version = version
 
-        self.citations[CitationKey(path, entry_key)] = citation
+        self.citations[citation.key] = citation
 
         return citation
 
