@@ -76,6 +76,10 @@ class EnumeratedEntries(Iterator):
     def __iter__(self):
         return iteritems(self._keys2refnr)
 
+    # Python 3
+    def __next__(self):
+        return self.next()
+
     def next(self):
         yield next(self.__iter__())
 

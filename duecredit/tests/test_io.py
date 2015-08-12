@@ -1,8 +1,8 @@
 from ..collector import DueCreditCollector
 from ..entries import BibTeX, DueCreditEntry
-from ..io import TextOutput, PickleOutput, import_doi
+from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
-    assert_true
+    assert_true, assert_false
 from six.moves import StringIO
 from six import text_type
 
@@ -191,3 +191,23 @@ def _generate_sample_bibtex():
         sample_bibtex += "%s={%s},\n" % (string, value)
     sample_bibtex += "}"
     return sample_bibtex
+
+def test_enumeratedentries():
+    enumentries = EnumeratedEntries()
+    assert_false(enumentries)
+
+    # add some entries
+    entries = [('ciao', 1), ('miao', 2), ('bau', 3)]
+    for entry, _ in entries:
+        enumentries.add(entry)
+
+    assert_equal(len(enumentries), 3)
+
+    for entry, nr in entries:
+        assert_equal(nr, enumentries[entry])
+        assert_equal(entry, enumentries.fromrefnr(nr))
+
+    assert_raises(KeyError, enumentries.__getitem__, 'boh')
+    assert_raises(KeyError, enumentries.fromrefnr, 666)
+
+    assert_equal(entries, sorted(enumentries, key=lambda x: x[1]))
