@@ -138,20 +138,17 @@ class TextOutput(object):  # TODO some parent class to do what...?
         # set up view
 
         # package level
+        sublevels = [modules, objects]
         for package in sorted(packages['entry_keys']):
             for entry_key in packages['entry_keys'][package]:
                 enum_entries.add(entry_key)
             citations_ordered.append(package)
-            # module level
-            for module in sorted(filter(lambda x: package in x, modules['entry_keys'])):
-                for entry_key_mod in modules['entry_keys'][module]:
-                    enum_entries.add(entry_key_mod)
-                citations_ordered.append(module)
-            # object level
-            for obj in sorted(filter(lambda x: package in x, objects['entry_keys'])):
-                for entry_key_obj in objects['entry_keys'][obj]:
-                    enum_entries.add(entry_key_obj)
-                citations_ordered.append(obj)
+            # sublevels
+            for sublevel in sublevels:
+                for obj in sorted(filter(lambda x: package in x, sublevel['entry_keys'])):
+                    for entry_key_obj in sublevel['entry_keys'][obj]:
+                        enum_entries.add(entry_key_obj)
+                    citations_ordered.append(obj)
 
         # Now we can "render" different views of our "model"
         # Here for now just text BUT that is where we can "split" the logic and provide
