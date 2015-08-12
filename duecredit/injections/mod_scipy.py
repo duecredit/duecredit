@@ -163,8 +163,7 @@ def inject(injector):
 
     injector.add('scipy.cluster.hierarchy', 'linkage', BibTeX("""
     @article{sibson1973slink,
-        title={SLINK: an optimally efficient algorithm for the single-link
-        cluster method},
+        title={SLINK: an optimally efficient algorithm for the single-link cluster method},
         author={Sibson, Robin},
         journal={The Computer Journal},
         volume={16},

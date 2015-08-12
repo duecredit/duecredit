@@ -19,10 +19,12 @@ from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
 from .utils import never_fail, borrowdoc, external_versions
+from collections import namedtuple
 
 import logging
 lgr = logging.getLogger('duecredit.collector')
 
+CitationKey = namedtuple('CitationKey', ['path', 'entry_key'])
 
 class Citation(object):
     """Encapsulates citations and information on their use"""
@@ -37,7 +39,7 @@ class Citation(object):
           The entry to use, either identified by its id or a new one (to be added)
         description: str, optional
           Description of what this functionality provides
-        path: str, optional
+        path: str
           Path to the object which this citation associated with.  Format is
           "module[.submodules][:[class.]method]", i.e. ":" is used to separate module
           path from the path within the module.
@@ -63,14 +65,16 @@ class Citation(object):
           - "donate" should be commonly used with Url entries to point to the websites
             describing how to contribute some funds to the referenced project
         """
+        if path is None:
+            raise ValueError('Must specify path')
         self._entry = entry
         self._description = description
         # We might want extract all the relevant functionality into a separate class
         self._path = path
         self._cite_module = cite_module
-        self.count = 0
         self.tags = tags or []
         self.version = version
+        self.count = 0
 
     def __repr__(self):
         args = [repr(self._entry)]
@@ -155,6 +159,14 @@ class Citation(object):
         else:
             return entry.path.startswith(self.path + '.')
 
+    @property
+    def key(self):
+        return CitationKey(self.path, self.entry.get_key())
+
+    @staticmethod
+    def get_key(path, entry_key):
+        return CitationKey(path, entry_key)
+
 
 class DueCreditCollector(object):
     """Collect the references
@@ -220,24 +232,26 @@ class DueCreditCollector(object):
         # TODO: if cite is invoked but no path is provided -- we must figure it out
         # I guess from traceback, otherwise how would we know later to associate it
         # with modules???
+        path = kwargs.get('path', None)
+        if path is None:
+            raise ValueError('path must be provided')
+
         if isinstance(entry, DueCreditEntry):
             # new one -- add it
             self.add(entry)
-            entry_ = entry
+            entry_ = self._entries[entry.get_key()]
         else:
             entry_ = self._entries[entry]
+
         entry_key = entry_.get_key()
-
-        # TODO: we must allow the same entry be present in multiple citations, so
-        # RF to do so
-        if entry_key not in self.citations:
-            self.citations[entry_key] = Citation(entry_, **kwargs)
-
-        citation = self.citations[entry_key]
+        citation_key = Citation.get_key(path=path, entry_key=entry_key)
+        try:
+            citation = self.citations[citation_key]
+        except KeyError:
+            self.citations[citation_key] = citation = Citation(entry_, **kwargs)
+        assert(citation.key == citation_key)
+        # update citation count
         citation.count += 1
-        # TODO: update path and use here?
-        if not citation.path:
-            citation.path = kwargs.get('path', None)
 
         # TODO: theoretically version shouldn't differ if we don't preload previous results
         if not citation.version:
@@ -261,6 +275,16 @@ class DueCreditCollector(object):
             citation.version = version
 
         return citation
+
+    def _citations_fromentrykey(self):
+        """Return a dictionary with the current citations indexed by the entry key"""
+        citations_key = dict()
+        for (path, entry_key), citation in iteritems(self.citations):
+            if entry_key not in citations_key:
+                citations_key[entry_key] = citation
+
+        return citations_key
+
 
     @staticmethod
     def _args_match_conditions(conditions, *fargs, **fkwargs):

@@ -1,8 +1,8 @@
 from ..collector import DueCreditCollector
 from ..entries import BibTeX, DueCreditEntry
-from ..io import TextOutput, PickleOutput, import_doi
+from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
-    assert_true
+    assert_true, assert_false
 from six.moves import StringIO
 from six import text_type
 
@@ -45,7 +45,7 @@ def test_pickleoutput():
                    "pages={491-492}\n}")
     collector_ = DueCreditCollector()
     collector_.add(entry)
-    collector_.cite(entry)
+    collector_.cite(entry, path='module')
 
     # test it doesn't puke with an empty collector
     collectors = [collector_, DueCreditCollector()]
@@ -66,7 +66,7 @@ def test_pickleoutput():
 def test_text_output():
     entry = BibTeX(_sample_bibtex)
     collector = DueCreditCollector()
-    collector.cite(entry)
+    collector.cite(entry, path='module')
 
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
@@ -106,11 +106,11 @@ def test_text_output_dump_formatting():
     mymodule('magical', kwarg2=1)
     TextOutput(strio, due).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true('1 modules cited' in value, msg='value was {0}'.format(value))
+    assert_true('1 packages cited' in value, msg='value was {0}'.format(value))
     assert_true('1 functions cited' in value, msg='value was {0}'.format(value))
     assert_true('(v 0.0.16)' in value,
                 msg='value was {0}'.format(value))
-    assert_equal(len(value.split('\n')), 18, msg='value was {0}'.format(value))
+    assert_equal(len(value.split('\n')), 19, msg='value was {0}'.format(value))
 
     # test we get the reference numbering right
     samples_bibtex = [_generate_sample_bibtex() for x in range(5)]
@@ -132,9 +132,8 @@ def test_text_output_dump_formatting():
                    path='myothermodule:myotherfunction')
         @due.dcite(BibTeX(samples_bibtex[4]), description='solution to life',
                    path='myothermodule:myotherfunction')
-        # XXX: atm cross-referencing doesn't work
-        # @due.dcite(BibTeX(_sample_bibtex2), description='solution to life',
-        #           path='myothermodule:myotherfunction')
+        @due.dcite(BibTeX(_sample_bibtex2), description='solution to life',
+                   path='myothermodule:myotherfunction')
         def myotherfunction(arg42):
             pass
 
@@ -151,16 +150,17 @@ def test_text_output_dump_formatting():
     reference_numbers = []
     references = []
     for line in lines:
-        match_citation = re.search('(\[[0-9]\])$', line)
-        match_reference = re.search('^(\[[0-9]\])', line)
+        match_citation = re.search('\[([0-9, ]+)\]$', line)
+        match_reference = re.search('^\[([0-9])\]', line)
         if match_citation:
-            citation_numbers.append(match_citation.group())
+            citation_numbers.extend(match_citation.group(1).split(', '))
         elif match_reference:
-            reference_numbers.append(match_reference.group())
+            reference_numbers.append(match_reference.group(1))
             references.append(line.replace(match_reference.group(), ""))
 
-    assert_equal(citation_numbers, reference_numbers)
-    assert_equal(len(set(references)), len(citation_numbers))
+    assert_equal(set(citation_numbers), set(reference_numbers))
+    assert_equal(len(set(references)), len(set(citation_numbers)))
+    assert_equal(len(citation_numbers), 8)
     # verify that we have returned to previous state of filters
     import warnings
     assert_true(('ignore', None, UserWarning, None, 0) not in warnings.filters)
@@ -191,3 +191,23 @@ def _generate_sample_bibtex():
         sample_bibtex += "%s={%s},\n" % (string, value)
     sample_bibtex += "}"
     return sample_bibtex
+
+def test_enumeratedentries():
+    enumentries = EnumeratedEntries()
+    assert_false(enumentries)
+
+    # add some entries
+    entries = [('ciao', 1), ('miao', 2), ('bau', 3)]
+    for entry, _ in entries:
+        enumentries.add(entry)
+
+    assert_equal(len(enumentries), 3)
+
+    for entry, nr in entries:
+        assert_equal(nr, enumentries[entry])
+        assert_equal(entry, enumentries.fromrefnr(nr))
+
+    assert_raises(KeyError, enumentries.__getitem__, 'boh')
+    assert_raises(KeyError, enumentries.fromrefnr, 666)
+
+    assert_equal(entries, sorted(enumentries, key=lambda x: x[1]))

@@ -1,6 +1,7 @@
 from citeproc.source.bibtex import BibTeX as cpBibTeX
 import citeproc as cp
 
+from collections import defaultdict, Iterator
 import os
 from os.path import dirname, exists
 import pickle
@@ -47,6 +48,44 @@ def import_doi(doi):
     return bibtex
 
 
+class EnumeratedEntries(Iterator):
+    """A container of entries enumerated referenced by their entry_key"""
+    def __init__(self):
+        self._keys2refnr = {}
+        self._refnr2keys = {}
+        self._refnr = 1
+
+    def add(self, entry_key):
+        """Add entry_key and update refnr"""
+        if entry_key not in self._keys2refnr:
+            self._keys2refnr[entry_key] = self._refnr
+            self._refnr2keys[self._refnr] = entry_key
+            self._refnr += 1
+
+    def __getitem__(self, item):
+        if item not in self._keys2refnr:
+            raise KeyError('{0} not present'.format(item))
+        return self._keys2refnr[item]
+
+    def fromrefnr(self, refnr):
+        if refnr not in self._refnr2keys:
+            raise KeyError('{0} not present'.format(refnr))
+        return self._refnr2keys[refnr]
+
+    def __iter__(self):
+        return iteritems(self._keys2refnr)
+
+    # Python 3
+    def __next__(self):
+        return self.next()
+
+    def next(self):
+        yield next(self.__iter__())
+
+    def __len__(self):
+        return len(self._keys2refnr)
+
+
 class TextOutput(object):  # TODO some parent class to do what...?
     def __init__(self, fd, collector, style=None):
         self.fd = fd
@@ -58,9 +97,8 @@ class TextOutput(object):  # TODO some parent class to do what...?
         else:
             self.style = 'harvard1'
 
-    def dump(self, tags=None):
-
-        # TODO: all that configuration/options should be done outside
+    # TODO: refactor name to sth more intuitive
+    def _model_citations(self, tags=None):
         if not tags:
             tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
         tags = set(tags)
@@ -72,93 +110,87 @@ class TextOutput(object):  # TODO some parent class to do what...?
                              for k, c in iteritems(citations)
                              if tags.intersection(c.tags))
 
+        packages = {}
+        modules = {}
+        objects = {}
 
-        # Separate logic (model) from presentation (view).  Let's first create a "model"
-        # Collect all citations under their corresponding packages
+        for key in ('citations', 'entry_keys'):
+            packages[key] = defaultdict(list)
+            modules[key] = defaultdict(list)
+            objects[key] = defaultdict(list)
 
-        # TODO: such logic/setup would not work if we want to allow citations for modules
-        # within packages, so we really need a 3 level reporting:  package / module / obj
-        cited_packages = {}
-        for citation in itervalues(citations):
-            package = citation.package
-            objname = citation.objname
-
-            if package not in cited_packages:
-                # list of two lists -- one citations for the package itself,
-                # another one will be also dictionary for citations for functions
-                cited_packages[package] = [[], {}]
-
-            if citation.cites_module is True:
-                cited_packages[package][0].append(citation)
+        # for each path store both a list of entry keys and of citations
+        for (path, entry_key), citation in iteritems(citations):
+            if ':' in path:
+                target_dict = objects
+            elif '.' in path:
+                target_dict = modules
             else:
-                if objname not in cited_packages[package][1]:
-                    # initiate a list of citations for that object
-                    cited_packages[package][1][objname] = []
-                cited_packages[package][1][objname].append(citation)
+                target_dict = packages
+            target_dict['citations'][path].append(citation)
+            target_dict['entry_keys'][path].append(entry_key)
+        return packages, modules, objects
 
-        # Now prune references to packages which had no citations ot internal functionality
-        # TODO: theoretically should be done before pruning based on tags so we still
-        # catch those which were used anyhow
-        for package, (package_citations, obj_citations) in list(iteritems(cited_packages)): # operate on a copy
-            # check if any module citation is "forced", so we
-            # always cite if it was imported
-            if any(c.cite_module for c in package_citations):
-                continue
-            if not obj_citations:
-                cited_packages.pop(package)
+    def dump(self, tags=None):
+        # get 'model' of citations
+        packages, modules, objects = self._model_citations(tags)
+        # mapping key -> refnr
+        enum_entries = EnumeratedEntries()
+
+        citations_ordered = []
+        # set up view
+
+        # package level
+        sublevels = [modules, objects]
+        for package in sorted(packages['entry_keys']):
+            for entry_key in packages['entry_keys'][package]:
+                enum_entries.add(entry_key)
+            citations_ordered.append(package)
+            # sublevels
+            for sublevel in sublevels:
+                for obj in sorted(filter(lambda x: package in x, sublevel['entry_keys'])):
+                    for entry_key_obj in sublevel['entry_keys'][obj]:
+                        enum_entries.add(entry_key_obj)
+                    citations_ordered.append(obj)
 
         # Now we can "render" different views of our "model"
         # Here for now just text BUT that is where we can "split" the logic and provide
         # different renderings given the model -- text, rest, md, tex+latex, whatever
         self.fd.write('DueCredit Report:\n')
 
-        refnr = 0
-        citations_ordered = []
+        for path in citations_ordered:
+            if ':' in path:
+                self.fd.write('  ')
+                target_dict = objects
+            elif '.' in path:
+                self.fd.write('  ')
+                target_dict = modules
+            else:
+                target_dict = packages
+            citations = target_dict['citations'][path]
+            entry_keys = target_dict['entry_keys'][path]
+            versions = sorted(map(str, set(str(r.version) for r in citations)))
+            refnrs = sorted([str(enum_entries[entry_key]) for entry_key in entry_keys])
+            self.fd.write('- {0} (v {1}) [{2}]\n'.format(path, ' '.join(versions), ', '.join(refnrs)))
 
-        for package, (package_citations, obj_citations) in iteritems(cited_packages):
-            # package level citation
-            versions = sorted(map(str, set(str(r.version) for r in package_citations)))
-            refnr += 1
-            self.fd.write('- {0} (v {1}) [{2}]\n'.format(
-                package,
-                ', '.join(versions),
-                ', '.join(str(x) for x in range(refnr, refnr+len(package_citations)))))
-            # update refnr in case there are multiple citations for the package
-            refnr += len(package_citations) - 1
-            citations_ordered.extend(package_citations)
+        # Print out some stats
+        obj_names = ('packages', 'modules', 'functions')
+        n_citations = map(len, (packages['citations'], modules['citations'], objects['citations']))
+        for citation_type, n in zip(obj_names, n_citations):
+            self.fd.write('\n{0} {1} cited'.format(n, citation_type))
 
-
-            # function level citations
-            for obj, citations in iteritems(obj_citations):
-                # TODO -- there could be multiple, and they might have different
-                # description so must be groupped accordingly. For now just simply listing them
-                # all separately
-                for citation in citations:
-                    refnr += 1
-                    self.fd.write('  - {0} ({1}) [{2}]\n'.format(
-                        citation.path,
-                        citation.description,
-                        refnr))
-                citations_ordered.extend(citations)
-
-        # Let's collect some stats now (before it was misleading since multiple citations
-        # could have been for the same package or object)
-        self.fd.write('\n{0} modules cited\n{1} functions cited\n'.format(
-            len(cited_packages), sum(len(x[1]) for x in itervalues(cited_packages))))
-        if citations_ordered:
-            self.fd.write('\nReferences\n' + '-' * 10 + '\n')
-            for i, citation in enumerate(citations_ordered):
-                self.fd.write('\n'"[%d] " % (i+1) + get_text_rendering(citation, style=self.style))
+        if enum_entries:
+            citations_fromentrykey = self.collector._citations_fromentrykey()
+            self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
+            # collect all the entries used
+            refnr_key = [(nr, enum_entries.fromrefnr(nr)) for nr in range(1, len(enum_entries)+1)]
+            for nr, key in refnr_key:
+                self.fd.write('\n[{0}] '.format(nr))
+                self.fd.write(get_text_rendering(citations_fromentrykey[key], style=self.style))
             self.fd.write('\n')
 
 def get_text_rendering(citation, style='harvard1'):
-    # TODO: smth fked up smwhere
-    from .collector import Citation
-    # TODO: and we need to move it away -- circular imports etc
-    if isinstance(citation, Citation):
-        entry = citation.entry
-    else:
-        entry = citation
+    entry = citation.entry
     if isinstance(entry, Doi):
         bibtex_rendering = get_bibtex_rendering(entry)
         return get_text_rendering(bibtex_rendering)
