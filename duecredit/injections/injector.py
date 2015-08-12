@@ -59,6 +59,11 @@ def find_object(mod, path):
         obj = getattr(parent, obj_name)
     return parent, obj_name, obj
 
+# We will keep a very original __import__ to mitigate cases of buggy python
+# behavior, see e.g.
+# https://github.com/duecredit/duecredit/issues/40
+# But we will also keep the __import__ as of 'activate' call state so we could
+# stay friendly to anyone else who might decorate __import__ as well
 _very_orig_import = __builtin__.__import__
 
 class DueCreditInjector(object):
@@ -204,6 +209,12 @@ class DueCreditInjector(object):
 
         lgr.log(3, "Done processing injections for module %s", mod_name)
 
+    def _mitigate_None_orig_import(self, name, *args, **kwargs):
+        lgr.error("For some reason self._orig_import is None"
+                  ". Importing using stock importer to mitigate and adjusting _orig_import")
+        DueCreditInjector._orig_import = _very_orig_import
+        return _very_orig_import(name, *args, **kwargs)
+
     def activate(self, retrospect=True):
         """
         Parameters
@@ -225,7 +236,10 @@ class DueCreditInjector(object):
                 if self.__processing_queue or name in self._processed_modules or name in self.__queue_to_process:
                     lgr.debug("Performing undecorated import of %s", name)
                     # return right away without any decoration in such a case
-                    return self._orig_import(name, *args, **kwargs)
+                    if self._orig_import:
+                        return _very_orig_import(name, *args, **kwargs)
+                    else:
+                        return self._mitigate_None_orig_import(name, *args, **kwargs)
                 import_level_prefix = self._import_level_prefix
                 lgr.log(1, "%sProcessing request to import %s", import_level_prefix, name)
                 # importing submodule might result in importing a new one and
@@ -250,9 +264,7 @@ class DueCreditInjector(object):
                     if self._orig_import:
                         mod = self._orig_import(name, *args, **kwargs)
                     else:
-                        lgr.error("For some reason self._orig_import is None"
-                                  ". Importing using stock importer to mitigate")
-                        mod = _very_orig_import(name, *args, **kwargs)
+                        mod = self._mitigate_None_orig_import(name, *args, **kwargs)
 
                     self._handle_fresh_imports(name, import_level_prefix, level)
                 finally:
