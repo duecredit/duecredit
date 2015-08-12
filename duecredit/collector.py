@@ -162,6 +162,10 @@ class Citation(object):
     def key(self):
         return CitationKey(self.path, self.entry.get_key())
 
+    @staticmethod
+    def get_key(path, entry_key):
+        return CitationKey(path, entry_key)
+
 
 class DueCreditCollector(object):
     """Collect the references
@@ -239,9 +243,12 @@ class DueCreditCollector(object):
             entry_ = self._entries[entry]
 
         entry_key = entry_.get_key()
-        if (path, entry_key) not in self.citations:
-           self.citations[(path, entry_key)] = Citation(entry_, **kwargs)
-        citation = self.citations[(path, entry_key)]
+        citation_key = Citation.get_key(path=path, entry_key=entry_key)
+        try:
+            citation = self.citations[citation_key]
+        except KeyError:
+            self.citations[citation_key] = citation = Citation(entry_, **kwargs)
+        assert(citation.key == citation_key)
         # update citation count
         citation.count += 1
 
