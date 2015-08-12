@@ -1,7 +1,7 @@
 from citeproc.source.bibtex import BibTeX as cpBibTeX
 import citeproc as cp
 
-from collections import defaultdict
+from collections import defaultdict, Iterator
 import os
 from os.path import dirname, exists
 import pickle
@@ -47,7 +47,6 @@ def import_doi(doi):
                 f.write(bibtex)
     return bibtex
 
-from collections import Iterator
 
 class EnumeratedEntries(Iterator):
     """A container of entries enumerated referenced by their entry_key"""
