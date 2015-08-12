@@ -47,6 +47,41 @@ def import_doi(doi):
                 f.write(bibtex)
     return bibtex
 
+from collections import Iterator
+
+class EnumeratedEntries(Iterator):
+    """A container of entries enumerated referenced by their entry_key"""
+    def __init__(self):
+        self._keys2refnr = {}
+        self._refnr2keys = {}
+        self._refnr = 1
+
+    def add(self, entry_key):
+        """Add entry_key and update refnr"""
+        if entry_key not in self._keys2refnr:
+            self._keys2refnr[entry_key] = self._refnr
+            self._refnr2keys[self._refnr] = entry_key
+            self._refnr += 1
+
+    def __getitem__(self, item):
+        if item not in self._keys2refnr:
+            raise KeyError('{0} not present'.format(item))
+        return self._keys2refnr[item]
+
+    def fromrefnr(self, refnr):
+        if refnr not in self._refnr2keys:
+            raise KeyError('{0} not present'.format(refnr))
+        return self._refnr2keys[refnr]
+
+    def __iter__(self):
+        return iteritems(self._keys2refnr)
+
+    def next(self):
+        yield next(self.__iter__())
+
+    def __len__(self):
+        return len(self._keys2refnr)
+
 
 class TextOutput(object):  # TODO some parent class to do what...?
     def __init__(self, fd, collector, style=None):
@@ -96,32 +131,26 @@ class TextOutput(object):  # TODO some parent class to do what...?
     def dump(self, tags=None):
         # get 'model' of citations
         packages, modules, objects = self._model_citations(tags)
+        # mapping key -> refnr
+        enum_entries = EnumeratedEntries()
 
         citations_ordered = []
         # set up view
-        keys2refnr = defaultdict(int)  # mapping key -> ref nr
-        refnr = 1
 
         # package level
         for package in sorted(packages['entry_keys']):
             for entry_key in packages['entry_keys'][package]:
-                if entry_key not in keys2refnr:
-                    keys2refnr[entry_key] = refnr
-                    refnr += 1
+                enum_entries.add(entry_key)
             citations_ordered.append(package)
             # module level
             for module in sorted(filter(lambda x: package in x, modules['entry_keys'])):
                 for entry_key_mod in modules['entry_keys'][module]:
-                    if entry_key_mod not in keys2refnr:
-                        keys2refnr[entry_key_mod] = refnr
-                        refnr += 1
+                    enum_entries.add(entry_key_mod)
                 citations_ordered.append(module)
             # object level
             for obj in sorted(filter(lambda x: package in x, objects['entry_keys'])):
                 for entry_key_obj in objects['entry_keys'][obj]:
-                    if entry_key_obj not in keys2refnr:
-                        keys2refnr[entry_key_obj] = refnr
-                        refnr += 1
+                    enum_entries.add(entry_key_obj)
                 citations_ordered.append(obj)
 
         # Now we can "render" different views of our "model"
@@ -141,7 +170,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
             citations = target_dict['citations'][path]
             entry_keys = target_dict['entry_keys'][path]
             versions = sorted(map(str, set(str(r.version) for r in citations)))
-            refnrs = sorted([str(keys2refnr[entry_key]) for entry_key in entry_keys])
+            refnrs = sorted([str(enum_entries[entry_key]) for entry_key in entry_keys])
             self.fd.write('- {0} (v {1}) [{2}]\n'.format(path, ' '.join(versions), ', '.join(refnrs)))
 
         # Print out some stats
@@ -150,12 +179,12 @@ class TextOutput(object):  # TODO some parent class to do what...?
         for citation_type, n in zip(obj_names, n_citations):
             self.fd.write('\n{0} {1} cited'.format(n, citation_type))
 
-        if keys2refnr:
+        if enum_entries:
             citations_fromentrykey = self.collector.citations_fromentrykey()
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
             # collect all the entries used
-            refnr2keys = sorted([(nr, keys) for keys, nr in iteritems(keys2refnr)])
-            for nr, key in refnr2keys:
+            refnr_key = [(nr, enum_entries.fromrefnr(nr)) for nr in range(1, len(enum_entries)+1)]
+            for nr, key in refnr_key:
                 self.fd.write('\n[{0}] '.format(nr))
                 self.fd.write(get_text_rendering(citations_fromentrykey[key], style=self.style))
             self.fd.write('\n')
