@@ -150,7 +150,7 @@ def test_text_output_dump_formatting():
     reference_numbers = []
     references = []
     for line in lines:
-        match_citation = re.search('\[(.+)\]$', line)
+        match_citation = re.search('\[([0-9, ]+)\]$', line)
         match_reference = re.search('^\[([0-9])\]', line)
         if match_citation:
             citation_numbers.extend(match_citation.group(1).split(', '))
