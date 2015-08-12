@@ -180,7 +180,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
             self.fd.write('\n{0} {1} cited'.format(n, citation_type))
 
         if enum_entries:
-            citations_fromentrykey = self.collector.citations_fromentrykey()
+            citations_fromentrykey = self.collector._citations_fromentrykey()
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
             # collect all the entries used
             refnr_key = [(nr, enum_entries.fromrefnr(nr)) for nr in range(1, len(enum_entries)+1)]

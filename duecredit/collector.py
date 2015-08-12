@@ -275,7 +275,7 @@ class DueCreditCollector(object):
 
         return citation
 
-    def citations_fromentrykey(self):
+    def _citations_fromentrykey(self):
         """Return a dictionary with the current citations indexed by the entry key"""
         citations_key = dict()
         for (path, entry_key), citation in iteritems(self.citations):
