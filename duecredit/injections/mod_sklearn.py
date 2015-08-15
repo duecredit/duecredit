@@ -68,9 +68,9 @@ def inject(injector):
     # sklearn.cluster.spectral
     injector.add('sklearn.cluster.spectral', 'discretize', Doi('10.1109/ICCV.2003.1238361'),
                  description="Multiclass spectral clustering", tags=['reference'])
-    injector.add('sklearn.cluster.spectral', 'spectral_clustering', Doi('10.1.1.160.2324'),
+    injector.add('sklearn.cluster.spectral', 'spectral_clustering', Doi('10.1109/34.868688'),
                  description="Spectral clustering", tags=['implementation'])
-    injector.add('sklearn.cluster.spectral', 'spectral_clustering', Doi('10.1.1.165.9323'),
+    injector.add('sklearn.cluster.spectral', 'spectral_clustering', Doi('10.1007/s11222-007-9033-z'),
                  description="Spectral clustering", tags=['implementation'])
 
 
