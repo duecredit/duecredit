@@ -156,7 +156,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
         # Now we can "render" different views of our "model"
         # Here for now just text BUT that is where we can "split" the logic and provide
         # different renderings given the model -- text, rest, md, tex+latex, whatever
-        self.fd.write('DueCredit Report:\n')
+        self.fd.write('\nDueCredit Report:\n')
 
         for path in citations_ordered:
             if ':' in path:
