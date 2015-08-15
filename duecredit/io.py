@@ -190,10 +190,18 @@ class TextOutput(object):  # TODO some parent class to do what...?
             self.fd.write('\n')
 
 def get_text_rendering(citation, style='harvard1'):
+    from .collector import Citation
     entry = citation.entry
     if isinstance(entry, Doi):
         bibtex_rendering = get_bibtex_rendering(entry)
-        return get_text_rendering(bibtex_rendering)
+        # pass down the kwargs
+        bibtex_citation = Citation(bibtex_rendering,
+                                   description=citation.description,
+                                   path=citation.path,
+                                   version=citation.version,
+                                   cite_module=citation.cite_module,
+                                   tags=citation.tags)
+        return get_text_rendering(bibtex_citation)
     elif isinstance(entry, BibTeX):
         return format_bibtex(entry, style=style)
     else:
