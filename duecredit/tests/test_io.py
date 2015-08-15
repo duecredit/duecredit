@@ -111,7 +111,7 @@ def test_text_output_dump_formatting():
     assert_true('1 functions cited' in value, msg='value was {0}'.format(value))
     assert_true('(v 0.0.16)' in value,
                 msg='value was {0}'.format(value))
-    assert_equal(len(value.split('\n')), 19, msg='value was {0}'.format(value))
+    assert_equal(len(value.split('\n')), 21, msg='value was {0}'.format(value))
 
     # test we get the reference numbering right
     samples_bibtex = [_generate_sample_bibtex() for x in range(5)]
