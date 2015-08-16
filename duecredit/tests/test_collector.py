@@ -50,7 +50,7 @@ _sample_bibtex2 = """
   month = {Jul},
 }
 """
-_sample_doi = "a.b.c/1.2.3"
+_sample_doi = "10.3389/fninf.2012.00022"
 
 def test_citation_paths():
     entry = BibTeX(_sample_bibtex)

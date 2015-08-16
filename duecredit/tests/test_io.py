@@ -1,11 +1,13 @@
 from ..collector import DueCreditCollector, Citation
 from .test_collector import _sample_bibtex, _sample_doi
-from ..entries import BibTeX, DueCreditEntry
+from ..entries import BibTeX, DueCreditEntry, Doi
 from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, get_text_rendering
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
     assert_true, assert_false
 from six.moves import StringIO
 from six import text_type
+
+from mock import patch
 
 import random
 import re
@@ -213,9 +215,20 @@ def test_enumeratedentries():
 
     assert_equal(entries, sorted(enumentries, key=lambda x: x[1]))
 
-def test_get_text_rendering():
-    citation_bibtex = Citation(_sample_bibtex, path='mypath')
-    citation_doi = Citation(_sample_doi, path='mypath')
-    # smoke test
+@patch('duecredit.io.get_bibtex_rendering')
+@patch('duecredit.io.format_bibtex')
+def test_get_text_rendering(mock_format_bibtex, mock_get_bibtex_rendering):
+    # mock get_bibtex_rendering to return the same bibtex entry
+    sample_bibtex = BibTeX(_sample_bibtex)
+    mock_get_bibtex_rendering.return_value = sample_bibtex
+
+    # test if bibtex type is passed
+    citation_bibtex = Citation(sample_bibtex, path='mypath')
     assert_true(get_text_rendering(citation_bibtex))
+    mock_format_bibtex.assert_called_with(citation_bibtex.entry, style='harvard1')
+    mock_format_bibtex.reset_mock()
+
+    # test if doi type is passed
+    citation_doi = Citation(Doi(_sample_doi), path='mypath')
     assert_true(get_text_rendering(citation_doi))
+    mock_format_bibtex.assert_called_with(citation_bibtex.entry, style='harvard1')
