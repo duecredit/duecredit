@@ -224,11 +224,13 @@ def test_get_text_rendering(mock_format_bibtex, mock_get_bibtex_rendering):
 
     # test if bibtex type is passed
     citation_bibtex = Citation(sample_bibtex, path='mypath')
-    assert_true(get_text_rendering(citation_bibtex))
+    bibtex_output = get_text_rendering(citation_bibtex)
     mock_format_bibtex.assert_called_with(citation_bibtex.entry, style='harvard1')
     mock_format_bibtex.reset_mock()
 
     # test if doi type is passed
     citation_doi = Citation(Doi(_sample_doi), path='mypath')
-    assert_true(get_text_rendering(citation_doi))
+    doi_output = get_text_rendering(citation_doi)
     mock_format_bibtex.assert_called_with(citation_bibtex.entry, style='harvard1')
+
+    assert_equal(bibtex_output, doi_output)
