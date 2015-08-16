@@ -235,7 +235,7 @@ def test_dcite_match_conditions():
     assert_equal(len(due.citations), 2)
     assert_equal(len(due._entries), 2)
     assert_equal(due.citations[('method', 'XXX0')].count, 2) # Count should stay the same for XXX0
-    assert_equal(due.citations[('method', 'a.b.c/1.2.3')].count, 1) # but we get a new one
+    assert_equal(due.citations[('method', _sample_doi)].count, 1) # but we get a new one
 
 
 
