@@ -1,6 +1,7 @@
-from ..collector import DueCreditCollector
+from ..collector import DueCreditCollector, Citation
+from .test_collector import _sample_bibtex, _sample_doi
 from ..entries import BibTeX, DueCreditEntry
-from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries
+from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, get_text_rendering
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
     assert_true, assert_false
 from six.moves import StringIO
@@ -110,7 +111,7 @@ def test_text_output_dump_formatting():
     assert_true('1 functions cited' in value, msg='value was {0}'.format(value))
     assert_true('(v 0.0.16)' in value,
                 msg='value was {0}'.format(value))
-    assert_equal(len(value.split('\n')), 19, msg='value was {0}'.format(value))
+    assert_equal(len(value.split('\n')), 21, msg='value was {0}'.format(value))
 
     # test we get the reference numbering right
     samples_bibtex = [_generate_sample_bibtex() for x in range(5)]
@@ -211,3 +212,10 @@ def test_enumeratedentries():
     assert_raises(KeyError, enumentries.fromrefnr, 666)
 
     assert_equal(entries, sorted(enumentries, key=lambda x: x[1]))
+
+def test_get_text_rendering():
+    citation_bibtex = Citation(_sample_bibtex, path='mypath')
+    citation_doi = Citation(_sample_doi, path='mypath')
+    # smoke test
+    assert_true(get_text_rendering(citation_bibtex))
+    assert_true(get_text_rendering(citation_doi))

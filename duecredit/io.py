@@ -156,7 +156,7 @@ class TextOutput(object):  # TODO some parent class to do what...?
         # Now we can "render" different views of our "model"
         # Here for now just text BUT that is where we can "split" the logic and provide
         # different renderings given the model -- text, rest, md, tex+latex, whatever
-        self.fd.write('DueCredit Report:\n')
+        self.fd.write('\nDueCredit Report:\n')
 
         for path in citations_ordered:
             if ':' in path:
@@ -190,10 +190,18 @@ class TextOutput(object):  # TODO some parent class to do what...?
             self.fd.write('\n')
 
 def get_text_rendering(citation, style='harvard1'):
+    from .collector import Citation
     entry = citation.entry
     if isinstance(entry, Doi):
         bibtex_rendering = get_bibtex_rendering(entry)
-        return get_text_rendering(bibtex_rendering)
+        # pass down the kwargs
+        bibtex_citation = Citation(bibtex_rendering,
+                                   description=citation.description,
+                                   path=citation.path,
+                                   version=citation.version,
+                                   cite_module=citation.cite_module,
+                                   tags=citation.tags)
+        return get_text_rendering(bibtex_citation)
     elif isinstance(entry, BibTeX):
         return format_bibtex(entry, style=style)
     else:
