@@ -74,7 +74,24 @@ setup(
     author='Yaroslav Halchenko, Matteo Visconti di Oleggio Castello',
     author_email='yoh@onerussian.com',
     description='Publications (and donations) tracer',
-    long_description=README,
+    long_description="""\
+duecredit is being conceived to address the problem of inadequate
+citation of scientific software and methods, and limited visibility of
+donation requests for open-source software.
+
+It provides a simple framework (at the moment for Python only) to
+embed publication or other references in the original code so they are
+automatically collected and reported to the user at the necessary
+level of reference detail, i.e. only references for actually used
+functionality will be presented back if software provides multiple
+citeable implementations.
+
+To get a sense of what duecredit is about, run for example shipped along
+example script, or your analysis script with `-m duecredit`, e.g.
+
+    python -m duecredit examples/example_scipy.py
+
+""",
     url='https://github.com/duecredit/duecredit',
     # Download URL will point to the latest release, thus suffixes removed
     download_url='https://github.com/duecredit/duecredit/releases/tag/%s' % re.sub('-.*$', '', __version__),
