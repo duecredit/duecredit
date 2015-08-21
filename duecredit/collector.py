@@ -18,7 +18,8 @@ from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
-from .utils import never_fail, borrowdoc, external_versions
+from .utils import never_fail, borrowdoc
+from .versions import external_versions
 from collections import namedtuple
 
 import logging
