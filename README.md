@@ -76,11 +76,12 @@ By default `duecredit` does exactly nothing -- all decorators do not
 decorate, all `cite` functions just return, so there should be no fear
 that it would break anything. Then whenever anyone runs their analysis
 which uses your code and sets `DUECREDIT_ENABLE=yes` environment
-variable, and invokes any of the cited function/methods, at the end of
-the run all collected bibliography will be presented to the screen and
-pickled into `.duecredit.p` file in current directory:
+variable or uses `python -m duecredit`, and invokes any of the cited
+function/methods, at the end of the run all collected bibliography
+will be presented to the screen and pickled into `.duecredit.p` file
+in current directory:
 
-    $> DUECREDIT_ENABLE=True python examples/example_scipy.py
+    $> python -m duecredit examples/example_scipy.py
     I: Simulating 4 blobs
     I: Done clustering 4 blobs
     DueCredit Report:
