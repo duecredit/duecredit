@@ -118,6 +118,21 @@ class TestActiveInjector(object):
         # just a smoke test for now
         import mvpa2.suite as mv
 
+    def _test_incorrect_path(self, mod, obj):
+        ref = Doi('1.2.3.4')
+        # none of them should lead to a failure
+        self.injector.add(mod, obj, ref)
+        # now cause the import handling -- it must not fail
+        # TODO: catch/analyze warnings
+        exec('from duecredit.tests.mod import testfunc1')
+
+    def test_incorrect_path(self):
+        yield self._test_incorrect_path, "nonexistingmodule", None
+        yield self._test_incorrect_path, "duecredit.tests.mod.nonexistingmodule", None
+        yield self._test_incorrect_path, "duecredit.tests.mod", "nonexisting"
+        yield self._test_incorrect_path, "duecredit.tests.mod", "nonexisting.whocares"
+
+
 
 def _test_find_object(mod, path, parent, obj_name, obj):
     assert_equal(find_object(mod, path), (parent, obj_name, obj))
