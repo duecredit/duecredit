@@ -84,8 +84,11 @@ def inject(injector):
 }""")
     # Not clear here though if those are the original publication on the topic
     # or just an educational references (books), most probably both ;)
-    injector.add('sklearn.ensemble.forest', 'RandomForest.predict_proba', Breiman_2001,
-                 description="Random forest classifiers and regressions",
+    injector.add('sklearn.ensemble.forest', 'RandomForestClassifier.predict_proba', Breiman_2001,
+                 description="Random forest classifiers",
+                 tags=['implementation', 'edu'])
+    injector.add('sklearn.ensemble.forest', 'RandomForestRegressor.predict', Breiman_2001,
+                 description="Random forest regressions",
                  tags=['implementation', 'edu'])
     injector.add('sklearn.tree.tree', 'DecisionTreeClassifier.predict_proba', Breiman_1984,
                  description="Classification and regression trees",
