@@ -188,12 +188,16 @@ def _test_args_match_conditions(conds):
     #  got compound case
     assert_true(args_match_conditions(conds, scope='life'))
     assert_false(args_match_conditions(conds, scope='someother'))
+    # should be "and", so if one not matching -- both not matchin
+    assert_false(args_match_conditions(conds, method="wrong", scope='life'))
+    assert_false(args_match_conditions(conds, method="purge", scope='someother'))
     #assert_true(args_match_conditions(conds, None, None, 'life'))  # ambigous/conflicting
 
 def test_args_match_conditions():
     yield _test_args_match_conditions, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'}}
     yield _test_args_match_conditions, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'},
-                                     (2, 'scope'): {'life', 'DC_DEFAULT'}}
+                                        (2, 'scope'): {'life', 'DC_DEFAULT'}}
+
 
 def _test_dcite_match_conditions(due, callable, path):
     assert_equal(due.citations, {})
@@ -239,7 +243,7 @@ def test_dcite_match_conditions_function():
         assert_equal(arg1, "magical")
         return "load %s" % kwarg2
 
-    yield _test_dcite_match_conditions, due, method, 'callable'
+    _test_dcite_match_conditions(due, method, 'callable')
 
 
 def test_dcite_match_conditions_method():
@@ -248,8 +252,13 @@ def test_dcite_match_conditions_method():
     due.add(BibTeX(_sample_bibtex))
 
     class Citeable(object):
+        def __init__(self, param=None):
+            self.param = param
+
         @due.dcite("XXX0", path='obj.callable',
-                   conditions={(2, "kwarg2"): {"blah", "DC_DEFAULT"}})
+                   conditions={(2, "kwarg2"): {"blah", "DC_DEFAULT"},
+                               (0, 'self.param'): {"paramvalue"}  # must be matched
+                               })
         @due.dcite(Doi(_sample_doi), path='obj.callable',
                    conditions={(2, "kwarg2"): {"boo"}})
         def method(self, arg1, kwarg2="blah"):
@@ -257,10 +266,10 @@ def test_dcite_match_conditions_method():
             assert_equal(arg1, "magical")
             return "load %s" % kwarg2
 
-    citeable = Citeable()
-    yield _test_dcite_match_conditions, due, citeable.method, 'obj.callable'
+    citeable = Citeable(param="paramvalue")
+    _test_dcite_match_conditions(due, citeable.method, 'obj.callable')
 
-
+    # now test for self.param
 
 
 def test_get_output_handler_method():
