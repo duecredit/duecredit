@@ -7,8 +7,8 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-from ..utils import ExternalVersions
 from ..version import __version__
+from ..versions import ExternalVersions
 
 from nose.tools import assert_equal, assert_greater_equal, assert_greater
 from nose.tools import assert_raises

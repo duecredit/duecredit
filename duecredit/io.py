@@ -168,11 +168,14 @@ class TextOutput(object):  # TODO some parent class to do what...?
                 target_dict = modules
             else:
                 target_dict = packages
+            # TODO: absorb common logic into a common function
             citations = target_dict['citations'][path]
             entry_keys = target_dict['entry_keys'][path]
+            descriptions = sorted(map(str, set(str(r.description) for r in citations)))
             versions = sorted(map(str, set(str(r.version) for r in citations)))
             refnrs = sorted([str(enum_entries[entry_key]) for entry_key in entry_keys])
-            self.fd.write('- {0} (v {1}) [{2}]\n'.format(path, ' '.join(versions), ', '.join(refnrs)))
+            self.fd.write('- {0} / {1} (v {2}) [{3}]\n'.format(
+                ", ".join(descriptions), path, ', '.join(versions), ', '.join(refnrs)))
 
         # Print out some stats
         obj_names = ('packages', 'modules', 'functions')

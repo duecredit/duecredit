@@ -188,55 +188,88 @@ def _test_args_match_conditions(conds):
     #  got compound case
     assert_true(args_match_conditions(conds, scope='life'))
     assert_false(args_match_conditions(conds, scope='someother'))
+    # should be "and", so if one not matching -- both not matchin
+    assert_false(args_match_conditions(conds, method="wrong", scope='life'))
+    assert_false(args_match_conditions(conds, method="purge", scope='someother'))
     #assert_true(args_match_conditions(conds, None, None, 'life'))  # ambigous/conflicting
 
 def test_args_match_conditions():
     yield _test_args_match_conditions, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'}}
     yield _test_args_match_conditions, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'},
-                                     (2, 'scope'): {'life', 'DC_DEFAULT'}}
+                                        (2, 'scope'): {'life', 'DC_DEFAULT'}}
 
-def test_dcite_match_conditions():
+
+def _test_dcite_match_conditions(due, callable, path):
+    assert_equal(due.citations, {})
+    assert_equal(len(due._entries), 1)
+
+    assert_equal(callable("magical", "unknown"), "load unknown")
+    assert_equal(due.citations, {})
+    assert_equal(len(due._entries), 1)
+
+    assert_equal(callable("magical"), "load blah")
+
+    assert_equal(len(due.citations), 1)
+    assert_equal(len(due._entries), 1)
+    entry = due._entries['XXX0']
+    assert_equal(due.citations[(path, 'XXX0')].count, 1)
+
+    # Cause the same citation
+    assert_equal(callable("magical", "blah"), "load blah")
+    # Nothing should change
+    assert_equal(len(due.citations), 1)
+    assert_equal(len(due._entries), 1)
+    assert_equal(due.citations[(path, 'XXX0')].count, 2) # Besides the count
+
+    # Now cause new citation given another value
+    assert_equal(callable("magical", "boo"), "load boo")
+    assert_equal(len(due.citations), 2)
+    assert_equal(len(due._entries), 2)
+    assert_equal(due.citations[(path, 'XXX0')].count, 2) # Count should stay the same for XXX0
+    assert_equal(due.citations[(path, 'a.b.c/1.2.3')].count, 1) # but we get a new one
+
+
+def test_dcite_match_conditions_function():
 
     due = DueCreditCollector()
     due.add(BibTeX(_sample_bibtex))
 
-    @due.dcite("XXX0", path='method',
+    @due.dcite("XXX0", path='callable',
                conditions={(1, "kwarg2"): {"blah", "DC_DEFAULT"}})
-    @due.dcite(Doi(_sample_doi), path='method',
+    @due.dcite(Doi(_sample_doi), path='callable',
                conditions={(1, "kwarg2"): {"boo"}})
     def method(arg1, kwarg2="blah"):
         """docstring"""
         assert_equal(arg1, "magical")
         return "load %s" % kwarg2
 
-    assert_equal(due.citations, {})
-    assert_equal(len(due._entries), 1)
+    _test_dcite_match_conditions(due, method, 'callable')
 
-    assert_equal(method("magical", "unknown"), "load unknown")
-    assert_equal(due.citations, {})
-    assert_equal(len(due._entries), 1)
 
-    assert_equal(method("magical"), "load blah")
+def test_dcite_match_conditions_method():
 
-    assert_equal(len(due.citations), 1)
-    assert_equal(len(due._entries), 1)
-    entry = due._entries['XXX0']
-    assert_equal(due.citations[('method', 'XXX0')].count, 1)
+    due = DueCreditCollector()
+    due.add(BibTeX(_sample_bibtex))
 
-    # Cause the same citation
-    assert_equal(method("magical", "blah"), "load blah")
-    # Nothing should change
-    assert_equal(len(due.citations), 1)
-    assert_equal(len(due._entries), 1)
-    assert_equal(due.citations[('method', 'XXX0')].count, 2) # Besides the count
+    class Citeable(object):
+        def __init__(self, param=None):
+            self.param = param
 
-    # Now cause new citation given another value
-    assert_equal(method("magical", "boo"), "load boo")
-    assert_equal(len(due.citations), 2)
-    assert_equal(len(due._entries), 2)
-    assert_equal(due.citations[('method', 'XXX0')].count, 2) # Count should stay the same for XXX0
-    assert_equal(due.citations[('method', _sample_doi)].count, 1) # but we get a new one
+        @due.dcite("XXX0", path='obj.callable',
+                   conditions={(2, "kwarg2"): {"blah", "DC_DEFAULT"},
+                               (0, 'self.param'): {"paramvalue"}  # must be matched
+                               })
+        @due.dcite(Doi(_sample_doi), path='obj.callable',
+                   conditions={(2, "kwarg2"): {"boo"}})
+        def method(self, arg1, kwarg2="blah"):
+            """docstring"""
+            assert_equal(arg1, "magical")
+            return "load %s" % kwarg2
 
+    citeable = Citeable(param="paramvalue")
+    _test_dcite_match_conditions(due, citeable.method, 'obj.callable')
+
+    # now test for self.param
 
 
 def test_get_output_handler_method():

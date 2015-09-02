@@ -189,7 +189,7 @@ class DueCreditInjector(object):
                 # so we point to an object within the mod
                 try:
                     parent, obj_name, obj = find_object(mod, obj_path)
-                except KeyError as e:
+                except (KeyError, AttributeError) as e:
                     lgr.warning("Could not find %s in module %s: %s" % (obj_path, mod, e))
                     continue
 

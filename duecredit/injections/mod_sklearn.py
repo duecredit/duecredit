@@ -29,7 +29,7 @@ def inject(injector):
         volume={12},
         pages={2825--2830},
         year={2011},
-        publisher={JMLR. org}
+        publisher={JMLR.org}
         }
     """), description="Machine Learning library")
 
@@ -73,4 +73,24 @@ def inject(injector):
     injector.add('sklearn.cluster.spectral', 'spectral_clustering', Doi('10.1007/s11222-007-9033-z'),
                  description="Spectral clustering", tags=['implementation'])
 
+    # sklearn.ensemble.forest and tree
+    Breiman_2001 = Doi("10.1023/A:1010933404324")
+    Breiman_1984 = BibTeX("""@BOOK{breiman-friedman-olshen-stone-1984,
+  author        = {L. Breiman and J. Friedman and R. Olshen and C. Stone},
+  title         = {{Classification and Regression Trees}},
+  publisher     = {Wadsworth and Brooks},
+  address       = {Monterey, CA},
+  year          = {1984},
+}""")
+    # Not clear here though if those are the original publication on the topic
+    # or just an educational references (books), most probably both ;)
+    injector.add('sklearn.ensemble.forest', 'RandomForestClassifier.predict_proba', Breiman_2001,
+                 description="Random forest classifiers",
+                 tags=['implementation', 'edu'])
+    injector.add('sklearn.ensemble.forest', 'RandomForestRegressor.predict', Breiman_2001,
+                 description="Random forest regressions",
+                 tags=['implementation', 'edu'])
+    injector.add('sklearn.tree.tree', 'DecisionTreeClassifier.predict_proba', Breiman_1984,
+                 description="Classification and regression trees",
+                 tags=['implementation', 'edu'])
 

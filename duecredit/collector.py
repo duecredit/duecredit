@@ -18,7 +18,8 @@ from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
-from .utils import never_fail, borrowdoc, external_versions
+from .utils import never_fail, borrowdoc
+from .versions import external_versions
 from collections import namedtuple
 
 import logging
@@ -293,15 +294,36 @@ class DueCreditCollector(object):
     def _args_match_conditions(conditions, *fargs, **fkwargs):
         """Helper to identify when to trigger citation given parameters to the function call
         """
-        hit_default = False
         for (argpos, kwarg), values in iteritems(conditions):
+            # main logic -- assess default and if get to the next one if
+            # given argument is not present
+            if not ((len(fargs) > argpos) or (kwarg in fkwargs)):
+                if not ('DC_DEFAULT' in values):
+                    # if value was specified but not provided and not default
+                    # conditions are not satisfied
+                    return False
+                continue
+
+            # "extract" the value.  Must be defined here
+            value = "__duecredit_magical_undefined__"
             if len(fargs) > argpos:
-                return fargs[argpos] in values
+                value = fargs[argpos]
             if kwarg in fkwargs:
-                return fkwargs[kwarg] in values
-            if 'DC_DEFAULT' in values:
-                hit_default = True
-        return hit_default
+                value = fkwargs[kwarg]
+            assert(value != "__duecredit_magical_undefined__")
+
+            if '.' in kwarg:
+                # we were requested to condition based on the value of the attribute
+                # of the value.  So get to the attribute(s) value
+                for attr in kwarg.split('.')[1:]:
+                    value = getattr(value, attr)
+
+            # Value is present but not matching
+            if not (value in values):
+                return False
+
+        # if checks passed -- we must have matched conditions
+        return True
 
     @never_fail
     @borrowdoc(Citation, "__init__", replace="PLUGDOCSTRING")
@@ -312,18 +334,16 @@ class DueCreditCollector(object):
         ----------
         conditions: dict, optional
           If reference should be cited whenever parameters to the function call
-          satisfy given values.  Each key in the dictionary is a 2 element tuple
-          with first element, integer, pointing to a position of the argument in the original
-          function call signature, while second provides the name, thus if used as a keyword
-          argument.  Use "DC_DEFAULT" keyword as a value to depict default
-          value (e.g. if no explicit value was provided for that positional or keyword
-          argument).
-
-          Notes:
-            first matching argument (or e.g. absence of it, given presence of
-            "DC_DEFAULT") would result in match and order of items within conditions is not
-            guaranteed unless you use some OrderedDict.  Overall matching multiple cases
-            is not fully tested and we would appreciate a feedback and use-cases
+          satisfy given values (all of the specified).
+          Each key in the dictionary is a 2 element tuple with first element, integer,
+          pointing to a position of the argument in the original function call signature,
+          while second provides the name, thus if used as a keyword argument.
+          Use "DC_DEFAULT" keyword as a value to depict default value (e.g. if no
+          explicit value was provided for that positional or keyword argument).
+          If "keyword argument" is of the form "obj.attr1.attr2", then actual value
+          for comparison would be taken by extracting attr1 (and then attr2) attributes
+          from the provided value.  So, if desired to condition of the state of the object,
+          you can use `(0, "self.attr1") : {...values...}`
 
         Examples
         --------
@@ -345,6 +365,17 @@ class DueCreditCollector(object):
         >>> relief("doesn't matter")
         'crap'
 
+        Conditional based on the state of the object
+
+        >>> class Citeable(object):
+        ...     def __init__(self, param=None):
+        ...         self.param = param
+        ...     @due.dcite('XXX00', description="The same good old relief",
+        ...                conditions={(0, 'self.param'): {'magic'}})
+        ...     def __call__(self, data):
+        ...         return sum(data)
+        >>> Citeable('magic')([1, 2])
+        3
         """
         def func_wrapper(func):
             conditions = kwargs.pop('conditions', {})
