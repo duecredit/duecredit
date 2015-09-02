@@ -2,6 +2,7 @@ from citeproc.source.bibtex import BibTeX as cpBibTeX
 import citeproc as cp
 
 from collections import defaultdict, Iterator
+import copy
 import os
 from os.path import dirname, exists
 import pickle
@@ -194,13 +195,8 @@ def get_text_rendering(citation, style='harvard1'):
     entry = citation.entry
     if isinstance(entry, Doi):
         bibtex_rendering = get_bibtex_rendering(entry)
-        # pass down the kwargs
-        bibtex_citation = Citation(bibtex_rendering,
-                                   description=citation.description,
-                                   path=citation.path,
-                                   version=citation.version,
-                                   cite_module=citation.cite_module,
-                                   tags=citation.tags)
+        bibtex_citation = copy.copy(citation)
+        bibtex_citation.set_entry(bibtex_rendering)
         return get_text_rendering(bibtex_citation)
     elif isinstance(entry, BibTeX):
         return format_bibtex(entry, style=style)
