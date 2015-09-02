@@ -226,7 +226,7 @@ def _test_dcite_match_conditions(due, callable, path):
     assert_equal(len(due.citations), 2)
     assert_equal(len(due._entries), 2)
     assert_equal(due.citations[(path, 'XXX0')].count, 2) # Count should stay the same for XXX0
-    assert_equal(due.citations[(path, 'a.b.c/1.2.3')].count, 1) # but we get a new one
+    assert_equal(due.citations[(path, "10.3389/fninf.2012.00022")].count, 1) # but we get a new one
 
 
 def test_dcite_match_conditions_function():
