@@ -269,7 +269,7 @@ def test_dcite_match_conditions_method():
     citeable = Citeable(param="paramvalue")
     _test_dcite_match_conditions(due, citeable.method, 'obj.callable')
 
-    # now test for self.param
+    # now test for self.param -
 
 
 def test_get_output_handler_method():
