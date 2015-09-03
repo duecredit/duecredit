@@ -5,6 +5,7 @@ from collections import defaultdict, Iterator
 import copy
 import os
 from os.path import dirname, exists
+from itertools import compress
 import pickle
 import requests
 import tempfile
@@ -130,6 +131,28 @@ class TextOutput(object):  # TODO some parent class to do what...?
                 target_dict = packages
             target_dict['citations'][path].append(citation)
             target_dict['entry_keys'][path].append(entry_key)
+
+        # now filter packages that do not have cited submodules
+        cited_modules = modules['citations'].keys()
+        cited_objects = objects['citations'].keys()
+
+        # deep copy packages dict
+        old_packages = copy.deepcopy(packages)
+        for cited_package, citations in iteritems(packages['citations']):
+            # are there submodules/objects in this package?
+            if not any([cited_package in submodules
+                              for submodules in cited_modules + cited_objects]):
+                # it might happen that some citations have cite_module set to True
+                # keep only those in this case
+                citations_cite_module = map(lambda x: x.cite_module, citations)
+                if any(citations_cite_module):
+                    for key in ['citations', 'entry_keys']:
+                        old_packages[key][cited_package] = list(compress(old_packages[key][cited_package], citations_cite_module))
+                else:
+                    for key in ['citations', 'entry_keys']:
+                        lgr.log(3, 'Removing {0} for package {1} as no submodules were cited.'.format(key, cited_package))
+                        old_packages[key].pop(cited_package)
+        packages = old_packages
         return packages, modules, objects
 
     def dump(self, tags=None):
