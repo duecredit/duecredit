@@ -50,7 +50,7 @@ _sample_bibtex2 = """
   month = {Jul},
 }
 """
-_sample_doi = "a.b.c/1.2.3"
+_sample_doi = "10.3389/fninf.2012.00022"
 
 def test_citation_paths():
     entry = BibTeX(_sample_bibtex)
@@ -226,7 +226,7 @@ def _test_dcite_match_conditions(due, callable, path):
     assert_equal(len(due.citations), 2)
     assert_equal(len(due._entries), 2)
     assert_equal(due.citations[(path, 'XXX0')].count, 2) # Count should stay the same for XXX0
-    assert_equal(due.citations[(path, 'a.b.c/1.2.3')].count, 1) # but we get a new one
+    assert_equal(due.citations[(path, "10.3389/fninf.2012.00022")].count, 1) # but we get a new one
 
 
 def test_dcite_match_conditions_function():
@@ -269,7 +269,7 @@ def test_dcite_match_conditions_method():
     citeable = Citeable(param="paramvalue")
     _test_dcite_match_conditions(due, citeable.method, 'obj.callable')
 
-    # now test for self.param
+    # now test for self.param -
 
 
 def test_get_output_handler_method():

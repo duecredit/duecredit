@@ -168,6 +168,9 @@ class Citation(object):
     def get_key(path, entry_key):
         return CitationKey(path, entry_key)
 
+    def set_entry(self, newentry):
+        self._entry = newentry
+
 
 class DueCreditCollector(object):
     """Collect the references
