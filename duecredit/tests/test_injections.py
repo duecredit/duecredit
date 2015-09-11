@@ -161,8 +161,8 @@ def test_no_double_activation():
         __builtin__.__import__ = orig__import__
 
 def test_get_modules_for_injection():
-    assert_equal(get_modules_for_injection(), ['mod_numpy', 'mod_scipy',
-                                               'mod_sklearn'])
+    assert_equal(get_modules_for_injection(), [
+        'mod_biosig', 'mod_numpy', 'mod_pandas', 'mod_scipy', 'mod_sklearn'])
 
 def test_cover_our_injections():
     # this one tests only import/syntax/api for the injections
