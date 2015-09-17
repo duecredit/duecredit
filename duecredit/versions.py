@@ -3,13 +3,13 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 #
 #   See COPYING file distributed along with the duecredit package for the
-#   copyright and license terms.   Originates from datalad package distributed
-#   under MIT license
+#   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Module to help maintain a registry of versions for external modules etc
 """
 import sys
+from os import linesep
 from six import string_types
 
 from distutils.version import StrictVersion, LooseVersion
@@ -83,5 +83,39 @@ class ExternalVersions(object):
             self._versions[modname] = self._deduce_version(module)
 
         return self._versions.get(modname, self.UNKNOWN)
+
+    def keys(self):
+        """Return names of the known modules"""
+        return self._versions.keys()
+
+    def __contains__(self, item):
+        return item in self._versions
+
+    @property
+    def versions(self):
+        """Return dictionary (copy) of versions"""
+        return self._versions.copy()
+
+    def dumps(self, indent=False, preamble="Versions:"):
+        """Return listing of versions as a string
+
+        Parameters
+        ----------
+        indent: bool or str, optional
+          If set would instruct on how to indent entries (if just True, ' '
+          is used). Otherwise returned in a single line
+        preamble: str, optional
+          What preamble to the listing to use
+        """
+        if indent and (indent is True):
+            indent = ' '
+        items = ["%s=%s" % (k, self._versions[k]) for k in sorted(self._versions)]
+        out = "%s" % preamble
+        if indent:
+            out += (linesep + indent).join([''] + items) + linesep
+        else:
+            out += " " + ' '.join(items)
+        return out
+
 
 external_versions = ExternalVersions()
