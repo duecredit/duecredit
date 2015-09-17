@@ -36,7 +36,8 @@ def import_doi(doi):
     r.encoding = 'UTF-8'
     bibtex = r.text.strip()
     if not bibtex.startswith('@'):
-        raise ValueError('wrong doi specified')
+        raise ValueError('Query for BibTex for a DOI (%s) (wrong doi?) has failed. '
+                         'BibTeX response was: %s' %  (doi, bibtex))
     if not exists(cached):
         cache_dir = dirname(cached)
         if not exists(cache_dir):
