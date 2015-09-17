@@ -30,7 +30,7 @@ def test_external_versions_basic():
     # and it could be compared
     assert_greater_equal(ev['duecredit'], __version__)
     assert_greater(ev['duecredit'], '0.1')
-    assert_equal(ev.keys(), ['duecredit'])
+    assert_equal(list(ev.keys()), ['duecredit'])
     assert_true('duecredit' in ev)
     assert_false('unknown' in ev)
 
