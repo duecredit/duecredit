@@ -7,9 +7,12 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
+from os import linesep
+
 from ..version import __version__
 from ..versions import ExternalVersions
 
+from nose.tools import assert_true, assert_false
 from nose.tools import assert_equal, assert_greater_equal, assert_greater
 from nose.tools import assert_raises
 from nose import SkipTest
@@ -27,6 +30,11 @@ def test_external_versions_basic():
     # and it could be compared
     assert_greater_equal(ev['duecredit'], __version__)
     assert_greater(ev['duecredit'], '0.1')
+    assert_equal(list(ev.keys()), ['duecredit'])
+    assert_true('duecredit' in ev)
+    assert_false('unknown' in ev)
+
+    assert_equal(ev.dumps(), "Versions: duecredit=%s" % __version__)
 
     # For non-existing one we get None
     assert_equal(ev['duecreditnonexisting'], None)
@@ -47,11 +55,19 @@ def test_external_versions_basic():
     from duecredit.tests import mod
     assert_equal(ev[mod], mod.__version__)
 
+    # Check that we can get a copy of the verions
+    versions_dict = ev.versions
+    versions_dict['duecredit'] = "0.0.1"
+    assert_equal(versions_dict['duecredit'], "0.0.1")
+    assert_equal(ev['duecredit'], __version__)
+
+
 def test_external_versions_unknown():
     assert_equal(str(ExternalVersions.UNKNOWN), 'UNKNOWN')
 
 def test_external_versions_popular_packages():
     ev = ExternalVersions()
+
     def _test_external(modname):
         try:
             exec("import %s" % modname, locals(), globals())
@@ -66,3 +82,7 @@ def test_external_versions_popular_packages():
     for modname in ('scipy', 'numpy', 'mvpa2', 'sklearn', 'statsmodels', 'pandas',
                     'matplotlib', 'psychopy'):
         yield _test_external, modname
+
+    # more of a smoke test
+    assert_false(linesep in ev.dumps())
+    assert_true(ev.dumps(indent=True).endswith(linesep))

@@ -1,6 +1,15 @@
+# emacs: -*- mode: python; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil -*-
+# ex: set sts=4 ts=4 sw=4 noet:
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+#
+#   See COPYING file distributed along with the duecredit package for the
+#   copyright and license terms.
+#
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+
 from citeproc.source.bibtex import BibTeX as cpBibTeX
 import citeproc as cp
-
+import time
 from collections import defaultdict, Iterator
 import copy
 import os
@@ -32,11 +41,23 @@ def import_doi(doi):
     # else -- fetch it
     headers = {'Accept': 'text/bibliography; style=bibtex'}
     url = 'http://dx.doi.org/' + doi
-    r = requests.get(url, headers=headers)
-    r.encoding = 'UTF-8'
-    bibtex = r.text.strip()
+    retries = 10
+    while retries > 0:
+        r = requests.get(url, headers=headers)
+        r.encoding = 'UTF-8'
+        bibtex = r.text.strip()
+        if bibtex.startswith('@'):
+            # no more retries necessary
+            break
+        lgr.warning("Failed to obtain bibtex from doi.org, retrying...")
+        time.sleep(0.5)  # give some time to the server
+        retries -= 1
+    status_code = r.status_code
     if not bibtex.startswith('@'):
-        raise ValueError('wrong doi specified')
+        raise ValueError('Query %(url)s for BibTeX for a DOI %(doi)s (wrong doi?) has failed. '
+                         'Response code %(status_code)d. '
+                         #'BibTeX response was: %(bibtex)s'
+                         % locals())
     if not exists(cached):
         cache_dir = dirname(cached)
         if not exists(cache_dir):
