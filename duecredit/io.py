@@ -41,7 +41,7 @@ def import_doi(doi):
     # else -- fetch it
     headers = {'Accept': 'text/bibliography; style=bibtex'}
     url = 'http://dx.doi.org/' + doi
-    retries = 3
+    retries = 10
     while retries > 0:
         r = requests.get(url, headers=headers)
         r.encoding = 'UTF-8'
@@ -49,6 +49,7 @@ def import_doi(doi):
         if bibtex.startswith('@'):
             # no more retries necessary
             break
+        lgr.warning("Failed to obtain bibtex from doi.org, retrying...")
         time.sleep(0.5)  # give some time to the server
         retries -= 1
     status_code = r.status_code
