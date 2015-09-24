@@ -38,15 +38,15 @@ def inject(injector):
                  description="Affinity propagation clustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.bicluster
-    injector.add('sklearn.cluster.bicluster', 'SpectralCoclustering', Doi('10.1.1.140.301'),
+    injector.add('sklearn.cluster.bicluster', 'SpectralCoclustering._fit', Doi('10.1.1.140.301'),
                  description="Spectral Coclustering algorithm", tags=['implementation'])
-    injector.add('sklearn.cluster.bicluster', 'SpectralBiclustering', Doi('10.1.1.135.1608'),
+    injector.add('sklearn.cluster.bicluster', 'SpectralBiclustering._fit', Doi('10.1.1.135.1608'),
                  description="Spectral Biclustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.birch
-    injector.add('sklearn.cluster.birch', 'Birch', Doi('10.1145/233269.233324'),
+    injector.add('sklearn.cluster.birch', 'Birch._fit', Doi('10.1145/233269.233324'),
                  description="BIRCH clustering algorithm", tags=['implementation'])
-    injector.add('sklearn.cluster.birch', 'Birch', Url('https://code.google.com/p/jbirch/'),
+    injector.add('sklearn.cluster.birch', 'Birch._fit', Url('https://code.google.com/p/jbirch/'),
                  description="Java implementation of BIRCH clustering algorithm", tags=['another-implementation'])
 
     # sklearn.cluster.dbscan_
@@ -62,7 +62,7 @@ def inject(injector):
 }"""), description="dbscan clustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.mean_shift_
-    injector.add('sklearn.cluster.mean_shift_', 'MeanShift', Doi('10.1109/34.1000236'),
+    injector.add('sklearn.cluster.mean_shift_', 'mean_shift', Doi('10.1109/34.1000236'),
                  description="Mean shift clustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.spectral
