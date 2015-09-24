@@ -1,11 +1,14 @@
-#!/usr/bin/python
+# emacs: -*- mode: python; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil -*-
+# ex: set sts=4 ts=4 sw=4 noet:
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+#
+#   See COPYING file distributed along with the duecredit package for the
+#   copyright and license terms.
+#
+# ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 """
-#----------------------------------------------------------------
-Author: Jason Gors <jasonDOTgorsATgmail>
-Creation Date: 09-22-2015
-Purpose:  Automatic injection of bibliography entries for mdp module
-#----------------------------------------------------------------
+Automatic injection of bibliography entries for mdp module
 """
 
 
@@ -16,11 +19,6 @@ from ..entries import Doi, BibTeX, Url
 min_version = None
 max_version = None
 
-'''
-injector.add('', None, Doi(''),
-                description="",
-                tags=['implementation'])
-'''
 
 def inject(injector):
     injector.add('mdp', None, Doi('10.3389/neuro.11.008.2008'),
