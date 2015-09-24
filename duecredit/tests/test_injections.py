@@ -162,18 +162,25 @@ def test_no_double_activation():
 
 def test_get_modules_for_injection():
     assert_equal(get_modules_for_injection(), [
-        'mod_biosig', 'mod_numpy', 'mod_pandas', 'mod_scipy', 'mod_sklearn'])
+        'mod_biosig',
+        'mod_dipy',
+        'mod_mdp',
+        'mod_mne',
+        'mod_nipype',
+        'mod_numpy',
+        'mod_pandas',
+        'mod_psychopy',
+        'mod_scipy',
+        'mod_skimage',
+        'mod_sklearn'])
 
 def test_cover_our_injections():
     # this one tests only import/syntax/api for the injections
     due = DueCreditCollector()
     inj = DueCreditInjector(collector=due)
-    from duecredit.injections import mod_numpy
-    mod_numpy.inject(inj)
-    from duecredit.injections import mod_scipy
-    mod_scipy.inject(inj)
-    from duecredit.injections import mod_sklearn
-    mod_sklearn.inject(inj)
+    for modname in get_modules_for_injection():
+        mod = __import__('duecredit.injections.' + modname, fromlist=["duecredit.injections"])
+        mod.inject(inj)
 
 def test_no_harm_from_deactivate():
     # if we have not activated one -- shouldn't blow if we deactivate it
