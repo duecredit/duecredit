@@ -32,7 +32,7 @@ def inject(injector):
                  tags=['implementation'])
 
     injector.add('mdp.nodes', 'NIPALSNode', BibTeX("""
-        @incollection{
+        @incollection{Word1966,
             author={Wold, H.},
             title={Nonlinear estimation by iterative least squares procedures.},
             booktitle={Research Papers in Statistics},
@@ -53,7 +53,7 @@ def inject(injector):
                  tags=['implementation'])
     
     injector.add('mdp.nodes', 'NIPALSNode', BibTeX("""
-        @conference{
+        @conference{ZieheMuller1998,
             author={Ziehe, Andreas and Muller, Klaus-Robert},
             title={TDSEP an efficient algorithm for blind separation using time structure.},
             booktitle={Proc. 8th Int. Conf. Artificial Neural Networks},
@@ -87,7 +87,7 @@ def inject(injector):
 
  
     injector.add('mdp.nodes', 'XSFANode', BibTeX("""
-        @article{
+        @article{SprekelerZitoWiskott2009,
             author={Sprekeler, H., Zito, T., and Wiskott, L.},
             title={An Extension of Slow Feature Analysis for Nonlinear Blind Source Separation.},
             journal={Journal of Machine Learning Research.},
@@ -99,7 +99,7 @@ def inject(injector):
         tags=['edu'])
 
     injector.add('mdp.nodes', 'FDANode._train', BibTeX("""
-        @book{
+        @book{Nishop2011,
             author={Christopher M. Bishop},
             title={Neural Networks for Pattern Recognition},
             publisher={Oxford University Press, Inc}

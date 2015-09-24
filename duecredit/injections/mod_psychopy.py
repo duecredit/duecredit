@@ -19,7 +19,7 @@ max_version = None
 
 def inject(injector):
     injector.add('psychopy', None, Doi('doi:10.1016/j.jneumeth.2006.11.017'),
-                 description="PsychoPy—Psychophysics software in Python.",
+                 description="PsychoPy -- Psychophysics software in Python.",
                  tags=['implementation'])
     
     injector.add('psychopy', None, Doi('10.3389/neuro.11.010.2008'),
