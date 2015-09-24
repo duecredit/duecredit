@@ -162,7 +162,17 @@ def test_no_double_activation():
 
 def test_get_modules_for_injection():
     assert_equal(get_modules_for_injection(), [
-        'mod_biosig', 'mod_numpy', 'mod_pandas', 'mod_scipy', 'mod_sklearn'])
+        'mod_biosig',
+        'mod_dipy',
+        'mod_mdp',
+        'mod_mne',
+        'mod_nipype',
+        'mod_numpy',
+        'mod_pandas',
+        'mod_psychopy',
+        'mod_scipy',
+        'mod_skimage',
+        'mod_sklearn'])
 
 def test_cover_our_injections():
     # this one tests only import/syntax/api for the injections
