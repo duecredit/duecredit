@@ -36,11 +36,16 @@ def inject(injector):
                     description='FSL.',
                     tags=['implementation'])
 
-    #http://www.fil.ion.ucl.ac.uk/spm/
-    # not sure what primary spm citation is...couldn't find on website. 
-    #injector.add('nipype.interfaces', 'spm', Doi(''),
-                    #description='',
-                    #tags=['implementation'])
+    #http://www.fil.ion.ucl.ac.uk/spm
+    injector.add('nipype.interfaces', 'spm', BibTeX("""
+        @book{FrackowiakFristonFrithDolanMazziotta1997,
+            author={R.S.J. Frackowiak, K.J. Friston, C.D. Frith, R.J. Dolan, and J.C. Mazziotta},
+            title={Human Brain Function},
+            publisher={Academic Press USA}
+            year={1997},
+            }
+        """), description='The fundamental text on Statistical Parametric Mapping (SPM)',
+        tags=['implementation'])
 
     #http://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferMethodsCitation
     # there are a bunch, not sure what is primary
