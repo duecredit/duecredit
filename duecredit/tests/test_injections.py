@@ -166,6 +166,8 @@ def test_get_modules_for_injection():
         'mod_dipy',
         'mod_mdp',
         'mod_mne',
+        'mod_nibabel',
+        'mod_nipy',
         'mod_nipype',
         'mod_numpy',
         'mod_pandas',
