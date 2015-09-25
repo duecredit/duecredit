@@ -9,3 +9,4 @@ __pycache__
 .duecredit.p
 .coverage
 *.egg-info
+/duecredit/tests/test_import_doi
