@@ -37,7 +37,7 @@ def inject(injector):
                     tags=['implementation'])
 
     #http://www.fil.ion.ucl.ac.uk/spm
-    injector.add('nipype.interfaces', 'spm', BibTeX(""",
+    injector.add('nipype.interfaces', 'spm', BibTeX("""
         @book{FrackowiakFristonFrithDolanMazziotta1997
             author={R.S.J. Frackowiak, K.J. Friston, C.D. Frith, R.J. Dolan, and J.C. Mazziotta},
             title={Human Brain Function},
