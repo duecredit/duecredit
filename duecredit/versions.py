@@ -64,6 +64,9 @@ class ExternalVersions(object):
             return klass.UNKNOWN
 
     def __getitem__(self, module):
+        # when ran straight in its source code -- fails to discover nipy's version.. TODO
+        #if module == 'nipy':
+        #    import pdb; pdb.set_trace()
         if not isinstance(module, string_types):
             modname = module.__name__
         else:

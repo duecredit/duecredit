@@ -19,5 +19,10 @@ max_version = None
 
 def inject(injector):
     injector.add('nipy', None, Doi('10.1016/S1053-8119(09)72223-2'),
-                 description="NIPY: an open library and development framework for FMRI data analysis",
+                 description="Library fMRI data analysis",
                  tags=['implementation'])
+
+    for f, d in [('spectral_decomposition', 'PCA decomposition of symbolic HRF shifted over time'),
+                 ('taylor_approx', 'A Taylor series approximation of an HRF shifted over time')]:
+        injector.add('nipy.modalities.fmri.fmristat.hrf', f, Doi('10.1006/nimg.2002.1096'),
+            description=d, tags=['implementation'])
