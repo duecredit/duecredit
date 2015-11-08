@@ -1,0 +1,69 @@
+Source: duecredit
+Section: python
+Priority: optional
+Maintainer: Yaroslav Halchenko <debian@onerussian.com>
+Build-Depends: debhelper (>= 9), dh-python,
+               python-all,
+               python-citeproc,
+               python-contextlib2,
+               python-mock,
+               python-nose,
+               python-requests,
+               python-setuptools,
+               python-six,
+               python3-all,
+               python3-setuptools,
+               python3-citeproc,
+               python3-contextlib2,
+               python3-mock,
+               python3-nose,
+               python3-requests,
+               python3-six,
+Standards-Version: 3.9.6
+Homepage: https://github.com/duecredit/duecredit
+
+Package: python-duecredit
+Architecture: all
+Depends: ${misc:Depends}, ${python:Depends},
+Recommends: ${python:Recommends}
+Suggests: ${python:Suggests}
+XB-Python-Egg-Name: duecredit
+Description: Publications (and donations) tracer - Python 2.X
+ duecredit is being conceived to address the problem of inadequate
+ citation of scientific software and methods, and limited visibility of
+ donation requests for open-source software.
+ .
+ It provides a simple framework (at the moment for Python only) to
+ embed publication or other references in the original code so they are
+ automatically collected and reported to the user at the necessary
+ level of reference detail, i.e. only references for actually used
+ functionality will be presented back if software provides multiple
+ citeable implementations.
+ .
+ To get a sense of what duecredit is about, simply run 
+ or your analysis script with `-m duecredit`, e.g.
+ .
+     python -m duecredit examples/example_scipy.py
+
+Package: python3-duecredit
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends},
+Recommends: ${python3:Recommends}
+Suggests: ${python3:Suggests}
+XB-Python-Egg-Name: duecredit
+Description: Publications (and donations) tracer
+ duecredit is being conceived to address the problem of inadequate
+ citation of scientific software and methods, and limited visibility of
+ donation requests for open-source software.
+ .
+ It provides a simple framework (at the moment for Python only) to
+ embed publication or other references in the original code so they are
+ automatically collected and reported to the user at the necessary
+ level of reference detail, i.e. only references for actually used
+ functionality will be presented back if software provides multiple
+ citeable implementations.
+ .
+ To get a sense of what duecredit is about, simply run 
+ or your analysis script with `-m duecredit`, e.g.
+ .
+     python3 -m duecredit examples/example_scipy.py
