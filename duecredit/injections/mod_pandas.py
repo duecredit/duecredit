@@ -23,7 +23,7 @@ def inject(injector):
           author    = { McKinney, Wes },
           title     = { Data Structures for Statistical Computing in Python },
           booktitle = { Proceedings of the 9th Python in Science Conference },
-          pages     = { 51 - 56 },
+          pages     = { 51 -- 56 },
           year      = { 2010 },
           editor    = { van der Walt, St\'efan and Millman, Jarrod }
         }

@@ -37,7 +37,7 @@ def inject(injector):
             publisher={Wiley}
             year={1966},
             editor={David, F.},
-            pages={411-444},
+            pages={411--444},
             }
         """), description="Principal Component Analysis using the NIPALS algorithm.",
         tags=['edu'])
@@ -91,7 +91,7 @@ def inject(injector):
             journal={Journal of Machine Learning Research.},
             year={2009},
             volume={15},
-            pages={921-947},
+            pages={921--947},
             }
         """), description="Non-linear Blind Source Separation using Slow Feature Analysis",
         tags=['edu'])
@@ -102,7 +102,7 @@ def inject(injector):
             title={Neural Networks for Pattern Recognition},
             publisher={Oxford University Press, Inc}
             year={2011},
-            pages={105-112},
+            pages={105--112},
             }
         """), description="(generalized) Fisher Discriminant Analysis",
         tags=['edu'])

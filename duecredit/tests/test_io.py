@@ -54,7 +54,7 @@ def test_pickleoutput():
                    "author={Atkins, Joshua H. and Gershell, Leland J.}, \n"
                    "year={2002}, \n"
                    "month={Jul}, \n"
-                   "pages={491-492}\n}")
+                   "pages={491--492}\n}")
     collector_ = DueCreditCollector()
     collector_.add(entry)
     collector_.cite(entry, path='module')
