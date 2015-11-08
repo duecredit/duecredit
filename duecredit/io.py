@@ -267,8 +267,8 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         citation = cp.Citation([cp.CitationItem(key)])
         bibliography.register(citation)
     finally:
-	    if not os.environ.get("DUECREDIT_KEEPTEMP"):
-			os.unlink(fname)
+        if not os.environ.get("DUECREDIT_KEEPTEMP"):
+            os.unlink(fname)
 
     biblio_out = bibliography.bibliography()
     assert(len(biblio_out) == 1)

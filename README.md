@@ -100,7 +100,7 @@ in current directory:
         cluster method. The Computer Journal, 16(1), pp.30–34.
     [3] Van Der Walt, S., Colbert, S.C. & Varoquaux, G., 2011. The
         NumPy array: a structure for efficient numerical
-		computation. Computing in Science & Engineering, 13(2), pp.22–30.
+        computation. Computing in Science & Engineering, 13(2), pp.22–30.
 
 Incremental runs of various software would keep enriching that file.
 Then you can use `duecredit summary` command to show that information
