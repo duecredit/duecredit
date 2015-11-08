@@ -38,9 +38,9 @@ def inject(injector):
                  description="Affinity propagation clustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.bicluster
-    injector.add('sklearn.cluster.bicluster', 'SpectralCoclustering._fit', Doi('10.1.1.140.301'),
+    injector.add('sklearn.cluster.bicluster', 'SpectralCoclustering._fit', Doi('10.1101/gr.648603'),
                  description="Spectral Coclustering algorithm", tags=['implementation'])
-    injector.add('sklearn.cluster.bicluster', 'SpectralBiclustering._fit', Doi('10.1.1.135.1608'),
+    injector.add('sklearn.cluster.bicluster', 'SpectralBiclustering._fit', Doi('10.1101/gr.648603'),
                  description="Spectral Biclustering algorithm", tags=['implementation'])
 
     # sklearn.cluster.birch
