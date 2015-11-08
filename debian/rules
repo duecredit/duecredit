@@ -1,0 +1,6 @@
+#! /usr/bin/make -f
+
+export PYBUILD_NAME=duecredit
+export PYBUILD_AFTER_INSTALL_python2=rm -rf {destdir}/usr/bin/
+%:
+	dh $@ --with python2,python3 --buildsystem=pybuild
