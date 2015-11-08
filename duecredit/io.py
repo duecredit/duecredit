@@ -255,7 +255,7 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         try:
             bib_source = cpBibTeX(fname)
         except Exception as e:
-            lgr.error("Failed to process BibTeX file %s" % fname)
+            lgr.error("Failed to process BibTeX file %s: %s" % (fname, e))
             return "ERRORED: %s" % str(e)
         finally:
             # return warnings back
@@ -267,7 +267,8 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         citation = cp.Citation([cp.CitationItem(key)])
         bibliography.register(citation)
     finally:
-        os.unlink(fname)
+	    if not os.environ.get("DUECREDIT_KEEPTEMP"):
+			os.unlink(fname)
 
     biblio_out = bibliography.bibliography()
     assert(len(biblio_out) == 1)
