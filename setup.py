@@ -6,11 +6,13 @@ duecredit -- publications (donations, etc) tracer
 import re
 import os
 import sys
+import re
 
 from datetime import datetime
 from setuptools import setup
 from pkgutil import walk_packages
 from subprocess import Popen, PIPE
+from os.path import exists
 
 # Adopted from citeproc-py
 #  License: BSD-2
@@ -24,14 +26,26 @@ VERSION_FILE = PACKAGE + '/version.py'
 # inspired by http://dcreager.net/2010/02/10/setuptools-git-version-numbers/
 
 try:
-    print('Attempting to get version number from git...')
-    git = Popen(['git', 'describe', '--abbrev=4', '--dirty'],
-                stdout=PIPE, stderr=sys.stderr)
-    if git.wait() != 0:
-        raise OSError
-    line = git.stdout.readlines()[0]
-    __version__ = line.strip().decode('ascii')
-    __release_date__ = datetime.now().strftime('%b %d %Y, %H:%M:%S')
+    if exists('debian/copyright'):
+        print('Generating version.py out of debian/copyright information')
+        # building debian package. Deduce version from debian/copyright
+        with open('debian/changelog', 'r') as f:
+            lines = f.readlines()
+        __version__ = re.sub('(.*)-(.*?)$', r'\1.debian\2',
+                             lines[0].split()[1].strip('()')
+                             ).replace('-', '.')
+        # TODO: unify format whenever really bored ;)
+        __release_date__ = re.sub('^ -- .*>\s*(.*)', r'\1',
+                                  list(filter(lambda x: x.startswith(' -- '), lines))[0].rstrip())
+    else:
+        print('Attempting to get version number from git...')
+        git = Popen(['git', 'describe', '--abbrev=4', '--dirty'],
+                    stdout=PIPE, stderr=sys.stderr)
+        if git.wait() != 0:
+            raise OSError
+        line = git.stdout.readlines()[0]
+        __version__ = line.strip().decode('ascii')
+        __release_date__ = datetime.now().strftime('%b %d %Y, %H:%M:%S')
     with open(VERSION_FILE, 'w') as version_file:
         version_file.write("__version__ = '{0}'\n".format(__version__))
         version_file.write("__release_date__ = '{0}'\n".format(__release_date__))
