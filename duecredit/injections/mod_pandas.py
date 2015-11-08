@@ -20,11 +20,11 @@ max_version = None
 def inject(injector):
     injector.add('pandas', None, BibTeX("""
         @InProceedings{ mckinney-proc-scipy-2010,
-          author    = { Wes McKinney },
+          author    = { McKinney, Wes },
           title     = { Data Structures for Statistical Computing in Python },
           booktitle = { Proceedings of the 9th Python in Science Conference },
           pages     = { 51 - 56 },
           year      = { 2010 },
-          editor    = { St\'efan van der Walt and Jarrod Millman }
+          editor    = { van der Walt, St\'efan and Millman, Jarrod }
         }
     """), description="Data analysis library for tabular data")

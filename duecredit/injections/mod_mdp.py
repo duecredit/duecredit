@@ -98,7 +98,7 @@ def inject(injector):
 
     injector.add('mdp.nodes', 'FDANode.train', BibTeX("""
         @book{Bishop2011,
-            author={Christopher M. Bishop},
+            author={Bishop, Christopher M.},
             title={Neural Networks for Pattern Recognition},
             publisher={Oxford University Press, Inc}
             year={2011},
