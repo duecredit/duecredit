@@ -7,8 +7,6 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-from citeproc.source.bibtex import BibTeX as cpBibTeX
-import citeproc as cp
 import time
 from collections import defaultdict, Iterator
 import copy
@@ -238,6 +236,14 @@ def get_bibtex_rendering(entry):
 
 
 def format_bibtex(bibtex_entry, style='harvard1'):
+    try:
+        from citeproc.source.bibtex import BibTeX as cpBibTeX
+        import citeproc as cp
+    except ImportError as e:
+        raise RuntimeError(
+            "For formatted output we need citeproc and all of its dependencies "
+            "(such as lxml) but there is a problem while importing citeproc: %s"
+            % str(e))
     key = bibtex_entry.get_key()
     # need to save it temporarily to use citeproc-py
     fname = tempfile.mktemp(suffix='.bib')
