@@ -7,10 +7,14 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
+# Just for testing of robust operation
+import os
+if 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in os.environ.keys():
+    raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
+
 import time
 from collections import defaultdict, Iterator
 import copy
-import os
 from os.path import dirname, exists
 import pickle
 import requests
