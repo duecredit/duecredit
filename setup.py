@@ -71,10 +71,17 @@ def find_packages(path, prefix):
 
 
 setup(
-    name='duecredit',
+    name=PACKAGE,
     version=__version__,
     packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
-    package_data={PACKAGE: []},
+    # package_data={
+    #     PACKAGE: [
+    #         'tests/envs/nolxml/lxml.py',
+    #         'tests/envs/stubbed/README.txt',
+    #         'tests/envs/stubbed/due.py',
+    #         'tests/envs/stubbed/script.py',
+    #     ]
+    # },
     scripts=[],
     install_requires=['requests', 'citeproc-py'],
     include_package_data=True,
