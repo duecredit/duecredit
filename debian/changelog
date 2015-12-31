@@ -1,4 +1,11 @@
-duecredit (0.4.5-1) unstable; urgency=medium
+duecredit (0.4.5.1-1) unstable; urgency=medium
+
+  * Bugfix release for isatty comparison triggered by inferior mocking in
+    PyMVPA
+
+ -- Yaroslav Halchenko <debian@onerussian.com>  Thu, 31 Dec 2015 17:10:56 -0500
+
+duecredit (0.4.5-1) UNRELEASED; urgency=medium
 
   * Bugfix upstream release to make decoration with duecredit more robust
     against its internal import issues
