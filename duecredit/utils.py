@@ -22,6 +22,9 @@ lgr = logging.getLogger("duecredit.utils")
 
 def is_interactive():
     """Return True if all in/outs are tty"""
+    if any(not hasattr(inout, 'isatty') for inout in (sys.stdin, sys.stdout, sys.stderr)):
+        lgr.warning("Assuming non interactive session since isatty found missing")
+        return False
     # TODO: check on windows if hasattr check would work correctly and add value:
     #
     return sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty()

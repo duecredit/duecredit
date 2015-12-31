@@ -1,8 +1,10 @@
 #! /usr/bin/make -f
 
+export DH_VERBOSE=1
+
 export PYBUILD_NAME=duecredit
 export PYBUILD_AFTER_INSTALL_python2=rm -rf {destdir}/usr/bin/
-export PYBUILD_TEST_ARGS=-etest_import_doi
+export PYBUILD_TEST_ARGS=-e 'test_(import_doi|noincorrect_import_if_no_lxml_numpy)'
 
 export LC_ALL=C.UTF-8
 # there is still some race condition somewhere so injection test on a fast system

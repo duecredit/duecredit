@@ -27,7 +27,7 @@ License:
 Originally a part of the duecredit, which is distributed under BSD-2 license.
 """
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 class InactiveDueCreditCollector(object):
     """Just a stub at the Collector which would not do anything"""
@@ -52,6 +52,8 @@ def _donothing_func(*args, **kwargs):
 
 try:
     from duecredit import *
+    if 'due' in locals() and not hasattr(due, 'cite'):
+        raise RuntimeError("Imported due lacks .cite. DueCredit is now disabled")
 except Exception as e:
     if type(e).__name__ != 'ImportError':
         import logging
