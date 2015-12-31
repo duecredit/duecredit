@@ -1,4 +1,4 @@
-duecredit (0.4.5.2-1) unstable; urgency=medium
+duecredit (0.4.5.3-1) unstable; urgency=medium
 
   * Bugfix release for isatty comparison triggered by inferior mocking in
     PyMVPA
