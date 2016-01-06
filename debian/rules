@@ -1,5 +1,7 @@
 #! /usr/bin/make -f
 
+export DH_VERBOSE=1
+
 export PYBUILD_NAME=duecredit
 export PYBUILD_AFTER_INSTALL_python2=rm -rf {destdir}/usr/bin/
 export PYBUILD_TEST_ARGS=-e 'test_(import_doi|noincorrect_import_if_no_lxml_numpy)'
