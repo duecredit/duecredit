@@ -188,10 +188,10 @@ def _test_args_match_conditions(conds):
     #  got compound case
     assert_true(args_match_conditions(conds, scope='life'))
     assert_false(args_match_conditions(conds, scope='someother'))
-    # should be "and", so if one not matching -- both not matchin
+    # should be "and", so if one not matching -- both not matching
     assert_false(args_match_conditions(conds, method="wrong", scope='life'))
     assert_false(args_match_conditions(conds, method="purge", scope='someother'))
-    #assert_true(args_match_conditions(conds, None, None, 'life'))  # ambigous/conflicting
+    #assert_true(args_match_conditions(conds, None, None, 'life'))  # ambiguous/conflicting
 
 def test_args_match_conditions():
     yield _test_args_match_conditions, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'}}

@@ -37,7 +37,7 @@ def is_interactive():
 
 # Borrowed from pandas
 # Copyright: 2011-2014, Lambda Foundry, Inc. and PyData Development Team
-# Licese: BSD-3
+# License: BSD-3
 def optional_args(decorator):
     """allows a decorator to take optional positional and keyword arguments.
         Assumes that taking a single, callable, positional argument means that

@@ -55,7 +55,7 @@ def test_external_versions_basic():
     from duecredit.tests import mod
     assert_equal(ev[mod], mod.__version__)
 
-    # Check that we can get a copy of the verions
+    # Check that we can get a copy of the versions
     versions_dict = ev.versions
     versions_dict['duecredit'] = "0.0.1"
     assert_equal(versions_dict['duecredit'], "0.0.1")
