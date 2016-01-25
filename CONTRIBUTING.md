@@ -82,7 +82,7 @@ we outline the workflow used by the developers:
    that the commit causes a breakage (e.g. of tests) at that point.  Multiple
    entries could be listed joined with a `+` (e.g. `rf+doc-`).  See `git log` for 
    examples.  If a commit closes an existing DueCredit issue, then add to the end 
-   of the mesage `(Closes #ISSUE_NUMER)`
+   of the message `(Closes #ISSUE_NUMER)`
 
 5. Push to GitHub with:
 
@@ -147,7 +147,7 @@ brew link libxml2 --force
 brew link libxslt --force
 ```
 
-note that this will ovverride the default libraries installed with Mac
+note that this will override the default libraries installed with Mac
 OS X.
 
 Then use that virtual environment to run the tests, via
@@ -156,7 +156,7 @@ Then use that virtual environment to run the tests, via
 python -m nose -s -v duecredit
 ```
 
-or similiarly,
+or similarly,
 
 ```sh
 nosetests -s -v duecredit
