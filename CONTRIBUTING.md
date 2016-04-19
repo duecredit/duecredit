@@ -1,7 +1,7 @@
 Contributing to DueCredit
 =========================
 
-[gh-duecredit]: http://github.com/duecredit/duecredit
+[gh-duecredit]: https://github.com/duecredit/duecredit
 
 Files organization
 ------------------
