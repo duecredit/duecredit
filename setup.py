@@ -74,16 +74,15 @@ setup(
     name=PACKAGE,
     version=__version__,
     packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
-    # package_data={
-    #     PACKAGE: [
-    #         'tests/envs/nolxml/lxml.py',
-    #         'tests/envs/stubbed/README.txt',
-    #         'tests/envs/stubbed/due.py',
-    #         'tests/envs/stubbed/script.py',
-    #     ]
-    # },
     scripts=[],
-    install_requires=['requests', 'citeproc-py'],
+    install_requires=['requests', 'citeproc-py', 'six'],
+    extras_require={
+        'tests': [
+            'mock',
+            'nose>=1.3.4',
+            'vcrpy', 'contextlib2'
+        ]
+    },
     include_package_data=True,
     provides=[PACKAGE],
     #test_suite='nose.collector',
@@ -115,11 +114,12 @@ example script, or your analysis script with `-m duecredit`, e.g.
 """,
     url='https://github.com/duecredit/duecredit',
     # Download URL will point to the latest release, thus suffixes removed
-    download_url='https://github.com/duecredit/duecredit/releases/tag/%s' % re.sub('-.*$', '', __version__),
-    keywords=['citation tracing',],
+    download_url='https://github.com/duecredit/duecredit/releases/tag/%s'
+        % re.sub('-.*$', '', __version__),
+    keywords=['citation tracing'],
     license='2-clause BSD License',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Environment :: Other Environment',
         'Environment :: Web Environment',
@@ -135,7 +135,6 @@ example script, or your analysis script with `-m duecredit`, e.g.
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Topic :: Documentation',
-        'Topic :: Printing',
         'Topic :: Software Development :: Documentation',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]
