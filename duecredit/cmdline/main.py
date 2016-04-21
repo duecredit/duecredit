@@ -27,7 +27,7 @@ from ..utils import setup_exceptionhook
 
 def _license_info():
     return """\
-Copyright (c) 2015 Yaroslav Halchenko, Matteo Visconti di Oleggio Castello.
+Copyright 2015-2016 Yaroslav Halchenko, Matteo Visconti di Oleggio Castello.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
