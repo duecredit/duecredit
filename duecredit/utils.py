@@ -15,6 +15,7 @@ import sys
 import platform
 import tempfile
 
+from six import binary_type
 from os.path import exists, join as opj, isabs, expandvars, expanduser, abspath
 
 from os.path import realpath
@@ -32,6 +33,7 @@ try:
                 and platform.linux_distribution()[1].startswith('7.')
 except:  # pragma: no cover
     on_debian_wheezy = False
+
 
 lgr = logging.getLogger("duecredit.utils")
 
@@ -274,7 +276,7 @@ def with_tempfile(t, content=None, **tkwargs):
     ----------
     mkdir : bool, optional (default: False)
         If True, temporary directory created using tempfile.mkdtemp()
-    content : str, optional
+    content : str or bytes, optional
         Content to be stored in the file created
     `**tkwargs`:
         All other arguments are passed into the call to tempfile.mk{,d}temp(),
@@ -309,7 +311,7 @@ def with_tempfile(t, content=None, **tkwargs):
         filename = realpath(filename)
 
         if content:
-            with open(filename, 'w') as f:
+            with open(filename, 'w' + 'b' if isinstance(content, binary_type) else '') as f:
                 f.write(content)
         if __debug__:
             lgr.debug('Running %s with temporary filename %s',
