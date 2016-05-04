@@ -1,7 +1,7 @@
 Contributing to DueCredit
 =========================
 
-[gh-duecredit]: http://github.com/duecredit/duecredit
+[gh-duecredit]: https://github.com/duecredit/duecredit
 
 Files organization
 ------------------
@@ -122,8 +122,7 @@ that, the recommended course of action is to use `virtualenv`, e.g.
 
 virtualenv --system-site-packages venv-tests
 source venv-tests/bin/activate
-pip install -r requirements.txt
-python setup.py develop
+pip install -e '.[tests]'
 ```
 
 On Debian-based systems you might need to install some C-libraries to guarantee
