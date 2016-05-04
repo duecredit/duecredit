@@ -40,7 +40,7 @@ For using duecredit in your software
 
 2. Then use `duecredit` import due and necessary entries in your code as
 
-        from .due import due, Doi
+        from .due import due, Doi, BibTeX
 
      to provide reference for the entire module just use e.g.
 
@@ -52,6 +52,18 @@ For using duecredit in your software
          def pushit():
              ...
 
+References can also be entered as BibTeX entries
+
+        due.cite(BibTeX("""
+                @article{mynicearticle,
+                title={A very cool paper},
+                author={Happy, Author and Lucky, Author},
+                journal={The Journal of Serendipitous Discoveries}
+                }
+                """), 
+                description="Solves all your problems", path="magicpy")
+        
+        
 Add injections for other existing modules
 -----------------------------------------
 
