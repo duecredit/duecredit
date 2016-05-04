@@ -14,6 +14,7 @@ __docformat__ = 'restructuredtext'
 
 import argparse
 import logging
+import os
 import sys
 import textwrap
 
@@ -165,7 +166,7 @@ def main(args=None):
     args = parser.parse_args(args)
 
     # run the function associated with the selected command
-    if args.common_debug:
+    if args.common_debug or os.environ.get('DUECREDIT_DEBUG', None):
         # So we could see/stop clearly at the point of failure
         setup_exceptionhook()
         args.func(args)
