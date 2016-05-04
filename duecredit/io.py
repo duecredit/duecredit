@@ -12,6 +12,7 @@ import os
 if 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in os.environ.keys():
     raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
 
+import locale
 import time
 from collections import defaultdict, Iterator
 import copy
@@ -25,6 +26,8 @@ import warnings
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi
 from .log import lgr
+
+_PREFERRED_ENCODING = locale.getpreferredencoding()
 
 def get_doi_cache_file(doi):
     return os.path.join(CACHE_DIR, doi)
@@ -213,8 +216,12 @@ class TextOutput(object):  # TODO some parent class to do what...?
             refnr_key = [(nr, enum_entries.fromrefnr(nr)) for nr in range(1, len(enum_entries)+1)]
             for nr, key in refnr_key:
                 self.fd.write('\n[{0}] '.format(nr))
-                self.fd.write(get_text_rendering(citations_fromentrykey[key], style=self.style))
+                citation_text = get_text_rendering(citations_fromentrykey[key], style=self.style)
+                if PY2:
+                    citation_text = citation_text.encode(_PREFERRED_ENCODING)
+                self.fd.write(citation_text)
             self.fd.write('\n')
+
 
 def get_text_rendering(citation, style='harvard1'):
     from .collector import Citation
