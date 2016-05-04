@@ -36,6 +36,9 @@ try:
         doi_bad = 'fasljfdldaksj'
         assert_raises(ValueError, import_doi, doi_bad)
 
+        doi_zenodo = '10.5281/zenodo.50186'
+        assert_is_instance(import_doi(doi_zenodo), text_type)
+
 except ImportError:
     # no vcr, and that is in 2015!
     pass

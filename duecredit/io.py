@@ -41,7 +41,8 @@ def import_doi(doi):
             return doi
 
     # else -- fetch it
-    headers = {'Accept': 'text/bibliography; style=bibtex'}
+    #headers = {'Accept': 'text/bibliography; style=bibtex'}
+    headers = {'Accept': 'application/x-bibtex; charset=utf-8'}
     url = 'http://dx.doi.org/' + doi
     retries = 10
     while retries > 0:
