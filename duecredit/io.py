@@ -30,7 +30,7 @@ def get_doi_cache_file(doi):
     return os.path.join(CACHE_DIR, doi)
 
 
-def import_doi(doi):
+def import_doi(doi, sleep=0.5, retries=10):
     cached = get_doi_cache_file(doi)
 
     if exists(cached):
@@ -44,7 +44,6 @@ def import_doi(doi):
     #headers = {'Accept': 'text/bibliography; style=bibtex'}
     headers = {'Accept': 'application/x-bibtex; charset=utf-8'}
     url = 'http://dx.doi.org/' + doi
-    retries = 10
     while retries > 0:
         r = requests.get(url, headers=headers)
         r.encoding = 'UTF-8'
@@ -53,7 +52,7 @@ def import_doi(doi):
             # no more retries necessary
             break
         lgr.warning("Failed to obtain bibtex from doi.org, retrying...")
-        time.sleep(0.5)  # give some time to the server
+        time.sleep(sleep)  # give some time to the server
         retries -= 1
     status_code = r.status_code
     if not bibtex.startswith('@'):

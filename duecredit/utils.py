@@ -8,10 +8,30 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
+import glob
 import os
 import logging
 import sys
+import platform
+import tempfile
+
+from os.path import exists, join as opj, isabs, expandvars, expanduser, abspath
+
+from os.path import realpath
 from functools import wraps
+
+#
+# Some useful variables
+#
+on_windows = platform.system() == 'Windows'
+on_osx = platform.system() == 'Darwin'
+on_linux = platform.system() == 'Linux'
+try:
+    on_debian_wheezy = platform.system() == 'Linux' \
+                and platform.linux_distribution()[0] == 'debian' \
+                and platform.linux_distribution()[1].startswith('7.')
+except:  # pragma: no cover
+    on_debian_wheezy = False
 
 lgr = logging.getLogger("duecredit.utils")
 
@@ -30,6 +50,107 @@ def is_interactive():
     return sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty()
 
 
+def expandpath(path, force_absolute=True):
+    """Expand all variables and user handles in a path.
+
+    By default return an absolute path
+    """
+    path = expandvars(expanduser(path))
+    if force_absolute:
+        path = abspath(path)
+    return path
+
+
+def is_explicit_path(path):
+    """Return whether a path explicitly points to a location
+
+    Any absolute path, or relative path starting with either '../' or
+    './' is assumed to indicate a location on the filesystem. Any other
+    path format is not considered explicit."""
+    path = expandpath(path, force_absolute=False)
+    return isabs(path) \
+        or path.startswith(os.curdir + os.sep) \
+        or path.startswith(os.pardir + os.sep)
+
+def rotree(path, ro=True, chmod_files=True):
+    """To make tree read-only or writable
+
+    Parameters
+    ----------
+    path : string
+      Path to the tree/directory to chmod
+    ro : bool, optional
+      Either to make it R/O (default) or RW
+    chmod_files : bool, optional
+      Either to operate also on files (not just directories)
+    """
+    if ro:
+        chmod = lambda f: os.chmod(f, os.stat(f).st_mode & ~stat.S_IWRITE)
+    else:
+        chmod = lambda f: os.chmod(f, os.stat(f).st_mode | stat.S_IWRITE | stat.S_IREAD)
+
+    for root, dirs, files in os.walk(path, followlinks=False):
+        if chmod_files:
+            for f in files:
+                fullf = opj(root, f)
+                # might be the "broken" symlink which would fail to stat etc
+                if exists(fullf):
+                    chmod(fullf)
+        chmod(root)
+
+
+def rmtree(path, chmod_files='auto', *args, **kwargs):
+    """To remove git-annex .git it is needed to make all files and directories writable again first
+
+    Parameters
+    ----------
+    chmod_files : string or bool, optional
+       Either to make files writable also before removal.  Usually it is just
+       a matter of directories to have write permissions.
+       If 'auto' it would chmod files on windows by default
+    `*args` :
+    `**kwargs` :
+       Passed into shutil.rmtree call
+    """
+    # Give W permissions back only to directories, no need to bother with files
+    if chmod_files == 'auto':
+        chmod_files = on_windows
+
+    if not os.path.islink(path):
+        rotree(path, ro=False, chmod_files=chmod_files)
+        shutil.rmtree(path, *args, **kwargs)
+    else:
+        # just remove the symlink
+        os.unlink(path)
+
+
+def rmtemp(f, *args, **kwargs):
+    """Wrapper to centralize removing of temp files so we could keep them around
+
+    It will not remove the temporary file/directory if DATALAD_TESTS_KEEPTEMP
+    environment variable is defined
+    """
+    if not os.environ.get('DATALAD_TESTS_KEEPTEMP'):
+        if not os.path.lexists(f):
+            lgr.debug("Path %s does not exist, so can't be removed" % f)
+            return
+        lgr.log(5, "Removing temp file: %s" % f)
+        # Can also be a directory
+        if os.path.isdir(f):
+            rmtree(f, *args, **kwargs)
+        else:
+            for i in range(10):
+                try:
+                    os.unlink(f)
+                except OSError as e:
+                    if i < 9:
+                        sleep(0.1)
+                        continue
+                    else:
+                        raise
+                break
+    else:
+        lgr.info("Keeping temp file: %s" % f)
 
 #
 # Decorators
@@ -121,6 +242,102 @@ def borrowdoc(cls, methodname=None, replace=None):
                 method.__doc__ = method.__doc__.replace(replace, other_method.__doc__)
         return method
     return _borrowdoc
+
+# TODO: just provide decorators for tempfile.mk* functions. This is ugly!
+def get_tempfile_kwargs(tkwargs={}, prefix="", wrapped=None):
+    """Updates kwargs to be passed to tempfile. calls depending on env vars
+    """
+    # operate on a copy of tkwargs to avoid any side-effects
+    tkwargs_ = tkwargs.copy()
+
+    # TODO: don't remember why I had this one originally
+    # if len(targs)<2 and \
+    if not 'prefix' in tkwargs_:
+        tkwargs_['prefix'] = '_'.join(
+            ['duecredit_temp'] +
+            ([prefix] if prefix else []) +
+            ([''] if (on_windows or not wrapped)
+                  else [wrapped.__name__]))
+
+    directory = os.environ.get('DUECREDIT_TESTS_TEMPDIR')
+    if directory and 'dir' not in tkwargs_:
+        tkwargs_['dir'] = directory
+
+    return tkwargs_
+
+
+@optional_args
+def with_tempfile(t, content=None, **tkwargs):
+    """Decorator function to provide a temporary file name and remove it at the end
+
+    Parameters
+    ----------
+    mkdir : bool, optional (default: False)
+        If True, temporary directory created using tempfile.mkdtemp()
+    content : str, optional
+        Content to be stored in the file created
+    `**tkwargs`:
+        All other arguments are passed into the call to tempfile.mk{,d}temp(),
+        and resultant temporary filename is passed as the first argument into
+        the function t.  If no 'prefix' argument is provided, it will be
+        constructed using module and function names ('.' replaced with
+        '_').
+
+    To change the used directory without providing keyword argument 'dir' set
+    DUECREDIT_TESTS_TEMPDIR.
+
+    Examples
+    --------
+
+        @with_tempfile
+        def test_write(tfile):
+            open(tfile, 'w').write('silly test')
+    """
+
+    @wraps(t)
+    def newfunc(*arg, **kw):
+
+        tkwargs_ = get_tempfile_kwargs(tkwargs, wrapped=t)
+
+        # if DUECREDIT_TESTS_TEMPDIR is set, use that as directory,
+        # let mktemp handle it otherwise. However, an explicitly provided
+        # dir=... will override this.
+        mkdir = tkwargs_.pop('mkdir', False)
+
+        filename = {False: tempfile.mktemp,
+                    True: tempfile.mkdtemp}[mkdir](**tkwargs_)
+        filename = realpath(filename)
+
+        if content:
+            with open(filename, 'w') as f:
+                f.write(content)
+        if __debug__:
+            lgr.debug('Running %s with temporary filename %s',
+                      t.__name__, filename)
+        try:
+            return t(*(arg + (filename,)), **kw)
+        finally:
+            # glob here for all files with the same name (-suffix)
+            # would be useful whenever we requested .img filename,
+            # and function creates .hdr as well
+            lsuffix = len(tkwargs_.get('suffix', ''))
+            filename_ = lsuffix and filename[:-lsuffix] or filename
+            filenames = glob.glob(filename_ + '*')
+            if len(filename_) < 3 or len(filenames) > 5:
+                # For paranoid yoh who stepped into this already ones ;-)
+                lgr.warning("It is unlikely that it was intended to remove all"
+                            " files matching %r. Skipping" % filename_)
+                return
+            for f in filenames:
+                try:
+                    rmtemp(f)
+                except OSError:
+                    pass
+
+    if tkwargs.get('mkdir', None) and content is not None:
+        raise ValueError("mkdir=True while providing content makes no sense")
+
+    return newfunc
 
 
 #
