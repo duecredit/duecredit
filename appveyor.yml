@@ -39,3 +39,6 @@ install:
 test_script:
   - nosetests --with-doctest -v duecredit
   - python setup.py install
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
