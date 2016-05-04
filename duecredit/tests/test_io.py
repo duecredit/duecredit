@@ -74,7 +74,7 @@ def test_pickleoutput(fn):
         assert_equal(pickler.fn, fn)
         assert_equal(pickler.dump(), None)
 
-        with open(fn) as f:
+        with open(fn, 'rb') as f:
             collector_loaded = pickle.load(f)
 
         assert_equal(collector.citations.keys(),
