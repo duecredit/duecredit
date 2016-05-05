@@ -68,10 +68,12 @@ def run_python_command(cmd=None, script=None):
     assert(bool(cmd) != bool(script))  # one or another, not both
     args = ['-c', cmd] if cmd else [script]
     python = Popen([sys.executable] + args, stdout=PIPE, stderr=PIPE)
-    ret = python.wait()
-    return ret, python.stdout.read().decode(), python.stderr.read().decode()
+    stdout, stderr = python.communicate()  # wait()
+    ret = python.poll()
+    return ret, stdout.decode(), stderr.decode()
 
 mock_env_nolxml = {'PYTHONPATH': "%s:%s" % (badlxml_path, os.environ.get('PYTHONPATH', ''))}
+
 
 # Since duecredit and possibly lxml already loaded, let's just test
 # ability to import in absence of lxml via external call to python
@@ -87,6 +89,7 @@ def test_noincorrect_import_if_no_lxml():
         assert_equal(err, '')
         assert_equal(out, '')
         assert_equal(ret, 0)
+
 
 def check_noincorrect_import_if_no_lxml_numpy(kwargs, env):
     # Now make sure that we would not crash entire process at the end when unable to
