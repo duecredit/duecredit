@@ -159,9 +159,9 @@ class TextOutput(object):  # TODO some parent class to do what...?
 
         # now we need to filter out the packages that don't have modules
         # or objects cited
-        cited_packages = packages['citations'].keys()
-        cited_modules = modules['citations'].keys()
-        cited_objects = objects['citations'].keys()
+        cited_packages = list(packages['citations'].keys())
+        cited_modules = list(modules['citations'].keys())
+        cited_objects = list(objects['citations'].keys())
 
         for cited_package in cited_packages:
             children = filter(lambda x: x.startswith(cited_package),
