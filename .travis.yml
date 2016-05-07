@@ -10,8 +10,8 @@ python:
   - "3.5"
 #  - "pypy"
 #  - "pypy3"
-cache:
-  - pip
+#cache:
+#  - pip
 before_install:
   # - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then travis_retry sudo apt-get update -qq; fi
 
