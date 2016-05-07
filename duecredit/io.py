@@ -154,6 +154,20 @@ class TextOutput(object):  # TODO some parent class to do what...?
                 target_dict = packages
             target_dict['citations'][path].append(citation)
             target_dict['entry_keys'][path].append(entry_key)
+
+        # now we need to filter out the packages that don't have modules
+        # or objects cited
+        cited_packages = packages['citations'].keys()
+        cited_modules = modules['citations'].keys()
+        cited_objects = objects['citations'].keys()
+
+        for cited_package in cited_packages:
+            children = filter(lambda x: x.startswith(cited_package),
+                              cited_modules + cited_objects)
+            if len(children) == 0:
+                del packages['citations'][cited_package]
+                del packages['entry_keys'][cited_package]
+
         return packages, modules, objects
 
     def dump(self, tags=None):
