@@ -164,8 +164,8 @@ class TextOutput(object):  # TODO some parent class to do what...?
         cited_objects = list(objects['citations'].keys())
 
         for cited_package in cited_packages:
-            children = filter(lambda x: x.startswith(cited_package),
-                              cited_modules + cited_objects)
+            children = list(filter(lambda x: x.startswith(cited_package),
+                              cited_modules + cited_objects))
             if len(children) == 0:
                 del packages['citations'][cited_package]
                 del packages['entry_keys'][cited_package]
