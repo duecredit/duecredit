@@ -70,7 +70,7 @@ def test_external_versions_popular_packages():
 
     def _test_external(modname):
         try:
-            exec("import %s" % modname, locals(), globals())
+            exec("import %s" % modname, globals(), locals())
         except ImportError:
             raise SkipTest("External %s not present" % modname)
         except Exception as e:

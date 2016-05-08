@@ -65,7 +65,8 @@ class TestActiveInjector(object):
         assert_equal(len(self.due._entries), 0)
         assert_equal(len(self.due.citations), 0)
 
-        exec(import_stmt)
+        globals_, locals_ = {}, {}
+        exec(import_stmt, globals_, locals_)
 
         if skip:
             raise SkipTest("cowardly skipping a known failure on travis")
@@ -79,10 +80,10 @@ class TestActiveInjector(object):
         assert_equal(obj.__doc__, "custom docstring") # we preserved docstring
 
         # TODO: test decoration features -- preserver __doc__ etc
-        exec('ret = %s(None, "somevalue")' % (func_call or func))
+        exec('ret = %s(None, "somevalue")' % (func_call or func), globals_, locals_)
         # XXX: awkwardly 'ret' is not found in the scope while running nosetests
         # under python3.4, although present in locals()... WTF?
-        assert_equal(locals()['ret'], "%s: None, somevalue" % func)
+        assert_equal(locals_['ret'], "%s: None, somevalue" % func)
         assert_equal(len(self.due._entries), 1)
         assert_equal(len(self.due.citations), 1)
 
@@ -135,7 +136,7 @@ class TestActiveInjector(object):
         self.injector.add(mod, obj, ref)
         # now cause the import handling -- it must not fail
         # TODO: catch/analyze warnings
-        exec('from duecredit.tests.mod import testfunc1')
+        exec('from duecredit.tests.mod import testfunc1', {}, {})
 
     def test_incorrect_path(self):
         yield self._test_incorrect_path, "nonexistingmodule", None
