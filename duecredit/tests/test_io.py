@@ -80,16 +80,27 @@ def test_pickleoutput():
 
 def test_text_output():
     entry = BibTeX(_sample_bibtex)
-    collector = DueCreditCollector()
 
     # in this case, since we're not citing any module or method, we shouldn't
     # output anything
+    collector = DueCreditCollector()
     collector.cite(entry, path='package')
 
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
     assert_true("0 packages cited" in value, msg="value was %s" % value)
+    assert_true("0 modules cited" in value, msg="value was %s" % value)
+    assert_true("0 functions cited" in value, msg="value was %s" % value)
+
+    # but it should be cited if cite_module=True
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package', cite_module=True)
+
+    strio = StringIO()
+    TextOutput(strio, collector).dump(tags=['*'])
+    value = strio.getvalue()
+    assert_true("1 packages cited" in value, msg="value was %s" % value)
     assert_true("0 modules cited" in value, msg="value was %s" % value)
     assert_true("0 functions cited" in value, msg="value was %s" % value)
 

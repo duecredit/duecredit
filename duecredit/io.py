@@ -165,8 +165,17 @@ class TextOutput(object):  # TODO some parent class to do what...?
             children = list(filter(lambda x: x.startswith(cited_package),
                               cited_modules + cited_objects))
             if len(children) == 0:
-                del packages['citations'][cited_package]
-                del packages['entry_keys'][cited_package]
+                package_citations = packages['citations'][cited_package]
+                not_requested_citations = list(
+                        filter(lambda x: not x.cite_module, package_citations))
+                if len(not_requested_citations) == len(package_citations):
+                    del packages['citations'][cited_package]
+                    del packages['entry_keys'][cited_package]
+                else:
+                    for unwanted in not_requested_citations:
+                        unwanted_entry_key = unwanted.entry_key
+                        packages['citations'][cited_package].remove(unwanted)
+                        packages['entry_keys'][cited_package].remove(unwanted_entry_key)
 
         return packages, modules, objects
 
