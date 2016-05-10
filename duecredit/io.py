@@ -261,6 +261,11 @@ def format_bibtex(bibtex_entry, style='harvard1'):
     try:
         with open(fname, 'wt') as f:
             bibtex = bibtex_entry.rawentry
+            # XXX: workaround atm to fix zenodo bibtexs, convert @data to @misc
+            # and also ; into and
+            if bibtex.startswith('@data'):
+                bibtex = bibtex.replace('@data', '@misc', 1)
+                bibtex = bibtex.replace(';', ' and')
             bibtex = bibtex.replace(u'\u2013', '--') + "\n"
             # TODO: manage to save/use UTF-8
             if PY2:
