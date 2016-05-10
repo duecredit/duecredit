@@ -21,7 +21,8 @@ from mock import patch
 from ..collector import DueCreditCollector, Citation
 from .test_collector import _sample_bibtex, _sample_doi
 from ..entries import BibTeX, DueCreditEntry, Doi
-from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, get_text_rendering
+from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, \
+    get_text_rendering, format_bibtex
 from ..utils import with_tempfile
 
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
@@ -252,3 +253,28 @@ def test_get_text_rendering(mock_format_bibtex, mock_get_bibtex_rendering):
     mock_format_bibtex.assert_called_with(citation_bibtex.entry, style='harvard1')
 
     assert_equal(bibtex_output, doi_output)
+
+
+def test_format_bibtex_zenodo_doi():
+    """
+    test that we can correctly parse bibtex entries obtained from a zenodo doi
+    """
+    # this was fetched on 2016-05-10
+    bibtex_zenodo = """
+    @data{0b1284ba-5ce5-4367-84f3-c44b4962ad90,
+    doi = {10.5281/zenodo.50186},
+    url = {http://dx.doi.org/10.5281/zenodo.50186},
+    author = {Satrajit Ghosh; Chris Filo Gorgolewski; Oscar Esteban;
+    Erik Ziegler; David Ellis; cindeem; Michael Waskom; Dav Clark; Michael;
+    Fred Loney; Alexandre M. S.; Michael Notter; Hans Johnson;
+    Anisha Keshavan; Yaroslav Halchenko; Carlo Hamalainen; Blake Dewey;
+    Ben Cipollini; Daniel Clark; Julia Huntenburg; Drew Erickson;
+    Michael Hanke; moloney; Jason W; Demian Wassermann; cdla;
+    Nolan Nichols; Chris Markiewicz; Jarrod Millman; Arman Eshaghi; },
+    publisher = {Zenodo},
+    title = {nipype: Release candidate 1 for version 0.12.0},
+    year = {2016}
+    }
+    """
+    assert_equal(format_bibtex(BibTeX(bibtex_zenodo)),
+                 """Ghosh, S. et al., 2016. nipype: Release candidate 1 for version 0.12.0.""")
