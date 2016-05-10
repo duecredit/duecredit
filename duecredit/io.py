@@ -159,13 +159,12 @@ class TextOutput(object):  # TODO some parent class to do what...?
 
         # now we need to filter out the packages that don't have modules
         # or objects cited
-        cited_packages = list(packages['citations'].keys())
-        cited_modules = list(modules['citations'].keys())
-        cited_objects = list(objects['citations'].keys())
+        cited_packages = list(packages['citations'])
+        cited_modobj = list(modules['citations']) + list(objects['citations'])
 
         for cited_package in cited_packages:
-            children = list(filter(lambda x: x.startswith(cited_package),
-                              cited_modules + cited_objects))
+            children = list(filter(lambda x: x.startswith(cited_package + '.'),
+                              cited_modobj))
             if len(children) == 0:
                 package_citations = packages['citations'][cited_package]
                 not_requested_citations = list(
