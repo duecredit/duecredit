@@ -7,23 +7,25 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-from ..collector import DueCreditCollector, Citation
-from .test_collector import _sample_bibtex, _sample_doi
-from ..entries import BibTeX, DueCreditEntry, Doi
-from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, get_text_rendering
-from nose.tools import assert_equal, assert_is_instance, assert_raises, \
-    assert_true, assert_false
+import random
+import re
+import pickle
+import os
+
+from .test_collector import _sample_bibtex, _sample_bibtex2
 from six.moves import StringIO
 from six import text_type
 
 from mock import patch
 
-import random
-import re
-import sys
-import pickle
-import tempfile
-from .test_collector import _sample_bibtex, _sample_bibtex2
+from ..collector import DueCreditCollector, Citation
+from .test_collector import _sample_bibtex, _sample_doi
+from ..entries import BibTeX, DueCreditEntry, Doi
+from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, get_text_rendering
+from ..utils import with_tempfile
+
+from nose.tools import assert_equal, assert_is_instance, assert_raises, \
+    assert_true, assert_false
 
 try:
     import vcr
@@ -31,20 +33,22 @@ try:
     @vcr.use_cassette()
     def test_import_doi():
         doi_good = '10.1038/nrd842'
-        assert_is_instance(import_doi(doi_good), text_type)
+        kw = dict(sleep=0.00001, retries=2)
+        assert_is_instance(import_doi(doi_good, **kw), text_type)
 
         doi_bad = 'fasljfdldaksj'
-        assert_raises(ValueError, import_doi, doi_bad)
+        assert_raises(ValueError, import_doi, doi_bad, **kw)
 
         doi_zenodo = '10.5281/zenodo.50186'
-        assert_is_instance(import_doi(doi_zenodo), text_type)
+        assert_is_instance(import_doi(doi_zenodo, **kw), text_type)
 
 except ImportError:
     # no vcr, and that is in 2015!
     pass
 
 
-def test_pickleoutput():
+@with_tempfile
+def test_pickleoutput(fn):
     #entry = BibTeX('@article{XXX0, ...}')
     entry = BibTeX("@article{Atkins_2002,\n"
                    "title=title,\n"
@@ -66,17 +70,19 @@ def test_pickleoutput():
     collectors = [collector_, DueCreditCollector()]
 
     for collector in collectors:
-        with tempfile.NamedTemporaryFile() as fn:
-            pickler = PickleOutput(collector, fn=fn.name)
-            assert_equal(pickler.fn, fn.name)
-            assert_equal(pickler.dump(), None)
-            collector_loaded = pickle.load(fn)
+        pickler = PickleOutput(collector, fn=fn)
+        assert_equal(pickler.fn, fn)
+        assert_equal(pickler.dump(), None)
 
-            assert_equal(collector.citations.keys(),
-                         collector_loaded.citations.keys())
-            # TODO: implement comparison of citations
-            assert_equal(collector._entries.keys(),
-                         collector_loaded._entries.keys())
+        with open(fn, 'rb') as f:
+            collector_loaded = pickle.load(f)
+
+        assert_equal(collector.citations.keys(),
+                     collector_loaded.citations.keys())
+        # TODO: implement comparison of citations
+        assert_equal(collector._entries.keys(),
+                     collector_loaded._entries.keys())
+        os.unlink(fn)
 
 def test_text_output():
     entry = BibTeX(_sample_bibtex)

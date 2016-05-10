@@ -12,11 +12,11 @@ import sys
 
 from mock import patch
 from six.moves import StringIO
-from tempfile import NamedTemporaryFile
 from nose.tools import assert_raises, assert_equal
 
 from .. import __main__, __version__
 from .. import due
+from ..utils import with_tempfile
 
 
 @patch('sys.stdout', new_callable=StringIO)
@@ -34,10 +34,9 @@ def test_main_version(stdout):
 
 @patch.object(due, 'activate')
 @patch('sys.stdout', new_callable=StringIO)
-def test_main_run_a_script(stdout, mock_activate):
-    f = NamedTemporaryFile()
-    f.write('print("Running the script")\n'.encode()); f.flush()
-    __main__.main(['__main__.py', f.name])
+@with_tempfile(content='print("Running the script")\n'.encode())
+def test_main_run_a_script(stdout, mock_activate, f):
+    __main__.main(['__main__.py', f])
     assert_equal(stdout.getvalue().rstrip(), "Running the script")
     # And we have "activated" the due
     mock_activate.assert_called_once_with(True)
