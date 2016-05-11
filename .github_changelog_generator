@@ -1,0 +1,2 @@
+future-release=0.5.0
+exclude-tags-regex="(debian/.*|\d+\.\d+\.\d+\..*)"
