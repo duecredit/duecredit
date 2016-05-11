@@ -38,7 +38,7 @@ class TraceBack(object):
     """
 
     def __init__(self, collide=False):
-        """Initialize TrackBack metric
+        """Initialize TraceBack metric
 
         Parameters
         ----------
@@ -54,7 +54,7 @@ class TraceBack(object):
         entries = [[mbasename(x[0]), str(x[1])] for x in ftb if mbasename(x[0]) != 'logging.__init__']
         entries = [ e for e in entries if e[0] != 'unittest' ]
 
-        # lets make it more consize
+        # lets make it more concise
         entries_out = [entries[0]]
         for entry in entries[1:]:
             if entry[0] == entries_out[-1][0]:

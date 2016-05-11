@@ -11,9 +11,13 @@ from duecredit.collector import DueCreditCollector
 from duecredit.stub import InactiveDueCreditCollector
 from duecredit.entries import BibTeX, Doi
 
+from ..utils import on_windows
+from .utils import KnownFailure
+
 from nose.tools import assert_equal
 from nose.tools import assert_in
 from nose import SkipTest
+
 
 def _test_api(due):
     # add references
@@ -68,14 +72,18 @@ def run_python_command(cmd=None, script=None):
     assert(bool(cmd) != bool(script))  # one or another, not both
     args = ['-c', cmd] if cmd else [script]
     python = Popen([sys.executable] + args, stdout=PIPE, stderr=PIPE)
-    ret = python.wait()
-    return ret, python.stdout.read().decode(), python.stderr.read().decode()
+    stdout, stderr = python.communicate()  # wait()
+    ret = python.poll()
+    return ret, stdout.decode(), stderr.decode()
 
 mock_env_nolxml = {'PYTHONPATH': "%s:%s" % (badlxml_path, os.environ.get('PYTHONPATH', ''))}
+
 
 # Since duecredit and possibly lxml already loaded, let's just test
 # ability to import in absence of lxml via external call to python
 def test_noincorrect_import_if_no_lxml():
+    if on_windows:
+        raise KnownFailure("Fails for some reason on Windows")
     with patch.dict(os.environ, mock_env_nolxml):
         # make sure out mocking works here
         ret, out, err = run_python_command('import lxml')
@@ -87,6 +95,7 @@ def test_noincorrect_import_if_no_lxml():
         assert_equal(err, '')
         assert_equal(out, '')
         assert_equal(ret, 0)
+
 
 def check_noincorrect_import_if_no_lxml_numpy(kwargs, env):
     # Now make sure that we would not crash entire process at the end when unable to

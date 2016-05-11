@@ -70,7 +70,7 @@ class DueCreditInjector(object):
     """Takes care about "injecting" duecredit references into 3rd party modules upon their import
 
     First entries to be "injected" need to be add'ed to the instance.
-    To not incure significant duecredit startup penalty, those entries are added
+    To not incur significant duecredit startup penalty, those entries are added
     for a corresponding package only whenever corresponding top-level module gets
     imported.
     """
@@ -87,7 +87,7 @@ class DueCreditInjector(object):
         self._entry_records = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
         self._processed_modules = set()
         # We need to process modules only after we are done with all nested imports, otherwise we
-        # might be trying to prcess them too early -- whenever they are not yet linked to their
+        # might be trying to process them too early -- whenever they are not yet linked to their
         # parent's namespace. So we will keep track of import level and set of modules which
         # would need to be processed whenever we are back at __import_level == 1
         self.__import_level = 0
