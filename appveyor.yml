@@ -1,0 +1,49 @@
+environment:
+  matrix:
+    - PYTHON: "C:\\Python27"
+      PYTHON_VERSION: "2.7.8"
+      PYTHON_ARCH: "32"
+      MINICONDA: C:\Miniconda
+
+# TODO:
+# Reenable whenever lxml whl becomes available for those
+# otherwise it is a pain
+#
+#    - PYTHON: "C:\\Python33"
+#      PYTHON_VERSION: "3.3.5"
+#      PYTHON_ARCH: "32"
+#      MINICONDA: C:\Miniconda3
+#
+#    - PYTHON: "C:\\Python34"
+#      PYTHON_VERSION: "3.4.1"
+#      PYTHON_ARCH: "32"
+#      MINICONDA: C:\Miniconda3
+#
+#    - PYTHON: "C:\\Python35"
+#      PYTHON_VERSION: "3.5.1"
+#      PYTHON_ARCH: "32"
+#      MINICONDA: C:\Miniconda35
+
+init:
+  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH% %MINICONDA%"
+
+# Not a .NET project, we build in the install step instead
+build: false
+
+install:
+  - "set PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - "conda create -q -n test-environment python=%PYTHON_VERSION% mock contextlib2 nose coverage requests six"
+  - activate test-environment
+  - pip install -r requirements.txt
+  - pip install -e .
+
+test_script:
+  - nosetests --with-doctest -v duecredit
+  - python setup.py install
+
+# for interactive debugging upon completion (have 30 min to react)
+#on_finish:
+#  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))

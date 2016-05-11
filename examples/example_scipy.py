@@ -1,4 +1,4 @@
-# A tiny analysis script to demostrate duecredit
+# A tiny analysis script to demonstrate duecredit
 #
 # Import of duecredit is not necessary if you just run this script with
 # python -m duecredit

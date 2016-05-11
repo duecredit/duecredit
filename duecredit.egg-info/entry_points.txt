@@ -1,3 +1,0 @@
-[console_scripts]
-duecredit = duecredit.cmdline.main:main
-

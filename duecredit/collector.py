@@ -391,7 +391,7 @@ class DueCreditCollector(object):
 
             # if decorated function was invoked, it means that we need
             # to cite that even if it is a module. But do not override
-            # value if user explicitely stated
+            # value if user explicitly stated
             if 'cite_module' not in kwargs:
                 kwargs['cite_module'] = True
 

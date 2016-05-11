@@ -43,8 +43,14 @@ try:
                     stdout=PIPE, stderr=sys.stderr)
         if git.wait() != 0:
             raise OSError
-        line = git.stdout.readlines()[0]
-        __version__ = line.strip().decode('ascii')
+        line = git.stdout.readlines()[0].strip().decode('ascii')
+        if line.count('-') >= 2:
+            # we should parse it to make version compatible with PEP440
+            # unfortunately we wouldn't be able to include git treeish
+            # into the version, and thus can have collisions. So let's
+            # release from master only
+            line = '.dev'.join(line.split('-')[:2])
+        __version__ = line
         __release_date__ = datetime.now().strftime('%b %d %Y, %H:%M:%S')
     with open(VERSION_FILE, 'w') as version_file:
         version_file.write("__version__ = '{0}'\n".format(__version__))
@@ -55,9 +61,9 @@ except OSError as e:
     if os.path.exists(VERSION_FILE):
         with open(VERSION_FILE) as version_file:
             code = compile(version_file.read(), VERSION_FILE, 'exec')
-            exec(code)
+            exec(code, {}, {})
     else:
-        __version__ = '0.unknown'
+        __version__ = '0.0.0.dev'
 
 with open('README.md') as file:
     README = file.read()
@@ -74,16 +80,15 @@ setup(
     name=PACKAGE,
     version=__version__,
     packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
-    # package_data={
-    #     PACKAGE: [
-    #         'tests/envs/nolxml/lxml.py',
-    #         'tests/envs/stubbed/README.txt',
-    #         'tests/envs/stubbed/due.py',
-    #         'tests/envs/stubbed/script.py',
-    #     ]
-    # },
     scripts=[],
-    install_requires=['requests', 'citeproc-py'],
+    install_requires=['requests', 'citeproc-py', 'six'],
+    extras_require={
+        'tests': [
+            'mock',
+            'nose>=1.3.4',
+            'vcrpy', 'contextlib2'
+        ]
+    },
     include_package_data=True,
     provides=[PACKAGE],
     #test_suite='nose.collector',
@@ -115,11 +120,12 @@ example script, or your analysis script with `-m duecredit`, e.g.
 """,
     url='https://github.com/duecredit/duecredit',
     # Download URL will point to the latest release, thus suffixes removed
-    download_url='https://github.com/duecredit/duecredit/releases/tag/%s' % re.sub('-.*$', '', __version__),
-    keywords=['citation tracing',],
+    download_url='https://github.com/duecredit/duecredit/releases/tag/%s'
+        % re.sub('-.*$', '', __version__),
+    keywords=['citation tracing'],
     license='2-clause BSD License',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Console',
         'Environment :: Other Environment',
         'Environment :: Web Environment',
@@ -135,7 +141,6 @@ example script, or your analysis script with `-m duecredit`, e.g.
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Topic :: Documentation',
-        'Topic :: Printing',
         'Topic :: Software Development :: Documentation',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]

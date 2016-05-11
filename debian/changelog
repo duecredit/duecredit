@@ -1,3 +1,9 @@
+duecredit (0.5.0-1) unstable; urgency=medium
+
+  * Fresh upstream release
+
+ -- Yaroslav Halchenko <debian@onerussian.com>  Wed, 11 May 2016 15:35:35 -0400
+
 duecredit (0.4.5.3-1) unstable; urgency=medium
 
   * Bugfix release for isatty comparison triggered by inferior mocking in
