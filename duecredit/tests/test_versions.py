@@ -10,7 +10,7 @@
 from os import linesep
 
 from ..version import __version__
-from ..versions import ExternalVersions
+from ..versions import ExternalVersions, StrictVersion
 
 from nose.tools import assert_true, assert_false
 from nose.tools import assert_equal, assert_greater_equal, assert_greater
@@ -34,7 +34,11 @@ def test_external_versions_basic():
     assert_true('duecredit' in ev)
     assert_false('unknown' in ev)
 
-    assert_equal(ev.dumps(), "Versions: duecredit=%s" % __version__)
+    # StrictVersion might remove training .0
+    version_str = str(ev['duecredit']) \
+        if isinstance(ev['duecredit'], StrictVersion) \
+        else __version__
+    assert_equal(ev.dumps(), "Versions: duecredit=%s" % version_str)
 
     # For non-existing one we get None
     assert_equal(ev['duecreditnonexisting'], None)
