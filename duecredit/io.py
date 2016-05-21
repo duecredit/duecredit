@@ -75,44 +75,6 @@ def import_doi(doi, sleep=0.5, retries=10):
     return bibtex
 
 
-class EnumeratedEntries(Iterator):
-    """A container of entries enumerated referenced by their entry_key"""
-    def __init__(self):
-        self._keys2refnr = {}
-        self._refnr2keys = {}
-        self._refnr = 1
-
-    def add(self, entry_key):
-        """Add entry_key and update refnr"""
-        if entry_key not in self._keys2refnr:
-            self._keys2refnr[entry_key] = self._refnr
-            self._refnr2keys[self._refnr] = entry_key
-            self._refnr += 1
-
-    def __getitem__(self, item):
-        if item not in self._keys2refnr:
-            raise KeyError('{0} not present'.format(item))
-        return self._keys2refnr[item]
-
-    def fromrefnr(self, refnr):
-        if refnr not in self._refnr2keys:
-            raise KeyError('{0} not present'.format(refnr))
-        return self._refnr2keys[refnr]
-
-    def __iter__(self):
-        return iteritems(self._keys2refnr)
-
-    # Python 3
-    def __next__(self):
-        return self.next()
-
-    def next(self):
-        yield next(self.__iter__())
-
-    def __len__(self):
-        return len(self._keys2refnr)
-
-
 def _is_contained(toppath, subpath):
     if ':' not in toppath:
         return ((toppath == subpath) or
