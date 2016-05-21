@@ -156,6 +156,29 @@ class TextOutput(object):  # TODO some parent class to do what...?
                 target_dict = packages
             target_dict['citations'][path].append(citation)
             target_dict['entry_keys'][path].append(entry_key)
+
+        # now we need to filter out the packages that don't have modules
+        # or objects cited
+        cited_packages = list(packages['citations'].keys())
+        cited_modules = list(modules['citations'].keys())
+        cited_objects = list(objects['citations'].keys())
+
+        for cited_package in cited_packages:
+            children = list(filter(lambda x: x.startswith(cited_package),
+                              cited_modules + cited_objects))
+            if len(children) == 0:
+                package_citations = packages['citations'][cited_package]
+                not_requested_citations = list(
+                        filter(lambda x: not x.cite_module, package_citations))
+                if len(not_requested_citations) == len(package_citations):
+                    del packages['citations'][cited_package]
+                    del packages['entry_keys'][cited_package]
+                else:
+                    for unwanted in not_requested_citations:
+                        unwanted_entry_key = unwanted.entry_key
+                        packages['citations'][cited_package].remove(unwanted)
+                        packages['entry_keys'][cited_package].remove(unwanted_entry_key)
+
         return packages, modules, objects
 
     def dump(self, tags=None):

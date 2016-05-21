@@ -87,12 +87,42 @@ def test_pickleoutput(fn):
 
 def test_text_output():
     entry = BibTeX(_sample_bibtex)
+
+    # in this case, since we're not citing any module or method, we shouldn't
+    # output anything
     collector = DueCreditCollector()
-    collector.cite(entry, path='module')
+    collector.cite(entry, path='package')
 
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
+    assert_true("0 packages cited" in value, msg="value was %s" % value)
+    assert_true("0 modules cited" in value, msg="value was %s" % value)
+    assert_true("0 functions cited" in value, msg="value was %s" % value)
+
+    # but it should be cited if cite_module=True
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package', cite_module=True)
+
+    strio = StringIO()
+    TextOutput(strio, collector).dump(tags=['*'])
+    value = strio.getvalue()
+    assert_true("1 packages cited" in value, msg="value was %s" % value)
+    assert_true("0 modules cited" in value, msg="value was %s" % value)
+    assert_true("0 functions cited" in value, msg="value was %s" % value)
+
+    # in this case, we should be citing the package since we are also citing a
+    # submodule
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package')
+    collector.cite(entry, path='package.module')
+
+    strio = StringIO()
+    TextOutput(strio, collector).dump(tags=['*'])
+    value = strio.getvalue()
+    assert_true("1 packages cited" in value, msg="value was %s" % value)
+    assert_true("1 modules cited" in value, msg="value was %s" % value)
+    assert_true("0 functions cited" in value, msg="value was %s" % value)
     assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
     assert_true(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
 
