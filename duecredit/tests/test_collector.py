@@ -59,10 +59,12 @@ def test_citation_paths():
     cit1 = Citation(entry, path="somemodule")
     assert_true(cit1.cites_module)
     assert_equal(cit1.module, "somemodule")
+    assert_equal(cit1.entry_key, entry.get_key())
 
     cit2 = Citation(entry, path="somemodule.submodule")
     assert_true(cit2.cites_module)
     assert_equal(cit2.module, "somemodule.submodule")
+    assert_equal(cit2.entry_key, entry.get_key())
 
     assert_true(cit1 in cit1)
     assert_true(cit2 in cit1)
@@ -71,6 +73,7 @@ def test_citation_paths():
     cit3 = Citation(entry, path="somemodule.submodule:class2.func2")
     assert_false(cit3.cites_module)
     assert_equal(cit3.module, "somemodule.submodule")
+    assert_equal(cit3.entry_key, entry.get_key())
 
     assert_true(cit2 in cit1)
     assert_true(cit3 in cit1)
@@ -80,6 +83,7 @@ def test_citation_paths():
     cit4 = Citation(entry, path="somemodule2:class2.func2")
     assert_false(cit4.cites_module)
     assert_equal(cit4.module, "somemodule2")
+    assert_equal(cit4.entry_key, entry.get_key())
 
     assert_false(cit1 in cit4)
     assert_false(cit4 in cit1)
