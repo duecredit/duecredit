@@ -22,7 +22,7 @@ from ..collector import DueCreditCollector, Citation
 from .test_collector import _sample_bibtex, _sample_doi
 from ..entries import BibTeX, DueCreditEntry, Doi
 from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, \
-    get_text_rendering, format_bibtex, _is_contained
+    get_text_rendering, format_bibtex, _is_contained, Output
 from ..utils import with_tempfile
 
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
@@ -84,6 +84,108 @@ def test_pickleoutput(fn):
         assert_equal(collector._entries.keys(),
                      collector_loaded._entries.keys())
         os.unlink(fn)
+
+
+def test_output():
+    entry = BibTeX(_sample_bibtex)
+    entry2 = BibTeX(_sample_bibtex2)
+
+    # normal use
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package')
+    collector.cite(entry, path='package.module')
+
+    output = Output(None, collector)
+
+    packages, modules, objects = output._filter_citations(tags=['*'])
+
+    assert_equal(len(packages), 1)
+    assert_equal(len(modules), 1)
+    assert_equal(len(objects), 0)
+
+    assert_equal(packages['package'][0],
+                 collector.citations[('package', entry.get_key())])
+    assert_equal(modules['package.module'][0],
+                 collector.citations[('package.module', entry.get_key())])
+
+    # no toppackage
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package')
+    collector.cite(entry, path='package2.module')
+
+    output = Output(None, collector)
+
+    packages, modules, objects = output._filter_citations(tags=['*'])
+
+    assert_equal(len(packages), 0)
+    assert_equal(len(modules), 1)
+    assert_equal(len(objects), 0)
+
+    assert_equal(modules['package2.module'][0],
+                 collector.citations[('package2.module', entry.get_key())])
+
+
+    # toppackage because required
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package', cite_module=True)
+    collector.cite(entry, path='package2.module')
+
+    output = Output(None, collector)
+
+    packages, modules, objects = output._filter_citations(tags=['*'])
+
+    assert_equal(len(packages), 1)
+    assert_equal(len(modules), 1)
+    assert_equal(len(objects), 0)
+
+    assert_equal(packages['package'][0],
+                 collector.citations[('package', entry.get_key())])
+    assert_equal(modules['package2.module'][0],
+                 collector.citations[('package2.module', entry.get_key())])
+
+
+    # check it returns multiple entries
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package')
+    collector.cite(entry2, path='package')
+    collector.cite(entry, path='package.module')
+
+    output = Output(None, collector)
+
+    packages, modules, objects = output._filter_citations(tags=['*'])
+
+    assert_equal(len(packages), 1)
+    assert_equal(len(packages['package']), 2)
+    assert_equal(len(modules), 1)
+    assert_equal(len(objects), 0)
+
+    assert_equal(packages['package'][0],
+                 collector.citations[('package', entry.get_key())])
+    assert_equal(packages['package'][1],
+                 collector.citations[('package', entry2.get_key())])
+    assert_equal(modules['package.module'][0],
+                 collector.citations[('package.module', entry.get_key())])
+
+
+    # check that filtering works
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package', tags=['edu'])
+    collector.cite(entry2, path='package')
+    collector.cite(entry, path='package.module', tags=['edu'])
+
+    output = Output(None, collector)
+
+    packages, modules, objects = output._filter_citations(tags=['edu'])
+
+    assert_equal(len(packages), 1)
+    assert_equal(len(packages['package']), 1)
+    assert_equal(len(modules), 1)
+    assert_equal(len(objects), 0)
+
+    assert_equal(packages['package'][0],
+                 collector.citations[('package', entry.get_key())])
+    assert_equal(modules['package.module'][0],
+                 collector.citations[('package.module', entry.get_key())])
 
 def test_text_output():
     entry = BibTeX(_sample_bibtex)
