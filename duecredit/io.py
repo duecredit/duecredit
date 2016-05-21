@@ -125,7 +125,7 @@ def _is_contained(toppath, subpath):
 class Output(object):
     """A generic class for setting up citations that then will be outputted
     differently (e.g., Bibtex, Text, etc.)"""
-    def __init__(self, fd, collector, **kwargs):
+    def __init__(self, fd, collector):
         self.fd = fd
         self.collector = collector
 
@@ -172,136 +172,72 @@ class Output(object):
 
         return packages, modules, objects
 
+    def dump(self, tags=None):
+        raise NotImplementedError
 
-class TextOutput(object):  # TODO some parent class to do what...?
+
+
+class TextOutput(Output):
     def __init__(self, fd, collector, style=None):
-        self.fd = fd
-        self.collector = collector
-        # TODO: check that CLS style actually exists
+        super(TextOutput, self).__init__(fd, collector)
         self.style = style
         if 'DUECREDIT_STYLE' in os.environ.keys():
             self.style = os.environ['DUECREDIT_STYLE']
         else:
             self.style = 'harvard1'
 
-    # TODO: refactor name to sth more intuitive
-    def _model_citations(self, tags=None):
-        if not tags:
-            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
-        tags = set(tags)
 
-        citations = self.collector.citations
-        if tags != {'*'}:
-            # Filter out citations
-            citations = dict((k, c)
-                             for k, c in iteritems(citations)
-                             if tags.intersection(c.tags))
+    @staticmethod
+    def _format_citations(citations, start_citation_number):
+        descriptions = map(str, set(str(r.description) for r in citations))
+        versions = map(str, set(str(r.version) for r in citations))
+        refnrs = map(str, range(start_citation_number,
+                                start_citation_number + len(citations)))
+        path = citations[0].path
 
-        packages = {}
-        modules = {}
-        objects = {}
-
-        for key in ('citations', 'entry_keys'):
-            packages[key] = defaultdict(list)
-            modules[key] = defaultdict(list)
-            objects[key] = defaultdict(list)
-
-        # for each path store both a list of entry keys and of citations
-        for (path, entry_key), citation in iteritems(citations):
-            if ':' in path:
-                target_dict = objects
-            elif '.' in path:
-                target_dict = modules
-            else:
-                target_dict = packages
-            target_dict['citations'][path].append(citation)
-            target_dict['entry_keys'][path].append(entry_key)
-
-        # now we need to filter out the packages that don't have modules
-        # or objects cited
-        cited_packages = list(packages['citations'])
-        cited_modobj = list(modules['citations']) + list(objects['citations'])
-
-        for cited_package in cited_packages:
-            children = list(filter(lambda x: x.startswith(cited_package + '.'),
-                              cited_modobj))
-            if len(children) == 0:
-                package_citations = packages['citations'][cited_package]
-                not_requested_citations = list(
-                        filter(lambda x: not x.cite_module, package_citations))
-                if len(not_requested_citations) == len(package_citations):
-                    del packages['citations'][cited_package]
-                    del packages['entry_keys'][cited_package]
-                else:
-                    for unwanted in not_requested_citations:
-                        unwanted_entry_key = unwanted.entry_key
-                        packages['citations'][cited_package].remove(unwanted)
-                        packages['entry_keys'][cited_package].remove(unwanted_entry_key)
-
-        return packages, modules, objects
+        return '- {0} / {1} (v {2}) [{3}]\n'.format(
+            ", ".join(descriptions), path, ', '.join(versions), ', '.join(refnrs))
 
     def dump(self, tags=None):
         # get 'model' of citations
-        packages, modules, objects = self._model_citations(tags)
-        # mapping key -> refnr
-        enum_entries = EnumeratedEntries()
+        packages, modules, objects = self._filter_citations(tags)
+        # put everything into a single dict
+        pmo = {}
+        pmo.update(packages)
+        pmo.update(modules)
+        pmo.update(objects)
 
-        citations_ordered = []
-        # set up view
+        # get all the paths
+        paths = sorted(list(pmo))
 
-        # package level
-        sublevels = [modules, objects]
-        for package in sorted(packages['entry_keys']):
-            for entry_key in packages['entry_keys'][package]:
-                enum_entries.add(entry_key)
-            citations_ordered.append(package)
-            # sublevels
-            for sublevel in sublevels:
-                for obj in sorted(filter(lambda x: package in x, sublevel['entry_keys'])):
-                    for entry_key_obj in sublevel['entry_keys'][obj]:
-                        enum_entries.add(entry_key_obj)
-                    citations_ordered.append(obj)
-
-        # Now we can "render" different views of our "model"
-        # Here for now just text BUT that is where we can "split" the logic and provide
-        # different renderings given the model -- text, rest, md, tex+latex, whatever
         self.fd.write('\nDueCredit Report:\n')
-
-        for path in citations_ordered:
-            if ':' in path:
+        start_refnr = 1
+        for path in paths:
+            # since they're lexicographically sorted by path, dependencies
+            # should be maintained
+            cit = pmo[path]
+            if ':' in path or '.' in path:
                 self.fd.write('  ')
-                target_dict = objects
-            elif '.' in path:
-                self.fd.write('  ')
-                target_dict = modules
-            else:
-                target_dict = packages
-            # TODO: absorb common logic into a common function
-            citations = target_dict['citations'][path]
-            entry_keys = target_dict['entry_keys'][path]
-            descriptions = sorted(map(str, set(str(r.description) for r in citations)))
-            versions = sorted(map(str, set(str(r.version) for r in citations)))
-            refnrs = sorted([str(enum_entries[entry_key]) for entry_key in entry_keys])
-            self.fd.write('- {0} / {1} (v {2}) [{3}]\n'.format(
-                ", ".join(descriptions), path, ', '.join(versions), ', '.join(refnrs)))
+            self.fd.write(self._format_citations(cit, start_refnr))
+            start_refnr += len(cit)
 
         # Print out some stats
-        obj_names = ('packages', 'modules', 'functions')
-        n_citations = map(len, (packages['citations'], modules['citations'], objects['citations']))
-        for citation_type, n in zip(obj_names, n_citations):
-            self.fd.write('\n{0} {1} cited'.format(n, citation_type))
-
-        if enum_entries:
-            citations_fromentrykey = self.collector._citations_fromentrykey()
+        stats = [(len(packages), 'package'),
+                 (len(modules), 'module'),
+                 (len(objects), 'function')]
+        for n, cit_type in stats:
+            self.fd.write('\n{0} {1} cited'.format(n, cit_type if n == 1
+                                                      else cit_type + 's'))
+        # now print out references
+        refnr = 1
+        if len(pmo) > 0:
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
-            # collect all the entries used
-            refnr_key = [(nr, enum_entries.fromrefnr(nr)) for nr in range(1, len(enum_entries)+1)]
-            for nr, key in refnr_key:
-                self.fd.write('\n[{0}] '.format(nr))
-                citation_text = get_text_rendering(citations_fromentrykey[key], style=self.style)
-                if PY2:
-                    citation_text = citation_text.encode(_PREFERRED_ENCODING)
-                self.fd.write(citation_text)
+            for path in paths:
+                for cit in pmo[path]:
+                    self.fd.write('\n[{0}] '.format(refnr))
+                    self.fd.write(get_text_rendering(cit,
+                                                     style=self.style))
+                    refnr += 1
             self.fd.write('\n')
 
 

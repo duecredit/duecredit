@@ -209,7 +209,7 @@ def test_text_output():
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true("1 packages cited" in value, msg="value was %s" % value)
+    assert_true("1 package cited" in value, msg="value was %s" % value)
     assert_true("0 modules cited" in value, msg="value was %s" % value)
     assert_true("0 functions cited" in value, msg="value was %s" % value)
 
@@ -222,8 +222,8 @@ def test_text_output():
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true("1 packages cited" in value, msg="value was %s" % value)
-    assert_true("1 modules cited" in value, msg="value was %s" % value)
+    assert_true("1 package cited" in value, msg="value was %s" % value)
+    assert_true("1 module cited" in value, msg="value was %s" % value)
     assert_true("0 functions cited" in value, msg="value was %s" % value)
     assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
     assert_true(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
@@ -257,17 +257,18 @@ def test_text_output_dump_formatting():
                 msg='value was {0}'.format(value))
 
     # now we call it -- check it prints stuff
+    strio = StringIO()
     mymodule('magical', kwarg2=1)
     TextOutput(strio, due).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true('1 packages cited' in value, msg='value was {0}'.format(value))
-    assert_true('1 functions cited' in value, msg='value was {0}'.format(value))
+    assert_true('1 package cited' in value, msg='value was {0}'.format(value))
+    assert_true('1 function cited' in value, msg='value was {0}'.format(value))
     assert_true('(v 0.0.16)' in value,
                 msg='value was {0}'.format(value))
-    assert_equal(len(value.split('\n')), 21, msg='value was {0}'.format(value))
+    assert_equal(len(value.split('\n')), 16, msg='value was {0}'.format(len(value.split('\n'))))
 
     # test we get the reference numbering right
-    samples_bibtex = [_generate_sample_bibtex() for x in range(5)]
+    samples_bibtex = [_generate_sample_bibtex() for x in range(6)]
     # this sucks but at the moment it's the only way to have multiple
     # references for a function
 
@@ -286,7 +287,7 @@ def test_text_output_dump_formatting():
                    path='myothermodule:myotherfunction')
         @due.dcite(BibTeX(samples_bibtex[4]), description='solution to life',
                    path='myothermodule:myotherfunction')
-        @due.dcite(BibTeX(_sample_bibtex2), description='solution to life',
+        @due.dcite(BibTeX(samples_bibtex[5]), description='solution to life',
                    path='myothermodule:myotherfunction')
         def myotherfunction(arg42):
             pass
