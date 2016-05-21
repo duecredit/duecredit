@@ -159,10 +159,15 @@ def test_output():
     assert_equal(len(modules), 1)
     assert_equal(len(objects), 0)
 
-    assert_equal(packages['package'][0],
-                 collector.citations[('package', entry.get_key())])
-    assert_equal(packages['package'][1],
+    # sort them in order so we know who is who
+    # entry2 key is Atk...
+    # entry key is XX..
+    packs = sorted(packages['package'], key=lambda x: x.entry_key)
+
+    assert_equal(packs[0],
                  collector.citations[('package', entry2.get_key())])
+    assert_equal(packs[1],
+                 collector.citations[('package', entry.get_key())])
     assert_equal(modules['package.module'][0],
                  collector.citations[('package.module', entry.get_key())])
 
