@@ -22,7 +22,7 @@ from ..collector import DueCreditCollector, Citation
 from .test_collector import _sample_bibtex, _sample_doi
 from ..entries import BibTeX, DueCreditEntry, Doi
 from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, \
-    get_text_rendering, format_bibtex
+    get_text_rendering, format_bibtex, _is_contained
 from ..utils import with_tempfile
 
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
@@ -308,3 +308,14 @@ def test_format_bibtex_zenodo_doi():
     """
     assert_equal(format_bibtex(BibTeX(bibtex_zenodo)),
                  """Ghosh, S. et al., 2016. nipype: Release candidate 1 for version 0.12.0.""")
+
+def test_is_contained():
+    toppath = 'package'
+    assert_true(_is_contained(toppath, 'package.module'))
+    assert_true(_is_contained(toppath, 'package.module.submodule'))
+    assert_true(_is_contained(toppath, 'package.module.submodule:object'))
+    assert_true(_is_contained(toppath, 'package:object'))
+    assert_true(_is_contained(toppath, toppath))
+    assert_false(_is_contained(toppath, 'package2'))
+    assert_false(_is_contained(toppath, 'package2:anotherobject'))
+    assert_false(_is_contained(toppath, 'package2.module:anotherobject'))
