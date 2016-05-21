@@ -330,13 +330,26 @@ class PickleOutput(object):
         with open(filename, 'rb') as f:
             return pickle.load(f)
 
-class BibTeXOutput(object):  # TODO some parent class to do what...?
+class BibTeXOutput(Output):
     def __init__(self, fd, collector):
-        self.fd = fd
-        self.collector = collector
+        super(BibTeXOutput, self).__init__(fd, collector)
 
-    def dump(self):
-        for citation in self.collector.citations.values():
+    def dump(self, tags=None):
+        packages, modules, objects = self._filter_citations(tags)
+        # get all the citations in order
+        pmo = {}
+        pmo.update(packages)
+        pmo.update(modules)
+        pmo.update(objects)
+
+        # get all the paths
+        paths = sorted(list(pmo))
+
+        citations = []
+        for path in paths:
+            citations.extend(pmo[path])
+
+        for citation in citations:
             try:
                 bibtex = get_bibtex_rendering(citation.entry)
             except:

@@ -22,7 +22,7 @@ from ..collector import DueCreditCollector, Citation
 from .test_collector import _sample_bibtex, _sample_doi
 from ..entries import BibTeX, DueCreditEntry, Doi
 from ..io import TextOutput, PickleOutput, import_doi, EnumeratedEntries, \
-    get_text_rendering, format_bibtex, _is_contained, Output
+    get_text_rendering, format_bibtex, _is_contained, Output, BibTeXOutput
 from ..utils import with_tempfile
 
 from nose.tools import assert_equal, assert_is_instance, assert_raises, \
@@ -319,6 +319,49 @@ def test_text_output_dump_formatting():
     # verify that we have returned to previous state of filters
     import warnings
     assert_true(('ignore', None, UserWarning, None, 0) not in warnings.filters)
+
+
+def test_bibtex_output():
+    entry = BibTeX(_sample_bibtex)
+    entry2 = BibTeX(_sample_bibtex2)
+
+    # in this case, since we're not citing any module or method, we shouldn't
+    # output anything
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package')
+
+    strio = StringIO()
+    BibTeXOutput(strio, collector).dump(tags=['*'])
+    value = strio.getvalue()
+    assert_equal(value, '', msg='Value was {0}'.format(value))
+
+    # impose citing
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package', cite_module=True)
+
+    strio = StringIO()
+    BibTeXOutput(strio, collector).dump(tags=['*'])
+    value = strio.getvalue()
+    assert_equal(value.strip(), _sample_bibtex.strip(), msg='Value was {0}'.format(value))
+
+    # impose filtering
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package', cite_module=True, tags=['edu'])
+    collector.cite(entry2, path='package.module')
+
+    strio = StringIO()
+    BibTeXOutput(strio, collector).dump(tags=['edu'])
+    value = strio.getvalue()
+    assert_equal(value.strip(), _sample_bibtex.strip(), msg='Value was {0}'.format(value))
+
+    # no filtering
+    strio = StringIO()
+    BibTeXOutput(strio, collector).dump(tags=['*'])
+    value = strio.getvalue()
+    assert_equal(value.strip(),
+                 _sample_bibtex.strip() + _sample_bibtex2.rstrip(),
+                 msg='Value was {0}'.format(value))
+
 
 def _generate_sample_bibtex():
     """
