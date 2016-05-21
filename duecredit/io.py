@@ -113,6 +113,66 @@ class EnumeratedEntries(Iterator):
         return len(self._keys2refnr)
 
 
+def _is_contained(toppath, subpath):
+    if ':' not in toppath:
+        return ((toppath == subpath) or
+                (subpath.startswith(toppath + '.')) or
+                (subpath.startswith(toppath + ':')))
+    else:
+        return subpath.startswith(toppath + '.')
+
+
+class Output(object):
+    """A generic class for setting up citations that then will be outputted
+    differently (e.g., Bibtex, Text, etc.)"""
+    def __init__(self, fd, collector, **kwargs):
+        self.fd = fd
+        self.collector = collector
+
+    def _filter_citations(self, tags=None):
+        """Given all the citations, filter only those that the user wants and
+        those that were actually used"""
+        if not tags:
+            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
+        tags = set(tags)
+
+        citations = self.collector.citations
+        if tags != {'*'}:
+            # Filter out citations based on tags
+            citations = dict((k, c)
+                             for k, c in iteritems(citations)
+                             if tags.intersection(c.tags))
+
+        packages = defaultdict(list)
+        modules = defaultdict(list)
+        objects = defaultdict(list)
+
+        # store the citations according to their path and divide them into
+        # the right level
+        for (path, entry_key), citation in iteritems(citations):
+            if ':' in path:
+                objects[path].append(citation)
+            elif '.' in path:
+                modules[path].append(citation)
+            else:
+                packages[path].append(citation)
+
+        # now we need to filter out the packages that don't have modules
+        # or objects cited, or are specifically requested
+        cited_packages = list(packages)
+        cited_modobj = list(modules) + list(objects)
+        for package in cited_packages:
+            package_citations = packages[package]
+            if filter(lambda x: x.cite_module, package_citations) or \
+                    filter(lambda x: _is_contained(package, x), cited_modobj):
+                continue
+            else:
+                # we don't need it
+                del packages[package]
+
+        return packages, modules, objects
+
+
 class TextOutput(object):  # TODO some parent class to do what...?
     def __init__(self, fd, collector, style=None):
         self.fd = fd
