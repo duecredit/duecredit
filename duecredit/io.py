@@ -150,11 +150,10 @@ class TextOutput(Output):
 
 
     @staticmethod
-    def _format_citations(citations, start_citation_number):
+    def _format_citations(citations, citation_nr):
         descriptions = map(str, set(str(r.description) for r in citations))
         versions = map(str, set(str(r.version) for r in citations))
-        refnrs = map(str, range(start_citation_number,
-                                start_citation_number + len(citations)))
+        refnrs = map(str, [citation_nr[c.entry.key] for c in citations])
         path = citations[0].path
 
         return '- {0} / {1} (v {2}) [{3}]\n'.format(
@@ -171,6 +170,15 @@ class TextOutput(Output):
 
         # get all the paths
         paths = sorted(list(pmo))
+        # get all the entry_keys in order
+        entry_keys = [c.entry.key for p in paths for c in pmo[p]]
+        # make a dictionary entry_key -> citation_nr
+        citation_nr = defaultdict(int)
+        refnr = 1
+        for entry_key in entry_keys:
+            if entry_key not in citation_nr:
+                citation_nr[entry_key] = refnr
+                refnr += 1
 
         self.fd.write('\nDueCredit Report:\n')
         start_refnr = 1
@@ -180,7 +188,7 @@ class TextOutput(Output):
             cit = pmo[path]
             if ':' in path or '.' in path:
                 self.fd.write('  ')
-            self.fd.write(self._format_citations(cit, start_refnr))
+            self.fd.write(self._format_citations(cit, citation_nr))
             start_refnr += len(cit)
 
         # Print out some stats
@@ -191,15 +199,17 @@ class TextOutput(Output):
             self.fd.write('\n{0} {1} cited'.format(n, cit_type if n == 1
                                                       else cit_type + 's'))
         # now print out references
-        refnr = 1
+        printed_keys = []
         if len(pmo) > 0:
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
             for path in paths:
                 for cit in pmo[path]:
-                    self.fd.write('\n[{0}] '.format(refnr))
-                    self.fd.write(get_text_rendering(cit,
-                                                     style=self.style))
-                    refnr += 1
+                    ek = cit.entry.key
+                    if ek not in printed_keys:
+                        self.fd.write('\n[{0}] '.format(citation_nr[ek]))
+                        self.fd.write(get_text_rendering(cit,
+                                                        style=self.style))
+                        printed_keys.append(ek)
             self.fd.write('\n')
 
 

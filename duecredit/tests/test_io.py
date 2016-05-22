@@ -194,6 +194,7 @@ def test_output():
 
 def test_text_output():
     entry = BibTeX(_sample_bibtex)
+    entry2 = BibTeX(_sample_bibtex2)
 
     # in this case, since we're not citing any module or method, we shouldn't
     # output anything
@@ -232,6 +233,25 @@ def test_text_output():
     assert_true("0 functions cited" in value, msg="value was %s" % value)
     assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
     assert_true(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
+
+
+    # in this case, we should be citing the package since we are also citing a
+    # submodule
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package')
+    collector.cite(entry2, path='package')
+    collector.cite(entry, path='package.module')
+
+    strio = StringIO()
+    TextOutput(strio, collector).dump(tags=['*'])
+    value = strio.getvalue()
+    assert_true("1 package cited" in value, msg="value was %s" % value)
+    assert_true("1 module cited" in value, msg="value was %s" % value)
+    assert_true("0 functions cited" in value, msg="value was %s" % value)
+    assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
+    assert_true('[1, 2]' in value, msg="value was %s" %value)
+    assert_false('[3]' in value, msg="value was %s" %value)
+    assert_true(value.strip().endswith("My Fancy. Journ., 666(3009)."))
 
 
 def test_text_output_dump_formatting():
