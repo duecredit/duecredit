@@ -160,13 +160,10 @@ class Citation(object):
         else:
             return entry.path.startswith(self.path + '.')
 
-    @property
-    def entry_key(self):
-        return self.entry.get_key()
 
     @property
     def key(self):
-        return CitationKey(self.path, self.entry_key)
+        return CitationKey(self.path, self.entry.key)
 
     @staticmethod
     def get_key(path, entry_key):

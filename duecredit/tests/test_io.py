@@ -162,7 +162,7 @@ def test_output():
     # sort them in order so we know who is who
     # entry2 key is Atk...
     # entry key is XX..
-    packs = sorted(packages['package'], key=lambda x: x.entry_key)
+    packs = sorted(packages['package'], key=lambda x: x.entry.key)
 
     assert_equal(packs[0],
                  collector.citations[('package', entry2.get_key())])
