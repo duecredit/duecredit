@@ -317,15 +317,17 @@ class BibTeXOutput(Output):
         # get all the paths
         paths = sorted(list(pmo))
 
-        citations = []
+        entries = []
         for path in paths:
-            citations.extend(pmo[path])
+            for c in pmo[path]:
+                if c.entry not in entries:
+                    entries.append(c.entry)
 
-        for citation in citations:
+        for entry in entries:
             try:
-                bibtex = get_bibtex_rendering(citation.entry)
+                bibtex = get_bibtex_rendering(entry)
             except:
-                lgr.warning("Failed to generate bibtex for %s" % citation.entry)
+                lgr.warning("Failed to generate bibtex for %s" % entry)
                 continue
             self.fd.write(bibtex.rawentry + "\n")
 

@@ -387,6 +387,15 @@ def test_bibtex_output():
                  _sample_bibtex.strip() + _sample_bibtex2.rstrip(),
                  msg='Value was {0}'.format(value))
 
+    # check the we output only unique bibtex entries
+    collector.cite(entry2, path='package')
+    strio = StringIO()
+    BibTeXOutput(strio, collector).dump(tags=['*'])
+    value = strio.getvalue()
+    assert_equal(value.strip(),
+                 _sample_bibtex.strip() + _sample_bibtex2.rstrip(),
+                 msg='Value was {0}'.format(value))
+
 
 def _generate_sample_bibtex():
     """
