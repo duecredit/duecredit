@@ -251,7 +251,6 @@ def test_text_output():
     assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
     assert_true('[1, 2]' in value, msg="value was %s" %value)
     assert_false('[3]' in value, msg="value was %s" %value)
-    assert_true(value.strip().endswith("My Fancy. Journ., 666(3009)."))
 
 
 def test_text_output_dump_formatting():
@@ -392,9 +391,10 @@ def test_bibtex_output():
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_equal(value.strip(),
-                 _sample_bibtex.strip() + _sample_bibtex2.rstrip(),
-                 msg='Value was {0}'.format(value))
+    value_ = sorted(value.strip().split('\n'))
+    bibtex = sorted((_sample_bibtex.strip() + _sample_bibtex2.rstrip()).split('\n'))
+    assert_equal(value_, bibtex,
+                 msg='Value was {0}'.format(value_, bibtex))
 
 
 def _generate_sample_bibtex():
