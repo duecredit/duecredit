@@ -18,6 +18,7 @@ from glob import glob
 import sys
 from functools import wraps
 
+import logging
 from ..log import lgr
 
 from six import iteritems
@@ -172,7 +173,10 @@ class DueCreditInjector(object):
         if mod_name not in self._entry_records:
             return
 
-        lgr.debug("Process %d injections for module %s", len(self._entry_records[mod_name]), mod_name)
+        total_number_of_citations = sum(map(len, self._entry_records[mod_name].values()))
+        lgr.log(logging.DEBUG + 5,
+                "Process %d citation injections for %d objects for module %s",
+                total_number_of_citations, len(self._entry_records[mod_name]), mod_name)
 
         try:
             mod = sys.modules[mod_name]
@@ -202,7 +206,10 @@ class DueCreditInjector(object):
                 if obj_path:  # if not entire module -- decorate!
                     decorator = self._collector.dcite(entry.get_key(), **obj_entry_record['kwargs'])
                     lgr.debug("Decorating %s:%s with %s", parent, obj_name, decorator)
-                    setattr(parent, obj_name, decorator(obj))
+                    obj_decorated = decorator(obj)
+                    setattr(parent, obj_name, obj_decorated)
+                    # override previous obj with the decorated one if there are multiple decorators
+                    obj = obj_decorated
                 else:
                     lgr.log(3, "Citing directly %s:%s since obj_path is empty", parent, obj_name)
                     self._collector.cite(entry.get_key(), **obj_entry_record['kwargs'])
