@@ -96,66 +96,75 @@ in current directory:
     $> python -m duecredit examples/example_scipy.py
     I: Simulating 4 blobs
     I: Done clustering 4 blobs
+    
     DueCredit Report:
-    - scipy (v 0.14.1) [1]
-      - scipy.cluster.hierarchy:linkage (Single linkage hierarchical clustering) [2]
-    - numpy (v 1.8.2) [3]
-
-    2 modules cited
-    1 functions cited
-
+    - Scientific tools library / scipy (v 0.14) [1]
+      - Single linkage hierarchical clustering / scipy.cluster.hierarchy:linkage (v 0.14) [2]
+    
+    1 package cited
+    0 modules cited
+    1 function cited
+    
     References
     ----------
-
+    
     [1] Jones, E. et al., 2001. SciPy: Open source scientific tools for Python.
-    [2] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link
-        cluster method. The Computer Journal, 16(1), pp.30–34.
-    [3] Van Der Walt, S., Colbert, S.C. & Varoquaux, G., 2011. The
-        NumPy array: a structure for efficient numerical
-        computation. Computing in Science & Engineering, 13(2), pp.22–30.
+    [2] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
 
 Incremental runs of various software would keep enriching that file.
 Then you can use `duecredit summary` command to show that information
 again (stored in `.duecredit.p` file) or export it as a BibTeX file
 ready for reuse, e.g.:
 
-    $> venv/bin/duecredit summary --format=bibtex
-    @book{sokal1958statistical,
-            author = {Sokal, R R and Michener, C D and {University of Kansas}},
-            title = {{A Statistical Method for Evaluating Systematic Relationships}},
-            publisher = {University of Kansas},
-            year = {1958},
-            series = {University of Kansas science bulletin}
+    $> duecredit summary --format=bibtex
+    @Misc{JOP+01,
+          author =    {Eric Jones and Travis Oliphant and Pearu Peterson and others},
+          title =     {{SciPy}: Open source scientific tools for {Python}},
+          year =      {2001--},
+          url = "http://www.scipy.org/",
+          note = {[Online; accessed 2015-07-13]}
         }
-    @book{jain1988algorithms,
-            title={Algorithms for clustering data},
-            author={Jain, Anil K and Dubes, Richard C},
-            year={1988},
-            publisher={Prentice-Hall, Inc.}
+    @article{sibson1973slink,
+            title={SLINK: an optimally efficient algorithm for the single-link cluster method},
+            author={Sibson, Robin},
+            journal={The Computer Journal},
+            volume={16},
+            number={1},
+            pages={30--34},
+            year={1973},
+            publisher={Br Computer Soc}
         }
-    ...
-
 
 and if by default only references for "implementation" are listed, we
 can enable listing of references for other tags as well (e.g. "edu"
 depicting instructional materials -- textbooks etc on the topic):
 
     $> DUECREDIT_REPORT_TAGS=* duecredit summary
+    
     DueCredit Report:
-    - scipy (v 0.14.1) [1, 2, 3, 4, 5, 6, 7, 8]
-      - scipy.cluster.hierarchy:linkage (Single linkage hierarchical clustering) [9]
-    - numpy (v 1.8.2) [10]
-
-    2 modules cited
-    1 functions cited
-
+    - Scientific tools library / numpy (v 1.9.2) [1]
+    - Scientific tools library / scipy (v 0.14) [2]
+      - Hierarchical clustering / scipy.cluster.hierarchy (v 0.14) [3, 4, 5, 6, 7, 8, 9]
+      - Single linkage hierarchical clustering / scipy.cluster.hierarchy:linkage (v 0.14) [10]
+    
+    2 packages cited
+    1 module cited
+    1 function cited
+    
     References
     ----------
-
-    [1] Sokal, R.R., Michener, C.D. & University of Kansas, 1958. A Statistical Method for Evaluating Systematic Relationships, University of Kansas.
-    [2] Jain, A.K. & Dubes, R.C., 1988. Algorithms for clustering data, Prentice-Hall, Inc..
-    [3] Johnson, S.C., 1967. Hierarchical clustering schemes. Psychometrika, 32(3), pp.241–254.
-    ...
+    
+    [1] Van Der Walt, S., Colbert, S.C. & Varoquaux, G., 2011. The NumPy array: a structure for efficient numerical computation. Computing in Science & Engineering, 13(2), pp.22–30.
+    [2] Jones, E. et al., 2001. SciPy: Open source scientific tools for Python.
+    [3] Sneath, P.H. & Sokal, R.R., 1962. Numerical taxonomy. Nature, 193(4818), pp.855–860.
+    [4] Batagelj, V. & Bren, M., 1995. Comparing resemblance measures. Journal of classification, 12(1), pp.73–90.
+    [5] Sokal, R.R., Michener, C.D. & University of Kansas, 1958. A Statistical Method for Evaluating Systematic Relationships, University of Kansas.
+    [6] Jain, A.K. & Dubes, R.C., 1988. Algorithms for clustering data, Prentice-Hall, Inc..
+    [7] Johnson, S.C., 1967. Hierarchical clustering schemes. Psychometrika, 32(3), pp.241–254.
+    [8] Edelbrock, C., 1979. Mixture model tests of hierarchical clustering algorithms:
+                the problem of classifying everybody. Multivariate Behavioral Research, 14(3), pp.367–384.
+    [9] Fisher, R.A., 1936. The use of multiple measurements in taxonomic problems. Annals of eugenics, 7(2), pp.179–188.
+    [10] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
 
 
 Ultimate goals
