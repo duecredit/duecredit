@@ -161,8 +161,7 @@ depicting instructional materials -- textbooks etc on the topic):
     [5] Sokal, R.R., Michener, C.D. & University of Kansas, 1958. A Statistical Method for Evaluating Systematic Relationships, University of Kansas.
     [6] Jain, A.K. & Dubes, R.C., 1988. Algorithms for clustering data, Prentice-Hall, Inc..
     [7] Johnson, S.C., 1967. Hierarchical clustering schemes. Psychometrika, 32(3), pp.241–254.
-    [8] Edelbrock, C., 1979. Mixture model tests of hierarchical clustering algorithms:
-                the problem of classifying everybody. Multivariate Behavioral Research, 14(3), pp.367–384.
+    [8] Edelbrock, C., 1979. Mixture model tests of hierarchical clustering algorithms: the problem of classifying everybody. Multivariate Behavioral Research, 14(3), pp.367–384.
     [9] Fisher, R.A., 1936. The use of multiple measurements in taxonomic problems. Annals of eugenics, 7(2), pp.179–188.
     [10] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
 
