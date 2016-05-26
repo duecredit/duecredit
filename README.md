@@ -96,20 +96,23 @@ in current directory:
     $> python -m duecredit examples/example_scipy.py
     I: Simulating 4 blobs
     I: Done clustering 4 blobs
-    
+
     DueCredit Report:
-    - Scientific tools library / scipy (v 0.14) [1]
-      - Single linkage hierarchical clustering / scipy.cluster.hierarchy:linkage (v 0.14) [2]
-    
-    1 package cited
+    - Scientific tools library / numpy (v 1.10.4) [1]
+    - Scientific tools library / scipy (v 0.14) [2]
+      - Single linkage hierarchical clustering / scipy.cluster.hierarchy:linkage (v 0.14) [3]
+
+    2 packages cited
     0 modules cited
     1 function cited
-    
+
     References
     ----------
-    
-    [1] Jones, E. et al., 2001. SciPy: Open source scientific tools for Python.
-    [2] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
+
+    [1] Van Der Walt, S., Colbert, S.C. & Varoquaux, G., 2011. The NumPy array: a structure for efficient numerical computation. Computing in Science & Engineering, 13(2), pp.22–30.
+    [2] Jones, E. et al., 2001. SciPy: Open source scientific tools for Python.
+    [3] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
+
 
 Incremental runs of various software would keep enriching that file.
 Then you can use `duecredit summary` command to show that information
@@ -117,6 +120,16 @@ again (stored in `.duecredit.p` file) or export it as a BibTeX file
 ready for reuse, e.g.:
 
     $> duecredit summary --format=bibtex
+    @article{van2011numpy,
+            title={The NumPy array: a structure for efficient numerical computation},
+            author={Van Der Walt, Stefan and Colbert, S Chris and Varoquaux, Gael},
+            journal={Computing in Science \& Engineering},
+            volume={13},
+            number={2},
+            pages={22--30},
+            year={2011},
+            publisher={AIP Publishing}
+            }
     @Misc{JOP+01,
           author =    {Eric Jones and Travis Oliphant and Pearu Peterson and others},
           title =     {{SciPy}: Open source scientific tools for {Python}},
@@ -135,6 +148,7 @@ ready for reuse, e.g.:
             publisher={Br Computer Soc}
         }
 
+
 and if by default only references for "implementation" are listed, we
 can enable listing of references for other tags as well (e.g. "edu"
 depicting instructional materials -- textbooks etc on the topic):
@@ -142,18 +156,18 @@ depicting instructional materials -- textbooks etc on the topic):
     $> DUECREDIT_REPORT_TAGS=* duecredit summary
     
     DueCredit Report:
-    - Scientific tools library / numpy (v 1.9.2) [1]
+    - Scientific tools library / numpy (v 1.10.4) [1]
     - Scientific tools library / scipy (v 0.14) [2]
       - Hierarchical clustering / scipy.cluster.hierarchy (v 0.14) [3, 4, 5, 6, 7, 8, 9]
-      - Single linkage hierarchical clustering / scipy.cluster.hierarchy:linkage (v 0.14) [10]
-    
+      - Single linkage hierarchical clustering / scipy.cluster.hierarchy:linkage (v 0.14) [10, 11]
+
     2 packages cited
     1 module cited
     1 function cited
-    
+
     References
     ----------
-    
+
     [1] Van Der Walt, S., Colbert, S.C. & Varoquaux, G., 2011. The NumPy array: a structure for efficient numerical computation. Computing in Science & Engineering, 13(2), pp.22–30.
     [2] Jones, E. et al., 2001. SciPy: Open source scientific tools for Python.
     [3] Sneath, P.H. & Sokal, R.R., 1962. Numerical taxonomy. Nature, 193(4818), pp.855–860.
@@ -163,7 +177,8 @@ depicting instructional materials -- textbooks etc on the topic):
     [7] Johnson, S.C., 1967. Hierarchical clustering schemes. Psychometrika, 32(3), pp.241–254.
     [8] Edelbrock, C., 1979. Mixture model tests of hierarchical clustering algorithms: the problem of classifying everybody. Multivariate Behavioral Research, 14(3), pp.367–384.
     [9] Fisher, R.A., 1936. The use of multiple measurements in taxonomic problems. Annals of eugenics, 7(2), pp.179–188.
-    [10] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
+    [10] Gower, J.C. & Ross, G., 1969. Minimum spanning trees and single linkage cluster analysis. Applied statistics, pp.54–64.
+    [11] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
 
 
 Ultimate goals
