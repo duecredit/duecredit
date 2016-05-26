@@ -77,7 +77,19 @@ class DueCreditInjector(object):
     """
 
     # Made as a class variable to assure being singleton and available upon del
-    _orig_import = None
+    __orig_import = None
+
+    # and interact with its value through the property to ease tracking of actions
+    # performed on it
+    @property
+    def _orig_import(self):
+        return DueCreditInjector.__orig_import
+
+    @_orig_import.setter
+    def _orig_import(self, value):
+        lgr.log(2, "Reassigning _orig_import from %r to %r", DueCreditInjector.__orig_import, value)
+        DueCreditInjector.__orig_import = value
+
 
     def __init__(self, collector=None):
         if collector is None:
@@ -94,6 +106,8 @@ class DueCreditInjector(object):
         self.__import_level = 0
         self.__queue_to_process = set()
         self.__processing_queue = False
+        self._active = False
+        lgr.debug("Created injector %r", self)
 
     def _populate_delayed_injections(self):
         self._delayed_injections = {}
@@ -219,7 +233,7 @@ class DueCreditInjector(object):
     def _mitigate_None_orig_import(self, name, *args, **kwargs):
         lgr.error("For some reason self._orig_import is None"
                   ". Importing using stock importer to mitigate and adjusting _orig_import")
-        DueCreditInjector._orig_import = _very_orig_import
+        self._orig_import = _very_orig_import
         return _very_orig_import(name, *args, **kwargs)
 
     def activate(self, retrospect=True):
@@ -236,7 +250,7 @@ class DueCreditInjector(object):
             if hasattr(__builtin__.__import__, '__duecredited__'):
                 raise RuntimeError("__import__ is already duecredited")
 
-            DueCreditInjector._orig_import = __builtin__.__import__
+            self._orig_import = __builtin__.__import__
 
             @wraps(__builtin__.__import__)
             def __import(name, *args, **kwargs):
@@ -294,6 +308,7 @@ class DueCreditInjector(object):
 
             lgr.debug("Assigning our importer")
             __builtin__.__import__ = __import
+            self._active = True
 
         else:
             lgr.warning("Seems that we are calling duecredit_importer twice."
@@ -349,16 +364,19 @@ class DueCreditInjector(object):
             lgr.warning("_orig_import is not yet known, so we haven't decorated default importer yet."
                         " Nothing TODO")
             return
-
+        if not self._active:
+            lgr.error("Must have not happened, but we will survive!")
         lgr.debug("Assigning original importer")
         __builtin__.__import__ = self._orig_import
-        DueCreditInjector._orig_import = None
+        self._orig_import = None
+        self._active = False
 
     def __del__(self):
-        if self._orig_import is not None:
+        lgr.debug("%s is asked to be deleted", self)
+        if self._active:
             self.deactivate()
         try:
-            super(self.__class__, self)._del__()
+            super(self.__class__, self).__del__()
         except Exception:
             pass
 
