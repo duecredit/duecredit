@@ -91,11 +91,14 @@ class Output(object):
         self.fd = fd
         self.collector = collector
 
-    def _filter_citations(self, tags=None):
+    def _get_collated_citations(self, tags=None, all_=None):
         """Given all the citations, filter only those that the user wants and
         those that were actually used"""
         if not tags:
             tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
+        if all_ is None:
+            # consult env var
+            all_ = os.environ.get('DUECREDIT_REPORT_ALL', '').lower() in {'1', 'true', 'yes', 'on'}
         tags = set(tags)
 
         citations = self.collector.citations
@@ -125,8 +128,9 @@ class Output(object):
         cited_modobj = list(modules) + list(objects)
         for package in cited_packages:
             package_citations = packages[package]
-            if list(filter(lambda x: x.cite_module, package_citations)) or \
-               list(filter(lambda x: _is_contained(package, x), cited_modobj)):
+            if all_ or \
+                list(filter(lambda x: x.cite_module, package_citations)) or \
+                list(filter(lambda x: _is_contained(package, x), cited_modobj)):
                 continue
             else:
                 # we don't need it
@@ -161,7 +165,7 @@ class TextOutput(Output):
 
     def dump(self, tags=None):
         # get 'model' of citations
-        packages, modules, objects = self._filter_citations(tags)
+        packages, modules, objects = self._get_collated_citations(tags)
         # put everything into a single dict
         pmo = {}
         pmo.update(packages)
@@ -307,7 +311,7 @@ class BibTeXOutput(Output):
         super(BibTeXOutput, self).__init__(fd, collector)
 
     def dump(self, tags=None):
-        packages, modules, objects = self._filter_citations(tags)
+        packages, modules, objects = self._get_collated_citations(tags)
         # get all the citations in order
         pmo = {}
         pmo.update(packages)

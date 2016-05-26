@@ -97,7 +97,7 @@ def test_output():
 
     output = Output(None, collector)
 
-    packages, modules, objects = output._filter_citations(tags=['*'])
+    packages, modules, objects = output._get_collated_citations(tags=['*'])
 
     assert_equal(len(packages), 1)
     assert_equal(len(modules), 1)
@@ -115,7 +115,7 @@ def test_output():
 
     output = Output(None, collector)
 
-    packages, modules, objects = output._filter_citations(tags=['*'])
+    packages, modules, objects = output._get_collated_citations(tags=['*'])
 
     assert_equal(len(packages), 0)
     assert_equal(len(modules), 1)
@@ -132,7 +132,7 @@ def test_output():
 
     output = Output(None, collector)
 
-    packages, modules, objects = output._filter_citations(tags=['*'])
+    packages, modules, objects = output._get_collated_citations(tags=['*'])
 
     assert_equal(len(packages), 1)
     assert_equal(len(modules), 1)
@@ -152,7 +152,7 @@ def test_output():
 
     output = Output(None, collector)
 
-    packages, modules, objects = output._filter_citations(tags=['*'])
+    packages, modules, objects = output._get_collated_citations(tags=['*'])
 
     assert_equal(len(packages), 1)
     assert_equal(len(packages['package']), 2)
@@ -180,7 +180,7 @@ def test_output():
 
     output = Output(None, collector)
 
-    packages, modules, objects = output._filter_citations(tags=['edu'])
+    packages, modules, objects = output._get_collated_citations(tags=['edu'])
 
     assert_equal(len(packages), 1)
     assert_equal(len(packages['package']), 1)
