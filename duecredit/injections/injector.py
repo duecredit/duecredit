@@ -364,7 +364,7 @@ class DueCreditInjector(object):
             lgr.warning("_orig_import is not yet known, so we haven't decorated default importer yet."
                         " Nothing TODO")
             return
-        if not self._active:
+        if not self._active:  # pragma: no cover
             lgr.error("Must have not happened, but we will survive!")
         lgr.debug("Assigning original importer")
         __builtin__.__import__ = self._orig_import
