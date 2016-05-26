@@ -96,6 +96,56 @@ class TestActiveInjector(object):
 
         assert(citation.tags == ['implementation', 'very custom'])
 
+    def _test_double_injection(self, func, import_stmt, func_call=None, skip=False):
+        assert_false('duecredit.tests.mod' in sys.modules)
+        # add one injection
+        self.injector.add('duecredit.tests.mod', func,
+                          Doi('1.2.3.4'),
+                          description="Testing %s" % func,
+                          min_version='0.1', max_version='1.0',
+                          tags=["implementation", "very custom"])
+        #add another one
+        self.injector.add('duecredit.tests.mod', func,
+                          Doi('1.2.3.5'),
+                          description="Testing %s" % func,
+                          min_version='0.1', max_version='1.0',
+                          tags=["implementation", "very custom"])
+
+        assert_false('duecredit.tests.mod' in sys.modules) # no import happening
+        assert_equal(len(self.due._entries), 0)
+        assert_equal(len(self.due.citations), 0)
+
+        globals_, locals_ = {}, {}
+        exec(import_stmt, globals_, locals_)
+
+        if skip:
+            raise SkipTest("cowardly skipping a known failure on travis")
+        assert_equal(len(self.due._entries), 2)   # we should get two entries now
+        assert_equal(len(self.due.citations), 0)  # but not yet a citation
+
+        import duecredit.tests.mod as mod
+        _, _, obj = find_object(mod, func)
+        assert_true(obj.__duecredited__)              # we wrapped
+        assert_false(obj.__duecredited__ is obj)      # and it is not pointing to the same func
+        assert_equal(obj.__doc__, "custom docstring") # we preserved docstring
+
+        # TODO: test decoration features -- preserver __doc__ etc
+        exec('ret = %s(None, "somevalue")' % (func_call or func), globals_, locals_)
+        # XXX: awkwardly 'ret' is not found in the scope while running nosetests
+        # under python3.4, although present in locals()... WTF?
+        assert_equal(locals_['ret'], "%s: None, somevalue" % func)
+        assert_equal(len(self.due._entries), 2)
+        assert_equal(len(self.due.citations), 2)
+
+        # TODO: there must be a cleaner way to get first value
+        citation = list(viewvalues(self.due.citations))[0]
+        # TODO: ATM we don't allow versioning of the submodules -- we should
+        # assert_equal(citation.version, '0.5')
+        # ATM it will be the duecredit's version
+        assert_equal(citation.version, __version__)
+
+        assert(citation.tags == ['implementation', 'very custom'])
+
     def test_simple_injection(self):
         # yoh can't figure out that ugly test failure which
         # 1. seems to appear in origin/master...ddc70b5
@@ -110,6 +160,22 @@ class TestActiveInjector(object):
         yield self._test_simple_injection, "TestClass1.testmeth1", \
               'from duecredit.tests.mod import TestClass1; c = TestClass1()', 'c.testmeth1'
         yield self._test_simple_injection, "TestClass12.Embed.testmeth1", \
+              'from duecredit.tests.mod import TestClass12; c = TestClass12.Embed()', 'c.testmeth1'
+
+    def test_double_injection(self):
+        # yoh can't figure out that ugly test failure which
+        # 1. seems to appear in origin/master...ddc70b5
+        # 2. doesn't reproduce on other python environments there
+        # 3. doesn't reproduce even if I login into that travis env with nearly identical everything
+        # So -- yoh gives up.  If you are young and brave, see e.g.
+        # https://travis-ci.org/duecredit/duecredit/builds/127939664
+        allow_first_failure = os.environ.get('TRAVIS_PYTHON_VERSION', '') == "2.7" or \
+                              '\\appveyor' in str(os.environ).lower()
+
+        yield self._test_double_injection, "testfunc1", 'from duecredit.tests.mod import testfunc1', None, allow_first_failure
+        yield self._test_double_injection, "TestClass1.testmeth1", \
+              'from duecredit.tests.mod import TestClass1; c = TestClass1()', 'c.testmeth1'
+        yield self._test_double_injection, "TestClass12.Embed.testmeth1", \
               'from duecredit.tests.mod import TestClass12; c = TestClass12.Embed()', 'c.testmeth1'
 
     def test_delayed_entries(self):
