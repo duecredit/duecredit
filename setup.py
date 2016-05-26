@@ -61,9 +61,10 @@ except OSError as e:
     if os.path.exists(VERSION_FILE):
         with open(VERSION_FILE) as version_file:
             code = compile(version_file.read(), VERSION_FILE, 'exec')
-            exec(code, {}, {})
+            exec(code, locals(), globals())
     else:
         __version__ = '0.0.0.dev'
+print("Version: %s" % __version__)
 
 with open('README.md') as file:
     README = file.read()
