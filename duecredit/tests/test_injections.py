@@ -59,7 +59,7 @@ class TestActiveInjector(object):
         if 'duecredit.tests.mod' in sys.modules:
             sys.modules.pop('duecredit.tests.mod')
 
-    def _test_simple_injection(self, func, import_stmt, func_call=None, skip=False):
+    def _test_simple_injection(self, func, import_stmt, func_call=None):
         assert_false('duecredit.tests.mod' in sys.modules)
         self.injector.add('duecredit.tests.mod', func,
                           Doi('1.2.3.4'),
@@ -73,8 +73,6 @@ class TestActiveInjector(object):
         globals_, locals_ = {}, {}
         exec(import_stmt, globals_, locals_)
 
-        if skip:
-            raise SkipTest("cowardly skipping a known failure on travis")
         assert_equal(len(self.due._entries), 1)   # we should get an entry now
         assert_equal(len(self.due.citations), 0)  # but not yet a citation
 
@@ -101,7 +99,7 @@ class TestActiveInjector(object):
 
         assert(citation.tags == ['implementation', 'very custom'])
 
-    def _test_double_injection(self, func, import_stmt, func_call=None, skip=False):
+    def _test_double_injection(self, func, import_stmt, func_call=None):
         assert_false('duecredit.tests.mod' in sys.modules)
         # add one injection
         self.injector.add('duecredit.tests.mod', func,
@@ -122,8 +120,6 @@ class TestActiveInjector(object):
         globals_, locals_ = {}, {}
         exec(import_stmt, globals_, locals_)
 
-        if skip:
-            raise SkipTest("cowardly skipping a known failure on travis")
         assert_equal(len(self.due._entries), 2)   # we should get two entries now
         assert_equal(len(self.due.citations), 0)  # but not yet a citation
 
@@ -151,32 +147,14 @@ class TestActiveInjector(object):
         assert(citation.tags == ['implementation', 'very custom'])
 
     def test_simple_injection(self):
-        # yoh can't figure out that ugly test failure which
-        # 1. seems to appear in origin/master...ddc70b5
-        # 2. doesn't reproduce on other python environments there
-        # 3. doesn't reproduce even if I login into that travis env with nearly identical everything
-        # So -- yoh gives up.  If you are young and brave, see e.g.
-        # https://travis-ci.org/duecredit/duecredit/builds/127939664
-        allow_first_failure = os.environ.get('TRAVIS_PYTHON_VERSION', '') == "2.7" or \
-            '\\appveyor' in str(os.environ).lower()
-
-        yield self._test_simple_injection, "testfunc1", 'from duecredit.tests.mod import testfunc1', None, allow_first_failure
+        yield self._test_simple_injection, "testfunc1", 'from duecredit.tests.mod import testfunc1', None
         yield self._test_simple_injection, "TestClass1.testmeth1", \
               'from duecredit.tests.mod import TestClass1; c = TestClass1()', 'c.testmeth1'
         yield self._test_simple_injection, "TestClass12.Embed.testmeth1", \
               'from duecredit.tests.mod import TestClass12; c = TestClass12.Embed()', 'c.testmeth1'
 
     def test_double_injection(self):
-        # yoh can't figure out that ugly test failure which
-        # 1. seems to appear in origin/master...ddc70b5
-        # 2. doesn't reproduce on other python environments there
-        # 3. doesn't reproduce even if I login into that travis env with nearly identical everything
-        # So -- yoh gives up.  If you are young and brave, see e.g.
-        # https://travis-ci.org/duecredit/duecredit/builds/127939664
-        allow_first_failure = os.environ.get('TRAVIS_PYTHON_VERSION', '') == "2.7" or \
-                              '\\appveyor' in str(os.environ).lower()
-
-        yield self._test_double_injection, "testfunc1", 'from duecredit.tests.mod import testfunc1', None, allow_first_failure
+        yield self._test_double_injection, "testfunc1", 'from duecredit.tests.mod import testfunc1', None
         yield self._test_double_injection, "TestClass1.testmeth1", \
                'from duecredit.tests.mod import TestClass1; c = TestClass1()', 'c.testmeth1'
         yield self._test_double_injection, "TestClass12.Embed.testmeth1", \
