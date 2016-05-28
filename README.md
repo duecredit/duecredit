@@ -179,6 +179,33 @@ depicting instructional materials -- textbooks etc on the topic):
     [9] Fisher, R.A., 1936. The use of multiple measurements in taxonomic problems. Annals of eugenics, 7(2), pp.179–188.
     [10] Gower, J.C. & Ross, G., 1969. Minimum spanning trees and single linkage cluster analysis. Applied statistics, pp.54–64.
     [11] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
+    
+The `DUECREDIT_REPORT_ALL` flag allows one to output all the references
+that were available but not directly used in the script. Compared to 
+the previous example, the following output additionally shows a reference
+for scikit-learn since `example_scipy.py` uses an uncited function from
+that package.
+
+    $> DUECREDIT_REPORT_TAGS=* DUECREDIT_REPORT_ALL=1 duecredit summary
+
+    DueCredit Report:
+    - Scientific tools library / numpy (v 1.10.4) [1]
+    - Scientific tools library / scipy (v 0.14) [2]
+      - Hierarchical clustering / scipy.cluster.hierarchy (v 0.14) [3, 4, 5, 6, 7, 8, 9]
+      - Single linkage hierarchical clustering / scipy.cluster.hierarchy:linkage (v 0.14) [10, 11]
+    - Machine Learning library / sklearn (v 0.15.2) [12]
+
+    3 packages cited
+    1 module cited
+    1 function cited
+
+    References
+    ----------
+
+    [1] Van Der Walt, S., Colbert, S.C. & Varoquaux, G., 2011. The NumPy array: a structure for efficient numerical computation. Computing in Science & Engineering, 13(2), pp.22–30.
+    [2] Jones, E. et al., 2001. SciPy: Open source scientific tools for Python.
+    [3] Sneath, P.H. & Sokal, R.R., 1962. Numerical taxonomy. Nature, 193(4818), pp.855–860.
+    ...
 
 
 Ultimate goals
