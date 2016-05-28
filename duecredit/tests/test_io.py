@@ -209,11 +209,12 @@ def test_output_return_all():
     assert_false(modules)
     assert_false(objects)
 
-    with patch.dict(os.environ, {'DUECREDIT_REPORT_ALL': '1'}):
-        packages, modules, objects = output._get_collated_citations(tags=['*'])
-        assert_equal(len(packages), 2)
-        assert_false(modules)
-        assert_false(objects)
+    for flag in ['1', 'True', 'TRUE', 'true', 'on', 'yes']:
+        with patch.dict(os.environ, {'DUECREDIT_REPORT_ALL': flag}):
+            packages, modules, objects = output._get_collated_citations(tags=['*'])
+            assert_equal(len(packages), 2)
+            assert_false(modules)
+            assert_false(objects)
 
 
 def test_text_output():
