@@ -29,6 +29,7 @@ from .log import lgr
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
 
+
 def get_doi_cache_file(doi):
     return os.path.join(CACHE_DIR, doi)
 
@@ -44,7 +45,6 @@ def import_doi(doi, sleep=0.5, retries=10):
             return doi
 
     # else -- fetch it
-    #headers = {'Accept': 'text/bibliography; style=bibtex'}
     headers = {'Accept': 'application/x-bibtex; charset=utf-8'}
     url = 'http://dx.doi.org/' + doi
     while retries > 0:

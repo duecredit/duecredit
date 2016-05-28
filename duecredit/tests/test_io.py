@@ -192,6 +192,30 @@ def test_output():
     assert_equal(modules['package.module'][0],
                  collector.citations[('package.module', entry.get_key())])
 
+
+def test_output_return_all():
+    entry = BibTeX(_sample_bibtex)
+    entry2 = BibTeX(_sample_bibtex2)
+
+    # normal use
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package')
+    collector.cite(entry2, path='package2')
+
+    output = Output(None, collector)
+
+    packages, modules, objects = output._get_collated_citations(tags=['*'])
+    assert_false(packages)
+    assert_false(modules)
+    assert_false(objects)
+
+    with patch.dict(os.environ, {'DUECREDIT_REPORT_ALL': '1'}):
+        packages, modules, objects = output._get_collated_citations(tags=['*'])
+        assert_equal(len(packages), 2)
+        assert_false(modules)
+        assert_false(objects)
+
+
 def test_text_output():
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
