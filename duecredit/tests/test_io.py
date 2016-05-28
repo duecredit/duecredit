@@ -211,8 +211,49 @@ def test_output_return_all():
 
     for flag in ['1', 'True', 'TRUE', 'true', 'on', 'yes']:
         with patch.dict(os.environ, {'DUECREDIT_REPORT_ALL': flag}):
+            # if _all is None then get the environment
             packages, modules, objects = output._get_collated_citations(tags=['*'])
             assert_equal(len(packages), 2)
+            assert_false(modules)
+            assert_false(objects)
+            # however if _all is set it shouldn't work
+            packages, modules, objects = output._get_collated_citations(tags=['*'], all_=False)
+            assert_false(packages)
+            assert_false(modules)
+            assert_false(objects)
+
+
+def test_output_tags():
+    entry = BibTeX(_sample_bibtex)
+    entry2 = BibTeX(_sample_bibtex2)
+
+    # normal use
+    collector = DueCreditCollector()
+    collector.cite(entry, path='package', cite_module=True, tags=['edu'])
+    collector.cite(entry2, path='package.module', tags=['wip'])
+
+    output = Output(None, collector)
+
+    packages, modules, objects = output._get_collated_citations(tags=['*'])
+    assert_true(len(packages) == 1)
+    assert_true(len(modules) == 1)
+    assert_false(objects)
+
+    packages, modules, objects = output._get_collated_citations()
+    assert_false(packages)
+    assert_false(modules)
+    assert_false(objects)
+
+    for tags in ['edu', 'wip', 'edu,wip']:
+        with patch.dict(os.environ, {'DUECREDIT_REPORT_TAGS': tags}):
+            # if tags is None then get the environment
+            packages, modules, objects = output._get_collated_citations()
+            assert_true(len(packages) == (1 if 'edu' in tags else 0))
+            assert_true(len(modules) == (1 if 'wip' in tags else 0))
+            assert_false(objects)
+            # however if tags is set it shouldn't work
+            packages, modules, objects = output._get_collated_citations(tags=['implementation'])
+            assert_false(packages)
             assert_false(modules)
             assert_false(objects)
 
