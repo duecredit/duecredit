@@ -129,8 +129,8 @@ class Output(object):
         for package in cited_packages:
             package_citations = packages[package]
             if all_ or \
-                list(filter(lambda x: x.cite_module, package_citations)) or \
-                list(filter(lambda x: _is_contained(package, x), cited_modobj)):
+                any(filter(lambda x: x.cite_module, package_citations)) or \
+                any(filter(lambda x: _is_contained(package, x), cited_modobj)):
                 continue
             else:
                 # we don't need it
