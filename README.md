@@ -181,10 +181,10 @@ depicting instructional materials -- textbooks etc on the topic):
     [11] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
     
 The `DUECREDIT_REPORT_ALL` flag allows one to output all the references
-that were available but not directly used in the script. Compared to 
-the previous example, the following output additionally shows a reference
-for scikit-learn since `example_scipy.py` uses an uncited function from
-that package.
+for the modules that lack objects or functions with citations.
+Compared to the previous example, the following output additionally 
+shows a reference for scikit-learn since `example_scipy.py` uses 
+an uncited function from that package.
 
     $> DUECREDIT_REPORT_TAGS=* DUECREDIT_REPORT_ALL=1 duecredit summary
 
