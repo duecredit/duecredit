@@ -19,6 +19,10 @@ class DueCreditEntry(object):
         return self._key
 
     @property
+    def key(self):
+        return self.get_key()
+
+    @property
     def rawentry(self):
         if PY2:
             return unicode(self._rawentry)
