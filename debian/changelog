@@ -1,3 +1,9 @@
+duecredit (0.6.0-1) unstable; urgency=medium
+
+  * Fresh upstream release 
+
+ -- Yaroslav Halchenko <debian@onerussian.com>  Fri, 17 Jun 2016 00:00:51 -0400
+
 duecredit (0.5.0-1) unstable; urgency=medium
 
   * Fresh upstream release
