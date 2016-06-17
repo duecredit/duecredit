@@ -1,5 +1,27 @@
 # Change Log
 
+## [0.6.0](https://github.com/duecredit/duecredit/tree/0.6.0) (2016-06-16)
+[Full Changelog](https://github.com/duecredit/duecredit/compare/0.5.0...0.6.0)
+
+**Implemented enhancements:**
+
+- Support system-specific references [\#81](https://github.com/duecredit/duecredit/issues/81)
+- export to bibtex doesn't support tags yet [\#19](https://github.com/duecredit/duecredit/issues/19)
+- ENH: support DUECREDIT\_REPORT\_ALL=1 to report all citations, not only with functionality used [\#92](https://github.com/duecredit/duecredit/pull/92) ([yarikoptic](https://github.com/yarikoptic))
+
+**Fixed bugs:**
+
+- Outputting to bibtex doesn't filter by used citations [\#68](https://github.com/duecredit/duecredit/issues/68)
+- references package even if no cited functions/methods used [\#48](https://github.com/duecredit/duecredit/issues/48)
+- When injecting multiple citations at the same point, only one referenced [\#47](https://github.com/duecredit/duecredit/issues/47)
+
+**Merged pull requests:**
+
+- BF: allow multiple injections at the same path, avoid resetting \_orig\_import if already deactivated [\#91](https://github.com/duecredit/duecredit/pull/91) ([yarikoptic](https://github.com/yarikoptic))
+- DOC: Update readme to reflect current output of duecredit summary [\#89](https://github.com/duecredit/duecredit/pull/89) ([mvdoc](https://github.com/mvdoc))
+- enable codecov coverage reports [\#87](https://github.com/duecredit/duecredit/pull/87) ([yarikoptic](https://github.com/yarikoptic))
+- REF,ENH: refactor {BibTeX,Text}Output into Output class with subclasses [\#86](https://github.com/duecredit/duecredit/pull/86) ([mvdoc](https://github.com/mvdoc))
+
 ## [0.5.0](https://github.com/duecredit/duecredit/tree/0.5.0) (2016-05-11)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.8...0.5.0)
 
