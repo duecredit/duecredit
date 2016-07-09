@@ -12,6 +12,7 @@ import os
 if 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in os.environ.keys():
     raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
 
+import re
 import locale
 import time
 from collections import defaultdict, Iterator
@@ -240,6 +241,31 @@ def get_bibtex_rendering(entry):
         raise ValueError("Have no clue how to get bibtex out of %s" % entry)
 
 
+def condition_bibtex(bibtex):
+    """Given a bibtex entry, "condition" it for processing with citeproc
+
+    Primarily a set of workarounds for either non-standard BibTeX entries
+    or citeproc bugs
+    """
+    # XXX: workaround atm to fix zenodo bibtexs, convert @data to @misc
+    # and also ; into and
+    if bibtex.startswith('@data'):
+        bibtex = bibtex.replace('@data', '@misc', 1)
+        bibtex = bibtex.replace(';', ' and')
+    bibtex = bibtex.replace(u'\u2013', '--') + "\n"
+    # workaround for citeproc 0.3.0 failing to parse a single page pages field
+    # as for BIDS paper.  Workaround to add trailing + after pages number
+    # related issue asking for a new release: https://github.com/brechtm/citeproc-py/issues/72
+    bibtex = re.sub(r'(pages\s*=\s*["{]\d+)(["}])', r'\1+\2', bibtex)
+    # TODO: manage to save/use UTF-8
+    if PY2:
+        # TODO: citeproc master, after 0.3.0 allows to load UTF-8 encoded
+        # files... so we need to fail for a release to take advantage
+        # bibtex = bibtex.encode('utf-8')
+        bibtex = bibtex.encode('ascii', 'ignore')
+    return bibtex
+
+
 def format_bibtex(bibtex_entry, style='harvard1'):
     try:
         from citeproc.source.bibtex import BibTeX as cpBibTeX
@@ -254,22 +280,13 @@ def format_bibtex(bibtex_entry, style='harvard1'):
     fname = tempfile.mktemp(suffix='.bib')
     try:
         with open(fname, 'wt') as f:
-            bibtex = bibtex_entry.rawentry
-            # XXX: workaround atm to fix zenodo bibtexs, convert @data to @misc
-            # and also ; into and
-            if bibtex.startswith('@data'):
-                bibtex = bibtex.replace('@data', '@misc', 1)
-                bibtex = bibtex.replace(';', ' and')
-            bibtex = bibtex.replace(u'\u2013', '--') + "\n"
-            # TODO: manage to save/use UTF-8
-            if PY2:
-                bibtex = bibtex.encode('ascii', 'ignore')
-            f.write(bibtex)
+            f.write(condition_bibtex(bibtex_entry.rawentry))
         # We need to avoid cpBibTex spitting out warnings
         old_filters = warnings.filters[:]  # store a copy of filters
         warnings.simplefilter('ignore', UserWarning)
         try:
-            bib_source = cpBibTeX(fname)
+            # TODO: needs citeproc release past 0.3.0
+            bib_source = cpBibTeX(fname) #, encoding='utf-8')
         except Exception as e:
             lgr.error("Failed to process BibTeX file %s: %s" % (fname, e))
             return "ERRORED: %s" % str(e)
