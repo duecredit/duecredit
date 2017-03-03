@@ -6,8 +6,6 @@ kwargs = dict(
     tags=["use"]
 )
 
-import numpy as np
-
 due.cite(path="test", **kwargs)
 
 

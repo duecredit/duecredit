@@ -11,22 +11,17 @@ import random
 import re
 import pickle
 import os
+import pytest
 
-from .test_collector import _sample_bibtex, _sample_bibtex2
 from six.moves import StringIO
 from six import text_type
 
-from mock import patch
-
+import duecredit.io
 from ..collector import DueCreditCollector, Citation
-from .test_collector import _sample_bibtex, _sample_doi
+from .test_collector import _sample_bibtex, _sample_doi, _sample_bibtex2
 from ..entries import BibTeX, DueCreditEntry, Doi
 from ..io import TextOutput, PickleOutput, import_doi, \
     get_text_rendering, format_bibtex, _is_contained, Output, BibTeXOutput
-from ..utils import with_tempfile
-
-from nose.tools import assert_equal, assert_is_instance, assert_raises, \
-    assert_true, assert_false
 
 try:
     import vcr
@@ -35,21 +30,21 @@ try:
     def test_import_doi():
         doi_good = '10.1038/nrd842'
         kw = dict(sleep=0.00001, retries=2)
-        assert_is_instance(import_doi(doi_good, **kw), text_type)
+        assert isinstance(import_doi(doi_good, **kw), text_type)
 
         doi_bad = 'fasljfdldaksj'
-        assert_raises(ValueError, import_doi, doi_bad, **kw)
+        with pytest.raises(ValueError):
+            import_doi(doi_bad, **kw)
 
         doi_zenodo = '10.5281/zenodo.50186'
-        assert_is_instance(import_doi(doi_zenodo, **kw), text_type)
+        assert isinstance(import_doi(doi_zenodo, **kw), text_type)
 
 except ImportError:
     # no vcr, and that is in 2015!
     pass
 
 
-@with_tempfile
-def test_pickleoutput(fn):
+def test_pickleoutput(tmpdir):
     #entry = BibTeX('@article{XXX0, ...}')
     entry = BibTeX("@article{Atkins_2002,\n"
                    "title=title,\n"
@@ -70,20 +65,20 @@ def test_pickleoutput(fn):
     # test it doesn't puke with an empty collector
     collectors = [collector_, DueCreditCollector()]
 
-    for collector in collectors:
-        pickler = PickleOutput(collector, fn=fn)
-        assert_equal(pickler.fn, fn)
-        assert_equal(pickler.dump(), None)
+    tempfile = str(tmpdir.mkdir("sub").join("tempfile.txt"))
 
-        with open(fn, 'rb') as f:
+    for collector in collectors:
+        pickler = PickleOutput(collector, fn=tempfile)
+        assert pickler.fn == tempfile
+        assert pickler.dump() is None
+
+        with open(tempfile, 'rb') as f:
             collector_loaded = pickle.load(f)
 
-        assert_equal(collector.citations.keys(),
-                     collector_loaded.citations.keys())
+        assert collector.citations.keys() == collector_loaded.citations.keys()
         # TODO: implement comparison of citations
-        assert_equal(collector._entries.keys(),
-                     collector_loaded._entries.keys())
-        os.unlink(fn)
+        assert collector._entries.keys() == collector_loaded._entries.keys()
+        os.unlink(tempfile)
 
 
 def test_output():
@@ -99,14 +94,12 @@ def test_output():
 
     packages, modules, objects = output._get_collated_citations(tags=['*'])
 
-    assert_equal(len(packages), 1)
-    assert_equal(len(modules), 1)
-    assert_equal(len(objects), 0)
+    assert len(packages) == 1
+    assert len(modules) == 1
+    assert len(objects) == 0
 
-    assert_equal(packages['package'][0],
-                 collector.citations[('package', entry.get_key())])
-    assert_equal(modules['package.module'][0],
-                 collector.citations[('package.module', entry.get_key())])
+    assert packages['package'][0] == collector.citations[('package', entry.get_key())]
+    assert modules['package.module'][0] == collector.citations[('package.module', entry.get_key())]
 
     # no toppackage
     collector = DueCreditCollector()
@@ -117,13 +110,11 @@ def test_output():
 
     packages, modules, objects = output._get_collated_citations(tags=['*'])
 
-    assert_equal(len(packages), 0)
-    assert_equal(len(modules), 1)
-    assert_equal(len(objects), 0)
+    assert len(packages) == 0
+    assert len(modules) == 1
+    assert len(objects) == 0
 
-    assert_equal(modules['package2.module'][0],
-                 collector.citations[('package2.module', entry.get_key())])
-
+    assert modules['package2.module'][0] == collector.citations[('package2.module', entry.get_key())]
 
     # toppackage because required
     collector = DueCreditCollector()
@@ -134,15 +125,12 @@ def test_output():
 
     packages, modules, objects = output._get_collated_citations(tags=['*'])
 
-    assert_equal(len(packages), 1)
-    assert_equal(len(modules), 1)
-    assert_equal(len(objects), 0)
+    assert len(packages) == 1
+    assert len(modules) == 1
+    assert len(objects) == 0
 
-    assert_equal(packages['package'][0],
-                 collector.citations[('package', entry.get_key())])
-    assert_equal(modules['package2.module'][0],
-                 collector.citations[('package2.module', entry.get_key())])
-
+    assert packages['package'][0] == collector.citations[('package', entry.get_key())]
+    assert modules['package2.module'][0] == collector.citations[('package2.module', entry.get_key())]
 
     # check it returns multiple entries
     collector = DueCreditCollector()
@@ -154,23 +142,19 @@ def test_output():
 
     packages, modules, objects = output._get_collated_citations(tags=['*'])
 
-    assert_equal(len(packages), 1)
-    assert_equal(len(packages['package']), 2)
-    assert_equal(len(modules), 1)
-    assert_equal(len(objects), 0)
+    assert len(packages) == 1
+    assert len(packages['package']) == 2
+    assert len(modules) == 1
+    assert len(objects) == 0
 
     # sort them in order so we know who is who
     # entry2 key is Atk...
     # entry key is XX..
     packs = sorted(packages['package'], key=lambda x: x.entry.key)
 
-    assert_equal(packs[0],
-                 collector.citations[('package', entry2.get_key())])
-    assert_equal(packs[1],
-                 collector.citations[('package', entry.get_key())])
-    assert_equal(modules['package.module'][0],
-                 collector.citations[('package.module', entry.get_key())])
-
+    assert packs[0] == collector.citations[('package', entry2.get_key())]
+    assert packs[1] == collector.citations[('package', entry.get_key())]
+    assert modules['package.module'][0] == collector.citations[('package.module', entry.get_key())]
 
     # check that filtering works
     collector = DueCreditCollector()
@@ -182,18 +166,16 @@ def test_output():
 
     packages, modules, objects = output._get_collated_citations(tags=['edu'])
 
-    assert_equal(len(packages), 1)
-    assert_equal(len(packages['package']), 1)
-    assert_equal(len(modules), 1)
-    assert_equal(len(objects), 0)
+    assert len(packages) == 1
+    assert len(packages['package']) == 1
+    assert len(modules) == 1
+    assert len(objects) == 0
 
-    assert_equal(packages['package'][0],
-                 collector.citations[('package', entry.get_key())])
-    assert_equal(modules['package.module'][0],
-                 collector.citations[('package.module', entry.get_key())])
+    assert packages['package'][0] == collector.citations[('package', entry.get_key())]
+    assert modules['package.module'][0] == collector.citations[('package.module', entry.get_key())]
 
 
-def test_output_return_all():
+def test_output_return_all(monkeypatch):
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -205,25 +187,25 @@ def test_output_return_all():
     output = Output(None, collector)
 
     packages, modules, objects = output._get_collated_citations(tags=['*'])
-    assert_false(packages)
-    assert_false(modules)
-    assert_false(objects)
+    assert not packages
+    assert not modules
+    assert not objects
 
     for flag in ['1', 'True', 'TRUE', 'true', 'on', 'yes']:
-        with patch.dict(os.environ, {'DUECREDIT_REPORT_ALL': flag}):
-            # if _all is None then get the environment
-            packages, modules, objects = output._get_collated_citations(tags=['*'])
-            assert_equal(len(packages), 2)
-            assert_false(modules)
-            assert_false(objects)
-            # however if _all is set it shouldn't work
-            packages, modules, objects = output._get_collated_citations(tags=['*'], all_=False)
-            assert_false(packages)
-            assert_false(modules)
-            assert_false(objects)
+        monkeypatch.setitem(os.environ, 'DUECREDIT_REPORT_ALL', flag)
+        # if _all is None then get the environment
+        packages, modules, objects = output._get_collated_citations(tags=['*'])
+        assert len(packages) == 2
+        assert not modules
+        assert not objects
+        # however if _all is set it shouldn't work
+        packages, modules, objects = output._get_collated_citations(tags=['*'], all_=False)
+        assert not packages
+        assert not modules
+        assert not objects
 
 
-def test_output_tags():
+def test_output_tags(monkeypatch):
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -235,27 +217,27 @@ def test_output_tags():
     output = Output(None, collector)
 
     packages, modules, objects = output._get_collated_citations(tags=['*'])
-    assert_true(len(packages) == 1)
-    assert_true(len(modules) == 1)
-    assert_false(objects)
+    assert len(packages) == 1
+    assert len(modules) == 1
+    assert not objects
 
     packages, modules, objects = output._get_collated_citations()
-    assert_false(packages)
-    assert_false(modules)
-    assert_false(objects)
+    assert not packages
+    assert not modules
+    assert not objects
 
     for tags in ['edu', 'wip', 'edu,wip']:
-        with patch.dict(os.environ, {'DUECREDIT_REPORT_TAGS': tags}):
-            # if tags is None then get the environment
-            packages, modules, objects = output._get_collated_citations()
-            assert_true(len(packages) == (1 if 'edu' in tags else 0))
-            assert_true(len(modules) == (1 if 'wip' in tags else 0))
-            assert_false(objects)
-            # however if tags is set it shouldn't work
-            packages, modules, objects = output._get_collated_citations(tags=['implementation'])
-            assert_false(packages)
-            assert_false(modules)
-            assert_false(objects)
+        monkeypatch.setitem(os.environ, 'DUECREDIT_REPORT_TAGS', tags)
+        # if tags is None then get the environment
+        packages, modules, objects = output._get_collated_citations()
+        assert len(packages) == (1 if 'edu' in tags else 0)
+        assert len(modules) == (1 if 'wip' in tags else 0)
+        assert not objects
+        # however if tags is set it shouldn't work
+        packages, modules, objects = output._get_collated_citations(tags=['implementation'])
+        assert not packages
+        assert not modules
+        assert not objects
 
 
 def test_text_output():
@@ -270,9 +252,9 @@ def test_text_output():
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true("0 packages cited" in value, msg="value was %s" % value)
-    assert_true("0 modules cited" in value, msg="value was %s" % value)
-    assert_true("0 functions cited" in value, msg="value was %s" % value)
+    assert "0 packages cited" in value, "value was %s" % value
+    assert "0 modules cited" in value, "value was %s" % value
+    assert "0 functions cited" in value, "value was %s" % value
 
     # but it should be cited if cite_module=True
     collector = DueCreditCollector()
@@ -281,9 +263,9 @@ def test_text_output():
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true("1 package cited" in value, msg="value was %s" % value)
-    assert_true("0 modules cited" in value, msg="value was %s" % value)
-    assert_true("0 functions cited" in value, msg="value was %s" % value)
+    assert "1 package cited" in value, "value was %s" % value
+    assert "0 modules cited" in value, "value was %s" % value
+    assert "0 functions cited" in value, "value was %s" % value
 
     # in this case, we should be citing the package since we are also citing a
     # submodule
@@ -294,11 +276,11 @@ def test_text_output():
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true("1 package cited" in value, msg="value was %s" % value)
-    assert_true("1 module cited" in value, msg="value was %s" % value)
-    assert_true("0 functions cited" in value, msg="value was %s" % value)
-    assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
-    assert_true(value.strip().endswith("Frontiers in Neuroinformatics, 6(22)."))
+    assert "1 package cited" in value, "value was %s" % value
+    assert "1 module cited" in value, "value was %s" % value
+    assert "0 functions cited" in value, "value was %s" % value
+    assert "Halchenko, Y.O." in value, "value was %s" % value
+    assert value.strip().endswith("Frontiers in Neuroinformatics, 6(22).")
 
 
     # in this case, we should be citing the package since we are also citing a
@@ -311,12 +293,12 @@ def test_text_output():
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true("1 package cited" in value, msg="value was %s" % value)
-    assert_true("1 module cited" in value, msg="value was %s" % value)
-    assert_true("0 functions cited" in value, msg="value was %s" % value)
-    assert_true("Halchenko, Y.O." in value, msg="value was %s" % value)
-    assert_true('[1, 2]' in value, msg="value was %s" %value)
-    assert_false('[3]' in value, msg="value was %s" %value)
+    assert "1 package cited" in value, "value was %s" % value
+    assert "1 module cited" in value, "value was %s" % value
+    assert "0 functions cited" in value, "value was %s" % value
+    assert "Halchenko, Y.O." in value, "value was %s" % value
+    assert '[1, 2]' in value, "value was %s" %value
+    assert '[3]' not in value, "value was %s" %value
 
 
 def test_text_output_dump_formatting():
@@ -327,8 +309,8 @@ def test_text_output_dump_formatting():
                path='mymodule', version='0.0.16')
     def mymodule(arg1, kwarg2="blah"):
         """docstring"""
-        assert_equal(arg1, "magical")
-        assert_equal(kwarg2, 1)
+        assert arg1 == "magical"
+        assert kwarg2 == 1
 
         @due.dcite(BibTeX(_sample_bibtex2), description='solution to life',
                    path='mymodule:myfunction')
@@ -342,20 +324,18 @@ def test_text_output_dump_formatting():
     strio = StringIO()
     TextOutput(strio, due).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true('0 modules cited' in value, msg='value was {0}'.format(value))
-    assert_true('0 functions cited' in value,
-                msg='value was {0}'.format(value))
+    assert '0 modules cited' in value, 'value was {0}'.format(value)
+    assert '0 functions cited' in value, 'value was {0}'.format(value)
 
     # now we call it -- check it prints stuff
     strio = StringIO()
     mymodule('magical', kwarg2=1)
     TextOutput(strio, due).dump(tags=['*'])
     value = strio.getvalue()
-    assert_true('1 package cited' in value, msg='value was {0}'.format(value))
-    assert_true('1 function cited' in value, msg='value was {0}'.format(value))
-    assert_true('(v 0.0.16)' in value,
-                msg='value was {0}'.format(value))
-    assert_equal(len(value.split('\n')), 16, msg='value was {0}'.format(len(value.split('\n'))))
+    assert '1 package cited' in value, 'value was {0}'.format(value)
+    assert '1 function cited' in value, 'value was {0}'.format(value)
+    assert '(v 0.0.16)' in value, 'value was {0}'.format(value)
+    assert len(value.split('\n')) == 16, 'value was {0}'.format(len(value.split('\n')))
 
     # test we get the reference numbering right
     samples_bibtex = [_generate_sample_bibtex() for x in range(6)]
@@ -366,8 +346,8 @@ def test_text_output_dump_formatting():
                path='myothermodule', version='0.0.666')
     def myothermodule(arg1, kwarg2="blah"):
         """docstring"""
-        assert_equal(arg1, "magical")
-        assert_equal(kwarg2, 1)
+        assert arg1 == "magical"
+        assert kwarg2 == 1
 
         @due.dcite(BibTeX(samples_bibtex[1]), description='solution to life',
                    path='myothermodule:myotherfunction')
@@ -403,12 +383,12 @@ def test_text_output_dump_formatting():
             reference_numbers.append(match_reference.group(1))
             references.append(line.replace(match_reference.group(), ""))
 
-    assert_equal(set(citation_numbers), set(reference_numbers))
-    assert_equal(len(set(references)), len(set(citation_numbers)))
-    assert_equal(len(citation_numbers), 8)
+    assert set(citation_numbers) == set(reference_numbers)
+    assert len(set(references)) == len(set(citation_numbers))
+    assert len(citation_numbers) == 8
     # verify that we have returned to previous state of filters
     import warnings
-    assert_true(('ignore', None, UserWarning, None, 0) not in warnings.filters)
+    assert ('ignore', None, UserWarning, None, 0) not in warnings.filters
 
 
 def test_bibtex_output():
@@ -423,7 +403,7 @@ def test_bibtex_output():
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_equal(value, '', msg='Value was {0}'.format(value))
+    assert value == '', 'Value was {0}'.format(value)
 
     # impose citing
     collector = DueCreditCollector()
@@ -432,7 +412,7 @@ def test_bibtex_output():
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_equal(value.strip(), _sample_bibtex.strip(), msg='Value was {0}'.format(value))
+    assert value.strip() == _sample_bibtex.strip(), 'Value was {0}'.format(value)
 
     # impose filtering
     collector = DueCreditCollector()
@@ -442,15 +422,13 @@ def test_bibtex_output():
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['edu'])
     value = strio.getvalue()
-    assert_equal(value.strip(), _sample_bibtex.strip(), msg='Value was {0}'.format(value))
+    assert value.strip() == _sample_bibtex.strip(), 'Value was {0}'.format(value)
 
     # no filtering
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert_equal(value.strip(),
-                 _sample_bibtex.strip() + _sample_bibtex2.rstrip(),
-                 msg='Value was {0}'.format(value))
+    assert value.strip() == _sample_bibtex.strip() + _sample_bibtex2.rstrip(), 'Value was {0}'.format(value)
 
     # check the we output only unique bibtex entries
     collector.cite(entry2, path='package')
@@ -459,8 +437,10 @@ def test_bibtex_output():
     value = strio.getvalue()
     value_ = sorted(value.strip().split('\n'))
     bibtex = sorted((_sample_bibtex.strip() + _sample_bibtex2.rstrip()).split('\n'))
-    assert_equal(value_, bibtex,
-                 msg='Value was {0}'.format(value_, bibtex))
+    assert value_ == bibtex, 'Value was {0}'.format(value_, bibtex)
+
+    # assert_equal(value_, bibtex,
+    #              msg='Value was {0}'.format(value_, bibtex))
 
 
 def _generate_sample_bibtex():
@@ -491,25 +471,38 @@ def _generate_sample_bibtex():
     return sample_bibtex
 
 
-@patch('duecredit.io.get_bibtex_rendering')
-@patch('duecredit.io.format_bibtex')
-def test_get_text_rendering(mock_format_bibtex, mock_get_bibtex_rendering):
-    # mock get_bibtex_rendering to return the same bibtex entry
+def test_get_text_rendering(monkeypatch):
+    # Patch bibtex_rendering
     sample_bibtex = BibTeX(_sample_bibtex)
-    mock_get_bibtex_rendering.return_value = sample_bibtex
+
+    def get_bibtex_rendering(*args, **kwargs):
+        return sample_bibtex
+
+    monkeypatch.setattr(duecredit.io, 'get_bibtex_rendering', get_bibtex_rendering)
+
+    # Patch format_bibtex
+    fmt_args = {}
+
+    def format_bibtex(entry, style):
+        fmt_args["entry"] = entry
+        fmt_args["style"] = style
+
+    monkeypatch.setattr(duecredit.io, 'format_bibtex', format_bibtex)
 
     # test if bibtex type is passed
     citation_bibtex = Citation(sample_bibtex, path='mypath')
     bibtex_output = get_text_rendering(citation_bibtex)
-    mock_format_bibtex.assert_called_with(citation_bibtex.entry, style='harvard1')
-    mock_format_bibtex.reset_mock()
+    assert fmt_args["entry"] == citation_bibtex.entry
+    assert fmt_args["style"] == 'harvard1'
+    fmt_args.clear()
 
     # test if doi type is passed
     citation_doi = Citation(Doi(_sample_doi), path='mypath')
     doi_output = get_text_rendering(citation_doi)
-    mock_format_bibtex.assert_called_with(citation_bibtex.entry, style='harvard1')
+    assert fmt_args["entry"] == citation_bibtex.entry
+    assert fmt_args["style"] == 'harvard1'
 
-    assert_equal(bibtex_output, doi_output)
+    assert bibtex_output == doi_output
 
 
 def test_format_bibtex_zenodo_doi():
@@ -533,16 +526,17 @@ def test_format_bibtex_zenodo_doi():
     year = {2016}
     }
     """
-    assert_equal(format_bibtex(BibTeX(bibtex_zenodo)),
-                 """Ghosh, S. et al., 2016. nipype: Release candidate 1 for version 0.12.0.""")
+    assert (format_bibtex(BibTeX(bibtex_zenodo)) ==
+            """Ghosh, S. et al., 2016. nipype: Release candidate 1 for version 0.12.0.""")
+
 
 def test_is_contained():
     toppath = 'package'
-    assert_true(_is_contained(toppath, 'package.module'))
-    assert_true(_is_contained(toppath, 'package.module.submodule'))
-    assert_true(_is_contained(toppath, 'package.module.submodule:object'))
-    assert_true(_is_contained(toppath, 'package:object'))
-    assert_true(_is_contained(toppath, toppath))
-    assert_false(_is_contained(toppath, 'package2'))
-    assert_false(_is_contained(toppath, 'package2:anotherobject'))
-    assert_false(_is_contained(toppath, 'package2.module:anotherobject'))
+    assert _is_contained(toppath, 'package.module')
+    assert _is_contained(toppath, 'package.module.submodule')
+    assert _is_contained(toppath, 'package.module.submodule:object')
+    assert _is_contained(toppath, 'package:object')
+    assert _is_contained(toppath, toppath)
+    assert not _is_contained(toppath, 'package2')
+    assert not _is_contained(toppath, 'package2:anotherobject')
+    assert not _is_contained(toppath, 'package2.module:anotherobject')
