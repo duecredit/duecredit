@@ -41,7 +41,7 @@ install:
   - pip install -e .
 
 test_script:
-  - nosetests --with-doctest -v duecredit
+  - coverage run --source duecredit -m py.test
   - python setup.py install
 
 # for interactive debugging upon completion (have 30 min to react)

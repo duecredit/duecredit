@@ -16,12 +16,13 @@ __docformat__ = 'restructuredtext'
 
 from .helpers import parser_add_common_args
 
+
 def setup_parser(parser):
     # TODO -- pass options such as verbosity etc
     pass
-    
+
+
 def run(args):
     import duecredit
-    import nose
-    raise NotImplementedError("Just use nosetests duecredit for now")
+    raise NotImplementedError("Just use pytest duecredit for now")
     #duecredit.test()

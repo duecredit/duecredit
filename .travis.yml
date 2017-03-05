@@ -28,7 +28,6 @@ install:
 script:
   #- nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO -v
   - coverage run --source duecredit -m py.test
-  # - PYTHONPATH=$PWD coverage run `which py.test` -s -v duecredit --logging-level=INFO -v
   - python setup.py install  # test installation
   # for now flaking only the stub.py
   - flake8 duecredit/stub.py
