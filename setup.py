@@ -85,7 +85,7 @@ setup(
     install_requires=['requests', 'citeproc-py', 'six'],
     extras_require={
         'tests': [
-            'pytest'
+            'pytest',
             'vcrpy', 'contextlib2'
         ]
     },
