@@ -10,6 +10,8 @@
 import os
 import sys
 import pytest
+import shutil
+
 from os.path import dirname, join as pathjoin, pardir, normpath
 from subprocess import Popen, PIPE
 
@@ -18,9 +20,45 @@ from duecredit.stub import InactiveDueCreditCollector
 from duecredit.entries import BibTeX, Doi
 
 from ..utils import on_windows
-
+import tempfile
+# temporary location where stuff would be copied
 badlxml_path = pathjoin(dirname(__file__), 'envs', 'nolxml')
-stubbed_script = pathjoin(dirname(__file__), 'envs', 'stubbed', 'script.py')
+stubbed_dir = tempfile.mktemp()
+stubbed_script = pathjoin(pathjoin(stubbed_dir, 'script.py'))
+
+
+@pytest.fixture(scope="module")
+def stubbed_env():
+    """Create stubbed module with a sample script"""
+    os.makedirs(stubbed_dir)
+    with open(stubbed_script, 'wb') as f:
+        f.write("""
+from due import due, Doi
+
+kwargs = dict(
+    entry=Doi("10.1007/s12021-008-9041-y"),
+    description="Multivariate pattern analysis of neural data",
+    tags=["use"]
+)
+
+due.cite(path="test", **kwargs)
+
+
+@due.dcite(**kwargs)
+def method(arg):
+    return arg+1
+
+assert(method(1) == 2)
+print("done123")
+""".encode())
+    # copy stub.py under stubbed
+    shutil.copy(
+        pathjoin(dirname(__file__), os.pardir, 'stub.py'),
+        pathjoin(stubbed_dir, 'due.py')
+    )
+    yield stubbed_script
+    # cleanup
+    shutil.rmtree(stubbed_dir)
 
 
 def _test_api(due):
@@ -91,7 +129,18 @@ def test_noincorrect_import_if_no_lxml(monkeypatch):
     assert ret == 0
 
 
-def check_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env):
+@pytest.mark.parametrize(
+    "env", [{},
+            {'DUECREDIT_ENABLE': 'yes'},
+            {'DUECREDIT_TEST_EARLY_IMPORT_ERROR': 'yes'}])
+@pytest.mark.parametrize(
+    "kwargs", [
+        # direct command to evaluate
+        {'cmd': 'import duecredit; import numpy as np; print("done123")'},
+        # script with decorated funcs etc -- should be importable
+        {'script': stubbed_script}
+    ])
+def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_env):
     # Now make sure that we would not crash entire process at the end when unable to
     # produce sensible output when we have something to cite
     # we do inject for numpy
@@ -123,18 +172,6 @@ def check_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env):
     else:
         assert 'done123\n' or 'done123\r\n' == out
     assert ret == 0  # but we must not fail overall regardless
-
-
-@pytest.mark.parametrize("env", [{}, {'DUECREDIT_ENABLE': 'yes'},
-                                 {'DUECREDIT_TEST_EARLY_IMPORT_ERROR': 'yes'}])
-def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, env):
-    for kwargs in (
-        # direct command to evaluate
-        {'cmd': 'import duecredit; import numpy as np; print("done123")'},
-        # script with decorated funcs etc -- should be importable
-        {'script': stubbed_script}
-    ):
-        check_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env)
 
 
 if __name__ == '__main__':
