@@ -61,7 +61,11 @@ print("done123")
     shutil.rmtree(stubbed_dir)
 
 
-def _test_api(due):
+@pytest.mark.parametrize(
+    'collector_class', [DueCreditCollector, InactiveDueCreditCollector]
+)
+def test_api(collector_class):
+    due = collector_class()
     # add references
     due.add(BibTeX('@article{XXX00, ...}'))
     # could even be by DOI -- we need to fetch and cache those
@@ -94,11 +98,6 @@ def _test_api(due):
 
     kid = Child()
     kid.birth("female")
-
-
-def test_api():
-    _test_api(DueCreditCollector())
-    _test_api(InactiveDueCreditCollector())
 
 
 def run_python_command(cmd=None, script=None):
