@@ -48,7 +48,7 @@ due.cite(path="test", **kwargs)
 def method(arg):
     return arg+1
 
-assert(method(1) == 2)
+assert method(1) == 2
 print("done123")
 """.encode())
     # copy stub.py under stubbed
@@ -104,9 +104,15 @@ def run_python_command(cmd=None, script=None):
     """Just a tiny helper which runs command and returns exit code, stdout, stderr"""
     assert bool(cmd) != bool(script)  # one or another, not both
     args = ['-c', cmd] if cmd else [script]
-    python = Popen([sys.executable] + args, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = python.communicate()  # wait()
-    ret = python.poll()
+    try:
+        # run script from some temporary directory so we do not breed .duecredit.p
+        # in current directory
+        tmpdir = tempfile.mkdtemp()
+        python = Popen([sys.executable] + args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
+        stdout, stderr = python.communicate()  # wait()
+        ret = python.poll()
+    finally:
+        shutil.rmtree(tmpdir)
     # TODO stdout cannot decode on Windows special character /x introduced
     return ret, stdout.decode(errors='ignore'), stderr.decode()
 
@@ -131,7 +137,9 @@ def test_noincorrect_import_if_no_lxml(monkeypatch):
 @pytest.mark.parametrize(
     "env", [{},
             {'DUECREDIT_ENABLE': 'yes'},
-            {'DUECREDIT_TEST_EARLY_IMPORT_ERROR': 'yes'}])
+            {'DUECREDIT_ENABLE': 'yes', 'DUECREDIT_REPORT_TAGS' :'*'},
+            {'DUECREDIT_TEST_EARLY_IMPORT_ERROR': 'yes'}
+            ])
 @pytest.mark.parametrize(
     "kwargs", [
         # direct command to evaluate
@@ -162,7 +170,14 @@ def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_e
     if os.environ.get('DUECREDIT_ENABLE', False) and on_windows:  # TODO this test fails on windows
         pytest.xfail("Fails for some reason on Windows")
     elif os.environ.get('DUECREDIT_ENABLE', False):  # we enabled duecredit
-        assert 'For formatted output we need citeproc' in out
+        if (os.environ.get('DUECREDIT_REPORT_TAGS', None) == '*' and kwargs.get('script')) \
+            or 'numpy' in kwargs.get('cmd', ''):
+            # we requested to have all tags output, and used bibtex in our entry
+            assert 'For formatted output we need citeproc' in out
+        else:
+            # there was nothing to format so we did not fail for no reason
+            assert 'For formatted output we need citeproc' not in out
+            assert '0 packages cited' in out
         assert 'done123' in out
     elif os.environ.get('DUECREDIT_TEST_EARLY_IMPORT_ERROR'):
         assert 'ImportError' in out
