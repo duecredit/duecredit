@@ -23,7 +23,7 @@ install:
   - travis_retry pip install -q coveralls codecov
   - python setup.py --help # just to trigger generation of .version
   - pip install -e '.[tests]'
-  - pip install flake8 pytest
+  - pip install --upgrade flake8 pytest
 
 script:
   #- nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO -v
