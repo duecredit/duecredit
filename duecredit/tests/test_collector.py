@@ -149,6 +149,7 @@ def test_dcite_method():
             assert citation.cite_module
 
         class SomeClass2(object):
+            # Used to test for classes that are not instantiated
             @due.dcite("XXX0", path="some.module.without.method")
             def method2(self, arg1, kwarg2="blah"):
                 assert arg1 == "magical"

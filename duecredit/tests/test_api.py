@@ -76,7 +76,7 @@ def test_api(collector_class):
 
     # Cite entire module
     due.cite('XXX00', description="Answers to existential questions", path="module")
-    # Cita some method within some submodule
+    # Cite some method within some submodule
     due.cite('XXX01', description="More answers to existential questions",
              path="module.submodule:class1.whoknowswhat2.func1")
 
@@ -156,9 +156,6 @@ def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_e
     except ImportError:
         pytest.skip("We need to have numpy to test correct operation")
 
-    if on_windows:
-        pytest.xfail("Fails for some reason on Windows")
-
     fake_env_nolxml_ = {'PYTHONPATH': "%s:%s" % (badlxml_path, os.environ.get('PYTHONPATH', ''))}.copy()
     fake_env_nolxml_.update(env)
 
@@ -190,4 +187,4 @@ def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_e
 
 if __name__ == '__main__':
     from duecredit import due
-    _test_api(due)
+    test_api(due)
