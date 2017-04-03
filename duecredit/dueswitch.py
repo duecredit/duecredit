@@ -34,10 +34,6 @@ def _get_active_due():
     from .config import CACHE_DIR, DUECREDIT_FILE
     from duecredit.collector import CollectorSummary, DueCreditCollector
     from .io import load_due
-    import atexit
-    # where to cache bibtex entries
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
 
     # TODO:  this needs to move to atexit handling, that we load previous
     # one and them merge with new ones.  Informative bits could be -- how

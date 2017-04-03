@@ -9,28 +9,26 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 import sys
-from mock import patch
 
 from ..utils import is_interactive
-from nose.tools import assert_false, assert_true
 
-def test_is_interactive_crippled_stdout():
-    class mocked_out(object):
+
+def test_is_interactive_crippled_stdout(monkeypatch):
+    class MockedOut(object):
         """the one which has no isatty
         """
         def write(self, *args, **kwargs):
             pass
 
-    class mocked_isatty(mocked_out):
+    class MockedIsaTTY(MockedOut):
         def isatty(self):
             return True
 
     for inout in ('in', 'out', 'err'):
-        with patch('sys.std%s' % inout, mocked_out()):
-            assert_false(is_interactive())
+        monkeypatch.setattr(sys, 'std%s' % inout, MockedOut())
+        assert not is_interactive()
 
     # just for paranoids
-    with patch('sys.stdin', mocked_isatty()), \
-            patch('sys.stdout', mocked_isatty()), \
-            patch('sys.stderr', mocked_isatty()):
-        assert_true(is_interactive())
+    for inout in ('in', 'out', 'err'):
+        monkeypatch.setattr(sys, 'std%s' % inout, MockedIsaTTY())
+    assert is_interactive()

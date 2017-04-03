@@ -85,14 +85,12 @@ setup(
     install_requires=['requests', 'citeproc-py', 'six'],
     extras_require={
         'tests': [
-            'mock',
-            'nose>=1.3.4',
+            'pytest',
             'vcrpy', 'contextlib2'
         ]
     },
     include_package_data=True,
     provides=[PACKAGE],
-    #test_suite='nose.collector',
     entry_points={
         'console_scripts': [
              'duecredit=duecredit.cmdline.main:main',

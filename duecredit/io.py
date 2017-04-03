@@ -32,6 +32,9 @@ _PREFERRED_ENCODING = locale.getpreferredencoding()
 
 
 def get_doi_cache_file(doi):
+    # where to cache bibtex entries
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
     return os.path.join(CACHE_DIR, doi)
 
 
