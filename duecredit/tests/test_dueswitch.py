@@ -7,26 +7,35 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-from mock import patch
 import atexit
-
-from nose import SkipTest
+import pytest
 
 from ..injections.injector import DueCreditInjector
 from ..dueswitch import due
 
-@patch.object(DueCreditInjector, 'activate')
-@patch.object(atexit, 'register')
-def test_dueswitch_activate(mock_register, mock_activate):
-    was_active = due.active
-    # atexit.register(crap)
-    # injector.activate()
+
+def test_dueswitch_activate(monkeypatch):
+    if due.active:
+       pytest.skip("due is already active, can't test more at this point")
+
+    state = dict(activate=0, register=0, register_func=None)
+
+    # Patch DueCreditInjector.activate
+    def activate_calls(*args, **kwargs):
+       state["activate"] += 1
+
+    monkeypatch.setattr(DueCreditInjector, "activate", activate_calls)
+
+    # Patch atexit.register
+    def register(func):
+       state["register"] += 1
+       state["register_func"] = func
+
+    monkeypatch.setattr(atexit, "register", register)
+
     due.activate()
-    if was_active:
-        # we can only test that mocked methods do not invoked second time
-        mock_activate.assert_not_called()
-        mock_register.assert_not_called()
-        raise SkipTest("due is already active, can't test more at this point")
+
     # was not active, so should have called activate of the injector class
-    mock_activate.assert_called_once_with()
-    mock_register.assert_called_once_with(due._dump_collector_summary)
+    assert state["activate"] == 1
+    assert state["register"] == 1
+    assert state["register_func"] == due._dump_collector_summary

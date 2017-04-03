@@ -9,33 +9,42 @@
 
 import sys
 
-from mock import patch
 from six.moves import StringIO
-from nose.tools import assert_raises, assert_equal
+import pytest
 
 from .. import __version__
 from ..cmdline import main
+
 
 def test_import():
     import duecredit.cmdline
     import duecredit.cmdline.main
 
-@patch('sys.stdout', new_callable=StringIO)
-def test_main_help(stdout):
-    assert_raises(SystemExit, main.main, ['--help'])
-    assert(stdout.getvalue().lstrip().startswith("Usage: "))
 
-# differs among Python versions -- catch both
-@patch('sys.std' + ('err' if sys.version_info < (3, 4) else 'out'), new_callable=StringIO)
-def test_main_version(out):
-    assert_raises(SystemExit, main.main, ['--version'])
-    assert_equal((out.getvalue()).split('\n')[0], "duecredit %s" % __version__)
+def test_main_help(monkeypatch):
+    # Patch stdout
+    fakestdout = StringIO()
+    monkeypatch.setattr(sys, "stdout", fakestdout)
+
+    pytest.raises(SystemExit, main.main, ['--help'])
+    assert fakestdout.getvalue().lstrip().startswith("Usage: ")
+
+
+def test_main_version(monkeypatch):
+    # Patch stdout or stderr for different Python versions -- catching both
+    fakestdout = StringIO()
+    fakeout = 'std' + ('err' if sys.version_info < (3, 4) else 'out')
+    monkeypatch.setattr(sys, fakeout, fakestdout)
+
+    pytest.raises(SystemExit, main.main, ['--version'])
+    assert (fakestdout.getvalue()).split('\n')[0] == "duecredit %s" % __version__
+
 
 # smoke test the cmd_summary
-# TODO: carry sample .duecredit.p, point to that file, mock TextOutput and BibTeXOutput .dumps
+# TODO: carry sample .duecredit.p, point to that file, monkeypatch TextOutput and BibTeXOutput .dumps
 def test_smoke_cmd_summary():
     main.main(['summary'])
 
-# test the not implemented cmd_test
-def test_cmd_test():
-    assert_raises(SystemExit, main.main, ['test'])
+
+def test_cmd_test():  # test the not implemented cmd_test
+    pytest.raises(SystemExit, main.main, ['test'])

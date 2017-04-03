@@ -8,8 +8,8 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 import gc
-import os
 import sys
+import pytest
 
 from six import viewvalues, PY2
 
@@ -19,16 +19,12 @@ else:
     import builtins as __builtin__
 _orig__import__ = __builtin__.__import__
 
-from duecredit.collector import DueCreditCollector, InactiveDueCreditCollector
-from duecredit.entries import BibTeX, Doi
+from duecredit.collector import DueCreditCollector
+from duecredit.entries import Doi
+import duecredit.tests.mod as mod
 
 from ..injections.injector import DueCreditInjector, find_object, get_modules_for_injection
 from .. import __version__
-
-from nose import SkipTest
-from nose.tools import assert_equal
-from nose.tools import assert_false
-from nose.tools import assert_true
 
 try:
     import mvpa2
@@ -38,6 +34,7 @@ except ImportError:
 
 from logging import getLogger
 lgr = getLogger('duecredit.tests.injector')
+
 
 class TestActiveInjector(object):
     def setup(self):
@@ -52,7 +49,7 @@ class TestActiveInjector(object):
         # gc might not pick up inj after some tests complete
         # so we will always deactivate explicitly
         self.injector.deactivate()
-        assert_true(__builtin__.__import__ is _orig__import__)
+        assert __builtin__.__import__ is _orig__import__
         self._cleanup_modules()
 
     def _cleanup_modules(self):
@@ -60,122 +57,121 @@ class TestActiveInjector(object):
             sys.modules.pop('duecredit.tests.mod')
 
     def _test_simple_injection(self, func, import_stmt, func_call=None):
-        assert_false('duecredit.tests.mod' in sys.modules)
+        assert 'duecredit.tests.mod' not in sys.modules
         self.injector.add('duecredit.tests.mod', func,
                           Doi('1.2.3.4'),
                           description="Testing %s" % func,
                           min_version='0.1', max_version='1.0',
                           tags=["implementation", "very custom"])
-        assert_false('duecredit.tests.mod' in sys.modules) # no import happening
-        assert_equal(len(self.due._entries), 0)
-        assert_equal(len(self.due.citations), 0)
+        assert 'duecredit.tests.mod' not in sys.modules  # no import happening
+        assert len(self.due._entries) == 0
+        assert len(self.due.citations) == 0
 
         globals_, locals_ = {}, {}
         exec(import_stmt, globals_, locals_)
 
-        assert_equal(len(self.due._entries), 1)   # we should get an entry now
-        assert_equal(len(self.due.citations), 0)  # but not yet a citation
+        assert len(self.due._entries) == 1   # we should get an entry now
+        assert len(self.due.citations) == 0  # but not yet a citation
 
         import duecredit.tests.mod as mod
         _, _, obj = find_object(mod, func)
-        assert_true(obj.__duecredited__)              # we wrapped
-        assert_false(obj.__duecredited__ is obj)      # and it is not pointing to the same func
-        assert_equal(obj.__doc__, "custom docstring") # we preserved docstring
+        assert obj.__duecredited__                # we wrapped
+        assert obj.__duecredited__ is not obj     # and it is not pointing to the same func
+        assert obj.__doc__ == "custom docstring"  # we preserved docstring
 
         # TODO: test decoration features -- preserver __doc__ etc
         exec('ret = %s(None, "somevalue")' % (func_call or func), globals_, locals_)
-        # XXX: awkwardly 'ret' is not found in the scope while running nosetests
+        # TODO: awkwardly 'ret' is not found in the scope while running pytest
         # under python3.4, although present in locals()... WTF?
-        assert_equal(locals_['ret'], "%s: None, somevalue" % func)
-        assert_equal(len(self.due._entries), 1)
-        assert_equal(len(self.due.citations), 1)
+        assert locals_['ret'] == "%s: None, somevalue" % func
+        assert len(self.due._entries) == 1
+        assert len(self.due.citations) == 1
 
         # TODO: there must be a cleaner way to get first value
         citation = list(viewvalues(self.due.citations))[0]
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version
-        assert_equal(citation.version, __version__)
+        assert citation.version == __version__
 
         assert(citation.tags == ['implementation', 'very custom'])
 
     def _test_double_injection(self, func, import_stmt, func_call=None):
-        assert_false('duecredit.tests.mod' in sys.modules)
+        assert 'duecredit.tests.mod' not in sys.modules
         # add one injection
         self.injector.add('duecredit.tests.mod', func,
                           Doi('1.2.3.4'),
                           description="Testing %s" % func,
                           min_version='0.1', max_version='1.0',
                           tags=["implementation", "very custom"])
-        #add another one
+        # add another one
         self.injector.add('duecredit.tests.mod', func,
                           Doi('1.2.3.5'),
                           description="Testing %s" % func,
                           min_version='0.1', max_version='1.0',
                           tags=["implementation", "very custom"])
-        assert_false('duecredit.tests.mod' in sys.modules) # no import happening
-        assert_equal(len(self.due._entries), 0)
-        assert_equal(len(self.due.citations), 0)
+        assert 'duecredit.tests.mod' not in sys.modules  # no import happening
+        assert len(self.due._entries) == 0
+        assert len(self.due.citations) == 0
 
         globals_, locals_ = {}, {}
         exec(import_stmt, globals_, locals_)
 
-        assert_equal(len(self.due._entries), 2)   # we should get two entries now
-        assert_equal(len(self.due.citations), 0)  # but not yet a citation
+        assert len(self.due._entries) == 2  # we should get two entries now
+        assert len(self.due.citations) == 0  # but not yet a citation
 
         import duecredit.tests.mod as mod
         _, _, obj = find_object(mod, func)
-        assert_true(obj.__duecredited__)              # we wrapped
-        assert_false(obj.__duecredited__ is obj)      # and it is not pointing to the same func
-        assert_equal(obj.__doc__, "custom docstring") # we preserved docstring
+        assert obj.__duecredited__  # we wrapped
+        assert obj.__duecredited__ is not obj  # and it is not pointing to the same func
+        assert obj.__doc__ == "custom docstring"  # we preserved docstring
 
         # TODO: test decoration features -- preserver __doc__ etc
         exec('ret = %s(None, "somevalue")' % (func_call or func), globals_, locals_)
-        # XXX: awkwardly 'ret' is not found in the scope while running nosetests
+        # TODO: awkwardly 'ret' is not found in the scope while running pytest
         # under python3.4, although present in locals()... WTF?
-        assert_equal(locals_['ret'], "%s: None, somevalue" % func)
-        assert_equal(len(self.due._entries), 2)
-        assert_equal(len(self.due.citations), 2)
+        assert locals_['ret'] == "%s: None, somevalue" % func
+        assert len(self.due._entries) == 2
+        assert len(self.due.citations) == 2
 
         # TODO: there must be a cleaner way to get first value
         citation = list(viewvalues(self.due.citations))[0]
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version
-        assert_equal(citation.version, __version__)
+        assert citation.version, __version__
 
-        assert(citation.tags == ['implementation', 'very custom'])
+        assert (citation.tags == ['implementation', 'very custom'])
 
-    def test_simple_injection(self):
-        yield self._test_simple_injection, "testfunc1", 'from duecredit.tests.mod import testfunc1', None
-        yield self._test_simple_injection, "TestClass1.testmeth1", \
-              'from duecredit.tests.mod import TestClass1; c = TestClass1()', 'c.testmeth1'
-        yield self._test_simple_injection, "TestClass12.Embed.testmeth1", \
-              'from duecredit.tests.mod import TestClass12; c = TestClass12.Embed()', 'c.testmeth1'
+    test1 = ('testfunc1', 'from duecredit.tests.mod import testfunc1', None)
+    test2 = ("TestClass1.testmeth1", 'from duecredit.tests.mod import TestClass1; c = TestClass1()', 'c.testmeth1')
+    test3 = ("TestClass12.Embed.testmeth1", 'from duecredit.tests.mod import TestClass12; c = TestClass12.Embed()',
+             'c.testmeth1')
 
-    def test_double_injection(self):
-        yield self._test_double_injection, "testfunc1", 'from duecredit.tests.mod import testfunc1', None
-        yield self._test_double_injection, "TestClass1.testmeth1", \
-               'from duecredit.tests.mod import TestClass1; c = TestClass1()', 'c.testmeth1'
-        yield self._test_double_injection, "TestClass12.Embed.testmeth1", \
-               'from duecredit.tests.mod import TestClass12; c = TestClass12.Embed()', 'c.testmeth1'
+    @pytest.mark.parametrize("func, import_stmt, func_call", [test1, test2, test3])
+    def test_simple_injection(self, func, import_stmt, func_call):
+        self._test_simple_injection(func, import_stmt, func_call)
+
+    @pytest.mark.parametrize("func, import_stmt, func_call", [test1, test2, test3])
+    def test_double_injection(self, func, import_stmt, func_call):
+        self._test_double_injection(func, import_stmt, func_call)
 
     def test_delayed_entries(self):
         # verify that addition of delayed injections happened
         modules_for_injection = get_modules_for_injection()
-        assert_equal(len(self.injector._delayed_injections), len(modules_for_injection))
-        assert_equal(self.injector._entry_records, {})    # but no entries were added
-        assert('scipy' in self.injector._delayed_injections)  # We must have it ATM
+        assert len(self.injector._delayed_injections) == len(modules_for_injection)
+        assert self.injector._entry_records == {}  # but no entries were added
+        assert 'scipy' in self.injector._delayed_injections  # We must have it ATM
 
         try:
             # We do have injections for scipy
             import scipy
         except ImportError as e:
-            raise SkipTest("scipy was not found: %s" % (e,))
+            pytest.skip("scipy was not found: %s" % (e,))
 
     def test_import_mvpa2_suite(self):
         if not _have_mvpa2:
-            raise SkipTest("no mvpa2 found")
+            pytest.skip("no mvpa2 found")
         # just a smoke test for now
         import mvpa2.suite as mv
 
@@ -187,24 +183,21 @@ class TestActiveInjector(object):
         # TODO: catch/analyze warnings
         exec('from duecredit.tests.mod import testfunc1', {}, {})
 
-    def test_incorrect_path(self):
-        yield self._test_incorrect_path, "nonexistingmodule", None
-        yield self._test_incorrect_path, "duecredit.tests.mod.nonexistingmodule", None
-        yield self._test_incorrect_path, "duecredit.tests.mod", "nonexisting"
-        yield self._test_incorrect_path, "duecredit.tests.mod", "nonexisting.whocares"
+    @pytest.mark.parametrize("mod, obj", [("nonexistingmodule", None),
+                                          ("duecredit.tests.mod.nonexistingmodule", None),
+                                          ("duecredit.tests.mod", "nonexisting"),
+                                          ("duecredit.tests.mod", "nonexisting.whocares")])
+    def test_incorrect_path(self, mod, obj):
+        self._test_incorrect_path(mod, obj)
 
 
+def test_find_iobject():
+    assert find_object(mod, 'testfunc1') == (mod, 'testfunc1', mod.testfunc1)
+    assert find_object(mod, 'TestClass1') == (mod, 'TestClass1', mod.TestClass1)
+    assert find_object(mod, 'TestClass1.testmeth1') == (mod.TestClass1, 'testmeth1', mod.TestClass1.testmeth1)
+    assert find_object(mod, 'TestClass12.Embed.testmeth1') == (mod.TestClass12.Embed,
+                                                               'testmeth1', mod.TestClass12.Embed.testmeth1)
 
-def _test_find_object(mod, path, parent, obj_name, obj):
-    assert_equal(find_object(mod, path), (parent, obj_name, obj))
-
-def test_find_object():
-    import duecredit.tests.mod as mod
-    yield _test_find_object, mod, 'testfunc1', mod, 'testfunc1', mod.testfunc1
-    yield _test_find_object, mod, 'TestClass1', mod, 'TestClass1', mod.TestClass1
-    yield _test_find_object, mod, 'TestClass1.testmeth1', mod.TestClass1, 'testmeth1', mod.TestClass1.testmeth1
-    yield _test_find_object, mod, 'TestClass12.Embed.testmeth1', \
-          mod.TestClass12.Embed, 'testmeth1', mod.TestClass12.Embed.testmeth1
 
 def test_no_double_activation():
     orig__import__ = __builtin__.__import__
@@ -212,31 +205,30 @@ def test_no_double_activation():
         due = DueCreditCollector()
         injector = DueCreditInjector(collector=due)
         injector.activate()
-        assert_false(__builtin__.__import__ is orig__import__)
+        assert __builtin__.__import__ is not orig__import__
         duecredited__import__ = __builtin__.__import__
         # TODO: catch/analyze/swallow warning
         injector.activate()
-        assert_true(__builtin__.__import__ is duecredited__import__) # we didn't decorate again
+        assert __builtin__.__import__ is duecredited__import__  # we didn't decorate again
     finally:
         injector.deactivate()
         __builtin__.__import__ = orig__import__
 
 
 def test_get_modules_for_injection():
-    assert_equal(get_modules_for_injection(), [
-        'mod_biosig',
-        'mod_dipy',
-        'mod_mdp',
-        'mod_mne',
-        'mod_nibabel',
-        'mod_nipy',
-        'mod_nipype',
-        'mod_numpy',
-        'mod_pandas',
-        'mod_psychopy',
-        'mod_scipy',
-        'mod_skimage',
-        'mod_sklearn'])
+    assert get_modules_for_injection() == ['mod_biosig',
+                                           'mod_dipy',
+                                           'mod_mdp',
+                                           'mod_mne',
+                                           'mod_nibabel',
+                                           'mod_nipy',
+                                           'mod_nipype',
+                                           'mod_numpy',
+                                           'mod_pandas',
+                                           'mod_psychopy',
+                                           'mod_scipy',
+                                           'mod_skimage',
+                                           'mod_sklearn']
 
 
 def test_cover_our_injections():
@@ -260,16 +252,16 @@ def test_injector_del():
         due = DueCreditCollector()
         inj = DueCreditInjector(collector=due)
         del inj   # delete inactive
-        assert_true(__builtin__.__import__ is orig__import__)
+        assert __builtin__.__import__ is orig__import__
         inj = DueCreditInjector(collector=due)
         inj.activate(retrospect=False)
-        assert_false(__builtin__.__import__ is orig__import__)
-        assert_false(inj._orig_import is None)
+        assert __builtin__.__import__ is not orig__import__
+        assert inj._orig_import is not None
         del inj   # delete active but not used
         inj = None
         __builtin__.__import__ = None # We need to do that since otherwise gc will not pick up inj
         gc.collect()  # To cause __del__
-        assert_true(__builtin__.__import__ is orig__import__)
+        assert __builtin__.__import__ is orig__import__
         import abc   # and new imports work just fine
     finally:
         __builtin__.__import__ = orig__import__
@@ -286,24 +278,24 @@ def test_injector_delayed_del():
 
         inj = DueCreditInjector(collector=due)
         inj.activate(retrospect=False)
-        assert_false(__builtin__.__import__ is orig__import__)
-        assert_false(inj._orig_import is None)
+        assert __builtin__.__import__ is not orig__import__
+        assert inj._orig_import is not None
         inj.deactivate()
-        assert_true(__builtin__.__import__ is orig__import__)
-        assert_true(inj._orig_import is None)
+        assert __builtin__.__import__ is orig__import__
+        assert inj._orig_import is None
 
         # create 2nd one
         inj2 = DueCreditInjector(collector=due)
         inj2.activate(retrospect=False)
-        assert_false(__builtin__.__import__ is orig__import__)
-        assert_false(inj2._orig_import is None)
+        assert __builtin__.__import__ is not orig__import__
+        assert inj2._orig_import is not None
         del inj
         inj = None
         gc.collect()  # To cause __del__
-        assert_false(__builtin__.__import__ is orig__import__)  # would fail if del had side-effect
-        assert_false(inj2._orig_import is None)
+        assert __builtin__.__import__ is not orig__import__  # would fail if del had side-effect
+        assert inj2._orig_import is not None
         inj2.deactivate()
-        assert_true(__builtin__.__import__ is orig__import__)
+        assert __builtin__.__import__ is orig__import__
         import abc   # and new imports work just fine
     finally:
         __builtin__.__import__ = orig__import__
