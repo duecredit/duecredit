@@ -73,16 +73,23 @@ class DueSwitch(object):
         return self.__active
 
     @never_fail
-    def _dump_collector_summary(self):
+    def dump(self, **kwargs):
+        """Dumps summary of the citations
+
+        Parameters
+        ----------
+        **kwargs: dict
+           Passed to `CollectorSummary` constructor.
+        """
         from duecredit.collector import CollectorSummary
-        due_summary = CollectorSummary(self.__collectors[True])
+        due_summary = CollectorSummary(self.__collectors[True], **kwargs)
         due_summary.dump()
 
     def __prepare_exit_and_injections(self):
         # Wrapper to create and dump summary... passing method doesn't work:
         #  probably removes instance too early
 
-        atexit.register(self._dump_collector_summary)
+        atexit.register(self.dump)
 
         # Deal with injector
         from .injections import DueCreditInjector
@@ -97,7 +104,7 @@ class DueSwitch(object):
             is_public = lambda x: not x.startswith('_')
             # Clean up current bindings first
             for k in filter(is_public, dir(self)):
-                if k not in ('activate', 'active'):
+                if k not in ('activate', 'active', 'dump'):
                     delattr(self, k)
 
             new_due = self.__collectors[activate]
