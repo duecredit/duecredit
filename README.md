@@ -207,6 +207,29 @@ an uncited function from that package.
     [3] Sneath, P.H. & Sokal, R.R., 1962. Numerical taxonomy. Nature, 193(4818), pp.855–860.
     ...
 
+Tags
+====
+
+You are welcome to introduce new tags specific for your citations but we hope
+that for consistency across projects, you would use following tags
+
+- "implementation" (default) -- an implementation of the cited method
+- "reference-implementation" -- the original implementation (ideally by
+  the authors of the paper) of the cited method
+- "another-implementation" -- some other implementation of
+   the method, e.g. if you would like to provide citation for another
+   implementation of the method you have implemented in your code and for
+   which you have already provided `implementation` or
+   `reference-implementation` tag
+- "use" -- publications demonstrating a worthwhile noting use of the
+  method
+- "edu" -- tutorials, textbooks and other materials useful to learn
+  more about cited functionality
+- "donate" -- should be commonly used with Url entries to point to the
+  websites  describing how to contribute some funds to the referenced
+  project
+- "funding" -- to point to the sources of funding which provided support
+  for a given functionality implementation and/or method development
 
 Ultimate goals
 ==============
