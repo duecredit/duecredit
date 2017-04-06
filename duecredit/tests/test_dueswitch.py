@@ -38,4 +38,4 @@ def test_dueswitch_activate(monkeypatch):
     # was not active, so should have called activate of the injector class
     assert state["activate"] == 1
     assert state["register"] == 1
-    assert state["register_func"] == due._dump_collector_summary
+    assert state["register_func"] == due.dump
