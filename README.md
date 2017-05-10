@@ -283,3 +283,20 @@ experimental prototype for gathering anonymous, opt-in usage data for
 open scientific software*.  Eventually in duecredit we aim either to
 provide similar functionality (since we are collecting such
 information as well) or just interface/report to sempervirens.
+
+Currently used by
+=================
+
+This is a running list of projects that use DueCredit natively. If you
+are using DueCredit, or plan to use it, please consider sending a pull
+request and add your project to this list. Thanks to
+[@fedorov](https://github.com/fedorov) for the idea. Last updated
+2017-05-10.
+
+- [PyMVPA](http://www.pymvpa.org)
+- [fatiando](https://github.com/fatiando/fatiando)
+- [Nipype](https://github.com/nipy/nipype)
+- [QInfer](https://github.com/QInfer/python-qinfer)
+- [shablona](https://github.com/uwescience/shablona)
+- [gfusion](https://github.com/mvdoc/gfusion)
+- [pybids](https://github.com/INCF/pybids)
