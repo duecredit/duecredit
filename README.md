@@ -4,7 +4,6 @@ duecredit
 [![Build Status](https://travis-ci.org/duecredit/duecredit.svg?branch=master)](https://travis-ci.org/duecredit/duecredit)
 [![Coverage Status](https://coveralls.io/repos/duecredit/duecredit/badge.svg)](https://coveralls.io/r/duecredit/duecredit)
 
-
 duecredit is being conceived to address the problem of inadequate
 citation of scientific software and methods, and limited visibility of
 donation requests for open-source software.
@@ -15,6 +14,8 @@ automatically collected and reported to the user at the necessary
 level of reference detail, i.e. only references for actually used
 functionality will be presented back if software provides multiple
 citeable implementations.
+
+![Example](examples/duecredit_example.gif)
 
 duecredit 101
 =============
@@ -84,7 +85,6 @@ corresponding module gets imported.
 User-view
 ---------
 
-![Example](examples/duecredit_example.gif)
 
 By default `duecredit` does exactly nothing -- all decorators do not
 decorate, all `cite` functions just return, so there should be no fear
