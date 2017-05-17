@@ -84,6 +84,8 @@ corresponding module gets imported.
 User-view
 ---------
 
+![Example](examples/duecredit_example.gif)
+
 By default `duecredit` does exactly nothing -- all decorators do not
 decorate, all `cite` functions just return, so there should be no fear
 that it would break anything. Then whenever anyone runs their analysis
