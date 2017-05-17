@@ -4,7 +4,6 @@ duecredit
 [![Build Status](https://travis-ci.org/duecredit/duecredit.svg?branch=master)](https://travis-ci.org/duecredit/duecredit)
 [![Coverage Status](https://coveralls.io/repos/duecredit/duecredit/badge.svg)](https://coveralls.io/r/duecredit/duecredit)
 
-
 duecredit is being conceived to address the problem of inadequate
 citation of scientific software and methods, and limited visibility of
 donation requests for open-source software.
@@ -15,6 +14,8 @@ automatically collected and reported to the user at the necessary
 level of reference detail, i.e. only references for actually used
 functionality will be presented back if software provides multiple
 citeable implementations.
+
+![Example](examples/duecredit_example.gif)
 
 duecredit 101
 =============
@@ -83,6 +84,7 @@ corresponding module gets imported.
 
 User-view
 ---------
+
 
 By default `duecredit` does exactly nothing -- all decorators do not
 decorate, all `cite` functions just return, so there should be no fear
@@ -213,22 +215,22 @@ Tags
 You are welcome to introduce new tags specific for your citations but we hope
 that for consistency across projects, you would use following tags
 
-- "implementation" (default) -- an implementation of the cited method
-- "reference-implementation" -- the original implementation (ideally by
+- `implementation` (default) — an implementation of the cited method
+- `reference-implementation` — the original implementation (ideally by
   the authors of the paper) of the cited method
-- "another-implementation" -- some other implementation of
+- `another-implementation` — some other implementation of
    the method, e.g. if you would like to provide citation for another
    implementation of the method you have implemented in your code and for
    which you have already provided `implementation` or
    `reference-implementation` tag
-- "use" -- publications demonstrating a worthwhile noting use of the
+- `use` — publications demonstrating a worthwhile noting use of the
   method
-- "edu" -- tutorials, textbooks and other materials useful to learn
+- `edu` — tutorials, textbooks and other materials useful to learn
   more about cited functionality
-- "donate" -- should be commonly used with Url entries to point to the
+- `donate` — should be commonly used with Url entries to point to the
   websites  describing how to contribute some funds to the referenced
   project
-- "funding" -- to point to the sources of funding which provided support
+- `funding` — to point to the sources of funding which provided support
   for a given functionality implementation and/or method development
 
 Ultimate goals
