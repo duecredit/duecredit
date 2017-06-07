@@ -292,8 +292,7 @@ Currently used by
 This is a running list of projects that use DueCredit natively. If you
 are using DueCredit, or plan to use it, please consider sending a pull
 request and add your project to this list. Thanks to
-[@fedorov](https://github.com/fedorov) for the idea. Last updated
-2017-05-10.
+[@fedorov](https://github.com/fedorov) for the idea.
 
 - [PyMVPA](http://www.pymvpa.org)
 - [fatiando](https://github.com/fatiando/fatiando)
@@ -302,3 +301,6 @@ request and add your project to this list. Thanks to
 - [shablona](https://github.com/uwescience/shablona)
 - [gfusion](https://github.com/mvdoc/gfusion)
 - [pybids](https://github.com/INCF/pybids)
+- [Quickshear](https://github.com/nipy/quickshear)
+
+Last updated 2017-06-06.
