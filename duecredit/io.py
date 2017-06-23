@@ -278,6 +278,13 @@ def format_bibtex(bibtex_entry, style='harvard1'):
             "For formatted output we need citeproc and all of its dependencies "
             "(such as lxml) but there is a problem while importing citeproc: %s"
             % str(e))
+    decode_exceptions = UnicodeDecodeError
+    try:
+        from citeproc.source.bibtex.bibparse import BibTeXDecodeError
+        decode_exceptions = (decode_exceptions, BibTeXDecodeError)
+    except ImportError:
+        # this version doesn't yet have this exception defined
+        pass
     key = bibtex_entry.get_key()
     # need to save it temporarily to use citeproc-py
     fname = tempfile.mktemp(suffix='.bib')
@@ -290,7 +297,7 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         try:
             try:
                 bib_source = cpBibTeX(fname)
-            except UnicodeDecodeError as e:
+            except decode_exceptions as e:
                 # So .bib must be having UTF-8 characters.  With
                 # a recent (not yet released past v0.3.0-68-g9800dad
                 # we should be able to provide encoding argument
