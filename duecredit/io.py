@@ -260,12 +260,7 @@ def condition_bibtex(bibtex):
     # as for BIDS paper.  Workaround to add trailing + after pages number
     # related issue asking for a new release: https://github.com/brechtm/citeproc-py/issues/72
     bibtex = re.sub(r'(pages\s*=\s*["{]\d+)(["}])', r'\1+\2', bibtex)
-    # TODO: manage to save/use UTF-8
-    if PY2:
-        # TODO: citeproc master, after 0.3.0 allows to load UTF-8 encoded
-        # files... so we need to fail for a release to take advantage
-        # bibtex = bibtex.encode('utf-8')
-        bibtex = bibtex.encode('ascii', 'ignore')
+    bibtex = bibtex.encode('utf-8')
     return bibtex
 
 
@@ -289,7 +284,7 @@ def format_bibtex(bibtex_entry, style='harvard1'):
     # need to save it temporarily to use citeproc-py
     fname = tempfile.mktemp(suffix='.bib')
     try:
-        with open(fname, 'wt') as f:
+        with open(fname, 'wb') as f:
             f.write(condition_bibtex(bibtex_entry.rawentry))
         # We need to avoid cpBibTex spitting out warnings
         old_filters = warnings.filters[:]  # store a copy of filters
