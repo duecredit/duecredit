@@ -288,8 +288,13 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         old_filters = warnings.filters[:]  # store a copy of filters
         warnings.simplefilter('ignore', UserWarning)
         try:
-            # TODO: needs citeproc release past 0.3.0
-            bib_source = cpBibTeX(fname) #, encoding='utf-8')
+            try:
+                bib_source = cpBibTeX(fname)
+            except UnicodeDecodeError as e:
+                # So .bib must be having UTF-8 characters.  With
+                # a recent (not yet released past v0.3.0-68-g9800dad
+                # we should be able to provide encoding argument
+                bib_source = cpBibTeX(fname, encoding='utf-8')
         except Exception as e:
             lgr.error("Failed to process BibTeX file %s: %s" % (fname, e))
             return "ERRORED: %s" % str(e)
