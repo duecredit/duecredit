@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.6.2](https://github.com/duecredit/duecredit/tree/0.6.2) (2017-06-23)
+
+- Testing was converted to pytest
+- Various enhancements in supporting python3 and BiBTeX with utf-8
+- New tag 'dataset' to describe datasets
+
 ## [0.6.1](https://github.com/duecredit/duecredit/tree/0.6.1) (2016-07-09)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.6.0...0.6.1)
 
