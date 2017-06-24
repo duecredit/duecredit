@@ -10,13 +10,12 @@
 
 """
 
-import sys
 import os
+import pkgutil
+import warnings
 
 from ..log import lgr
 from ..config import DUECREDIT_FILE
-from ..collector import CollectorSummary
-from ..io import TextOutput, BibTeXOutput
 
 __docformat__ = 'restructuredtext'
 
@@ -31,7 +30,8 @@ def setup_parser(parser):
 
     parser.add_argument(
         "-m", "--module",
-        help="Module to collect all DueCredit citations from")
+        nargs='*',
+        help="Module(s) to collect all DueCredit citations from")
 
 
 def run(args):
@@ -46,21 +46,30 @@ def run(args):
     # TODO: add a new mode where dcite would immediately collect
 
     # walk all the modules
-    import pkgutil
-    package = __import__(args.module, fromlist='dummy')
-    for importer, modname, ispkg in pkgutil.walk_packages(
-            path=package.__path__,
-            prefix=package.__name__ + '.',
-            onerror=lambda x: None):
-        lgr.info("Importing module %s" % modname)
-        try:
-            module = __import__(modname, fromlist="dummy")
-        except Exception as exc:
-            lgr.info("Failed to import %s: %s", modname, exc)
+    with warnings.catch_warnings():
+        for module in args.module:
+            lgr.info("Walking the %s module", module)
+            # Warnings aren't related to our "task" at hands, so we ignore
+            # them but we need to do it before each __import__ because
+            package = safe_import(module)
+            for importer, modname, ispkg in pkgutil.walk_packages(
+                    path=package.__path__,
+                    prefix=package.__name__ + '.',
+                    onerror=lambda x: None):
+                lgr.debug("Importing module %s" % modname)
+                safe_import(modname)
 
-    CollectorSummary(due).dump()
-    if True:
-        out = TextOutput(sys.stdout, due, args.style)
-    out.dump()
+    ## CollectorSummary(due).dump()
+    # if True:
+    #     out = TextOutput(sys.stdout, due) #, args.style)
+    # out.dump()
+
+
+def safe_import(modname):
+    try:
+        warnings.filterwarnings("ignore")
+        return __import__(modname)
+    except Exception as exc:
+        lgr.debug("Failed to import %s: %s, skipped", modname, exc)
 
 

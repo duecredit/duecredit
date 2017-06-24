@@ -403,6 +403,11 @@ class DueCreditCollector(object):
             lgr.debug("Decorating func %s within module %s" % (func.__name__, modname))
             # TODO: unittest for all the __version__ madness
 
+            # XXX
+            # print("HERE: %s %s" % (args, kwargs))
+            citation = self.cite(*args, **kwargs)
+            return func
+
             # TODO: check if we better use wrapt module which provides superior "correctness"
             #       of decorating.  vcrpy uses wrapt, and that thing seems to wrap
             @wraps(func)

@@ -297,16 +297,18 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         # We need to avoid cpBibTex spitting out warnings
         old_filters = warnings.filters[:]  # store a copy of filters
         warnings.simplefilter('ignore', UserWarning)
+        e1 = ''
         try:
             try:
                 bib_source = cpBibTeX(fname)
-            except decode_exceptions as e:
+            except decode_exceptions as e1:
                 # So .bib must be having UTF-8 characters.  With
                 # a recent (not yet released past v0.3.0-68-g9800dad
                 # we should be able to provide encoding argument
                 bib_source = cpBibTeX(fname, encoding='utf-8')
         except Exception as e:
-            lgr.error("Failed to process BibTeX file %s: %s" % (fname, e))
+            lgr.error("Failed to process BibTeX file %s: e1, %s"
+                      % (fname, e1, e))
             return "ERRORED: %s" % str(e)
         finally:
             # return warnings back
