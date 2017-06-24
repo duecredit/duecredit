@@ -24,6 +24,7 @@ import tempfile
 from six import PY2, itervalues, iteritems
 import warnings
 import platform
+from time import sleep
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi
