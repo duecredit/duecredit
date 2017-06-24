@@ -281,6 +281,13 @@ def format_bibtex(bibtex_entry, style='harvard1'):
             "For formatted output we need citeproc and all of its dependencies "
             "(such as lxml) but there is a problem while importing citeproc: %s"
             % str(e))
+
+    # Provide some fix ups needed
+    # remove after released (0.4.1?) https://github.com/brechtm/citeproc-py/pull/75
+    from citeproc.source.bibtex.latex import macro
+    if 'textquotesingle' not in macro.MACROS:
+        macro.MACROS['textquotesingle'] = macro.Symbol("'")
+
     decode_exceptions = UnicodeDecodeError
     try:
         from citeproc.source.bibtex.bibparse import BibTeXDecodeError
