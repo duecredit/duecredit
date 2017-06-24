@@ -260,6 +260,10 @@ def condition_bibtex(bibtex):
     # as for BIDS paper.  Workaround to add trailing + after pages number
     # related issue asking for a new release: https://github.com/brechtm/citeproc-py/issues/72
     bibtex = re.sub(r'(pages\s*=\s*["{]\d+)(["}])', r'\1+\2', bibtex)
+    # partial workaround for citeproc failing to parse page numbers when they contain non-numeric characters
+    # remove opening letter, e.g. 'S123' -> '123'
+    # related issue: https://github.com/brechtm/citeproc-py/issues/74
+    bibtex = re.sub(r'(pages\s*=\s*["{])([a-zA-Z])', r'\g<1>', bibtex)
     bibtex = bibtex.encode('utf-8')
     return bibtex
 
