@@ -99,7 +99,7 @@ class Output(object):
         """Given all the citations, filter only those that the user wants and
         those that were actually used"""
         if not tags:
-            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
+            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation,dataset').split(',')
         if all_ is None:
             # consult env var
             all_ = os.environ.get('DUECREDIT_REPORT_ALL', '').lower() in {'1', 'true', 'yes', 'on'}
