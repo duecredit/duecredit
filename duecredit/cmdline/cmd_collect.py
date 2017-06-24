@@ -70,6 +70,6 @@ def safe_import(modname):
         warnings.filterwarnings("ignore")
         return __import__(modname)
     except Exception as exc:
-        lgr.debug("Failed to import %s: %s, skipped", modname, exc)
+        lgr.warn("Failed to import %s: %s, skipped", modname, exc)
 
 
