@@ -1,4 +1,4 @@
-# emacs: -*- mode: python; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil -*-
+# emacs: -*- mode: python; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil; coding: utf-8 -*-
 # ex: set sts=4 ts=4 sw=4 noet:
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 #
@@ -528,6 +528,17 @@ def test_format_bibtex_zenodo_doi():
     """
     assert (format_bibtex(BibTeX(bibtex_zenodo)) ==
             """Ghosh, S. et al., 2016. nipype: Release candidate 1 for version 0.12.0.""")
+
+
+def test_format_bibtex_with_utf_characters():
+    """
+    test that we can correctly parse bibtex entry if it contains utf-8 characters
+    """
+    # this was fetched on 2017-07-23
+    bibtex_utf8 = import_doi('10.5281/zenodo.60847').replace("Brett", u"Brótt")
+    # there's more unicode characters inside the bibtex file for this doi
+    # but we put them also in the beginning for extra testing
+    assert (format_bibtex(BibTeX(bibtex_utf8)) == u'Brótt, M. et al., 2015. nibabel 2.0.1.')
 
 
 def test_is_contained():

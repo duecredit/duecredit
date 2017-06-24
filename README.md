@@ -232,6 +232,7 @@ that for consistency across projects, you would use following tags
   project
 - `funding` — to point to the sources of funding which provided support
   for a given functionality implementation and/or method development
+- `dataset` - for datasets
 
 Ultimate goals
 ==============
