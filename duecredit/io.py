@@ -23,12 +23,15 @@ import requests
 import tempfile
 from six import PY2, itervalues, iteritems
 import warnings
+import platform
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi
 from .log import lgr
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
+platform_system = platform.system().lower()
+on_windows = platform_system == 'windows'
 
 
 def get_doi_cache_file(doi):
@@ -315,7 +318,17 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         bibliography.register(citation)
     finally:
         if not os.environ.get("DUECREDIT_KEEPTEMP"):
-            os.unlink(fname)
+            exceptions = (OSError, WindowsError) if on_windows else OSError
+            for i in range(50):
+                try:
+                    os.unlink(fname)
+                except exceptions:
+                    if i < 49:
+                        sleep(0.1)
+                        continue
+                    else:
+                        raise
+                break
 
     biblio_out = bibliography.bibliography()
     assert(len(biblio_out) == 1)
