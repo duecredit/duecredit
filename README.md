@@ -303,5 +303,6 @@ request and add your project to this list. Thanks to
 - [gfusion](https://github.com/mvdoc/gfusion)
 - [pybids](https://github.com/INCF/pybids)
 - [Quickshear](https://github.com/nipy/quickshear)
+- [meqc](https://github.com/emdupre/meqc)
 
-Last updated 2017-06-06.
+Last updated 2017-06-27.
