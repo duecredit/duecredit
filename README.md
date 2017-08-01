@@ -107,8 +107,7 @@ which will in turn add those entries to the duecredit whenever the
 corresponding module gets imported.
 
 
-User-view
----------
+## User-view
 
 
 By default `duecredit` does exactly nothing -- all decorators do not
@@ -234,8 +233,8 @@ an uncited function from that package.
     [3] Sneath, P.H. & Sokal, R.R., 1962. Numerical taxonomy. Nature, 193(4818), pp.855–860.
     ...
 
-Tags
-====
+## Tags
+
 
 You are welcome to introduce new tags specific for your citations but we hope
 that for consistency across projects, you would use following tags
@@ -259,11 +258,10 @@ that for consistency across projects, you would use following tags
   for a given functionality implementation and/or method development
 - `dataset` - for datasets
 
-Ultimate goals
-==============
+## Ultimate goals
 
-Reduce demand for prima ballerina projects
-------------------------------------------
+
+### Reduce demand for prima ballerina projects
 
 **Problem**: Scientific software is often developed to gain citations for
 original publication through the use of the software implementing it.
@@ -283,8 +281,7 @@ standardization of scientific software development, thus addressing
 many (if not all) core problems with scientific software development
 everyone likes to bash about (reproducibility, longevity, etc.).
 
-Adequately reference core libraries
------------------------------------
+### Adequately reference core libraries
 
 **Problem**: Scientific software often, if not always, uses 3rd party
 libraries (e.g., NumPy, SciPy, atlas) which might not even be visible
@@ -303,8 +300,7 @@ making new methodological developments readily available to even wider
 audiences without proliferation of the low quality scientific software.
 
 
-Similar/related projects
-========================
+## Similar/related projects
 
 [sempervirens](https://github.com/njsmith/sempervirens) -- *an
 experimental prototype for gathering anonymous, opt-in usage data for
@@ -312,8 +308,7 @@ open scientific software*.  Eventually in duecredit we aim either to
 provide similar functionality (since we are collecting such
 information as well) or just interface/report to sempervirens.
 
-Currently used by
-=================
+## Currently used by
 
 This is a running list of projects that use DueCredit natively. If you
 are using DueCredit, or plan to use it, please consider sending a pull
