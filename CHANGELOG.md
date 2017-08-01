@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.6.3](https://github.com/duecredit/duecredit/tree/0.6.3) (2017-08-01)
+
+  Fixed a bug disallowing installation of duecredit in environments with
+  crippled/too-basic locale setting.
+
 ## [0.6.2](https://github.com/duecredit/duecredit/tree/0.6.2) (2017-06-23)
 
 - Testing was converted to pytest
