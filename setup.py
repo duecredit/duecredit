@@ -66,8 +66,16 @@ except OSError as e:
         __version__ = '0.0.0.dev'
 print("Version: %s" % __version__)
 
-with open('README.md') as file:
-    README = file.read()
+# In some environments with too basic locale settings
+# it might not be able to read the file with unicode, so we
+# would then just ignore the errors
+with open('README.md', 'rb') as f:
+    README = f.read()
+    # We need to decode it reliably
+    try:
+        README = README.decode()
+    except UnicodeDecodeError:
+        README = README.decode('ascii', errors='replace')
 
 def find_packages(path, prefix):
     yield prefix
