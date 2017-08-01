@@ -1,5 +1,5 @@
-duecredit
-=========
+# duecredit
+
 
 [![Build Status](https://travis-ci.org/duecredit/duecredit.svg?branch=master)](https://travis-ci.org/duecredit/duecredit)
 [![Coverage Status](https://coveralls.io/repos/duecredit/duecredit/badge.svg)](https://coveralls.io/r/duecredit/duecredit)
@@ -15,18 +15,37 @@ level of reference detail, i.e. only references for actually used
 functionality will be presented back if software provides multiple
 citeable implementations.
 
-![Example](examples/duecredit_example.gif)
+## Installation
 
-duecredit 101
-=============
+Duecredit is easy to install via pip, simply type:
+ 
+ `pip install duecredit`
+
+## Examples
+
+### To cite the modules you are using 
 
 You can already start "registering" citations using duecredit in your
 Python modules and even registering citations (we call this approach "injections")
 for modules which do not (yet) use duecredit.  duecredit will remain an optional
 dependency, i.e. your software will work correctly even without duecredit installed.
 
-"Native" use of duecredit (recommended)
----------------------------------------
+For example, list of references to the modules `yourproject` uses ca be produced with few simple commands:
+```bash
+cd /path/to/yourmodule # for ~/yourproject
+cd yourproject # change directory into where the main code base is
+python -m duecredit yourproject.py
+```
+Or you can also them in BibTex format, using:
+```bash
+duecredit summary --format=bibtex
+```
+See this gif animation for better illustration:
+![Example](examples/duecredit_example.gif)
+
+
+### To let others cite your software
+
 
 For using duecredit in your software
 
@@ -53,6 +72,8 @@ For using duecredit in your software
          def pushit():
              ...
 
+    You can easily obtain DOI for your software using Zenodo.org and few other DOI providers.
+
 References can also be entered as BibTeX entries
 
         due.cite(BibTeX("""
@@ -64,9 +85,13 @@ References can also be entered as BibTeX entries
                 """), 
                 description="Solves all your problems", path="magicpy")
         
+## Now what
         
-Add injections for other existing modules
------------------------------------------
+### Do the due
+
+Once you obtained the references in the duecredit output, include them in in the references section of your paper or software, which used the cited software.
+        
+### Add injections for other existing modules
 
 We hope that eventually this somewhat cruel approach will not be necessary.  But
 until other packages support duecredit "natively" we have provided a way to "inject"
