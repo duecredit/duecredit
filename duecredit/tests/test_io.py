@@ -534,10 +534,17 @@ def test_format_bibtex_with_utf_characters():
     """
     test that we can correctly parse bibtex entry if it contains utf-8 characters
     """
-    # this was fetched on 2017-07-23
-    bibtex_utf8 = import_doi('10.5281/zenodo.60847').replace("Brett", u"Brótt")
-    # there's more unicode characters inside the bibtex file for this doi
-    # but we put them also in the beginning for extra testing
+    # this was fetched on 2017-08-16
+    # replaced Brett with Brótt to have utf-8 characters in first author's name as well
+    bibtex_utf8 = u"@misc{https://doi.org/10.5281/zenodo.60847,\n  doi = {10.5281/zenodo.60847},\n  url = {" \
+                  u"http://zenodo.org/record/60847},\n  author = {Brótt, Matthew and Hanke, Michael and Cipollini, " \
+                  u"Ben and {Marc-Alexandre Côté} and Markiewicz, Chris and Gerhard, Stephan and Larson, " \
+                  u"Eric and Lee, Gregory R. and Halchenko, Yaroslav and Kastman, Erik and {Cindeem} and Morency, " \
+                  u"Félix C. and {Moloney} and Millman, Jarrod and Rokem, Ariel and {Jaeilepp} and Gramfort, " \
+                  u"Alexandre and Bosch, Jasper J.F. Van Den and {Krish Subramaniam} and Nichols, Nolan and {Embaker} " \
+                  u"and {Bpinsard} and {Chaselgrove} and Oosterhof, Nikolaas N. and St-Jean, Samuel and {Bago " \
+                  u"Amirbekian} and Nimmo-Smith, Ian and {Satrajit Ghosh}},\n  keywords = {},\n  title = {nibabel " \
+                  u"2.0.1},\n  publisher = {Zenodo},\n  year = {2015}\n} "
     assert (format_bibtex(BibTeX(bibtex_utf8)) == u'Brótt, M. et al., 2015. nibabel 2.0.1.')
 
 
