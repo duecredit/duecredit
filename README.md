@@ -23,14 +23,14 @@ Duecredit is easy to install via pip, simply type:
 
 ## Examples
 
-### To cite the modules you are using 
+### To cite the modules and methods you are using 
 
 You can already start "registering" citations using duecredit in your
 Python modules and even registering citations (we call this approach "injections")
 for modules which do not (yet) use duecredit.  duecredit will remain an optional
 dependency, i.e. your software will work correctly even without duecredit installed.
 
-For example, list of references to the modules `yourproject` uses ca be produced with few simple commands:
+For example, list citations of the modules and methods `yourproject` uses with few simple commands:
 ```bash
 cd /path/to/yourmodule # for ~/yourproject
 cd yourproject # change directory into where the main code base is
