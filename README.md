@@ -1,5 +1,5 @@
-duecredit
-=========
+# duecredit
+
 
 [![Build Status](https://travis-ci.org/duecredit/duecredit.svg?branch=master)](https://travis-ci.org/duecredit/duecredit)
 [![Coverage Status](https://coveralls.io/repos/duecredit/duecredit/badge.svg)](https://coveralls.io/r/duecredit/duecredit)
@@ -15,18 +15,37 @@ level of reference detail, i.e. only references for actually used
 functionality will be presented back if software provides multiple
 citeable implementations.
 
-![Example](examples/duecredit_example.gif)
+## Installation
 
-duecredit 101
-=============
+Duecredit is easy to install via pip, simply type:
+ 
+ `pip install duecredit`
+
+## Examples
+
+### To cite the modules and methods you are using 
 
 You can already start "registering" citations using duecredit in your
 Python modules and even registering citations (we call this approach "injections")
 for modules which do not (yet) use duecredit.  duecredit will remain an optional
 dependency, i.e. your software will work correctly even without duecredit installed.
 
-"Native" use of duecredit (recommended)
----------------------------------------
+For example, list citations of the modules and methods `yourproject` uses with few simple commands:
+```bash
+cd /path/to/yourmodule # for ~/yourproject
+cd yourproject # change directory into where the main code base is
+python -m duecredit yourproject.py
+```
+Or you can also them in BibTex format, using:
+```bash
+duecredit summary --format=bibtex
+```
+See this gif animation for better illustration:
+![Example](examples/duecredit_example.gif)
+
+
+### To let others cite your software
+
 
 For using duecredit in your software
 
@@ -53,6 +72,8 @@ For using duecredit in your software
          def pushit():
              ...
 
+    You can easily obtain DOI for your software using Zenodo.org and few other DOI providers.
+
 References can also be entered as BibTeX entries
 
         due.cite(BibTeX("""
@@ -64,9 +85,13 @@ References can also be entered as BibTeX entries
                 """), 
                 description="Solves all your problems", path="magicpy")
         
+## Now what
         
-Add injections for other existing modules
------------------------------------------
+### Do the due
+
+Once you obtained the references in the duecredit output, include them in in the references section of your paper or software, which used the cited software.
+        
+### Add injections for other existing modules
 
 We hope that eventually this somewhat cruel approach will not be necessary.  But
 until other packages support duecredit "natively" we have provided a way to "inject"
@@ -82,8 +107,7 @@ which will in turn add those entries to the duecredit whenever the
 corresponding module gets imported.
 
 
-User-view
----------
+## User-view
 
 
 By default `duecredit` does exactly nothing -- all decorators do not
@@ -209,8 +233,8 @@ an uncited function from that package.
     [3] Sneath, P.H. & Sokal, R.R., 1962. Numerical taxonomy. Nature, 193(4818), pp.855–860.
     ...
 
-Tags
-====
+## Tags
+
 
 You are welcome to introduce new tags specific for your citations but we hope
 that for consistency across projects, you would use following tags
@@ -234,11 +258,10 @@ that for consistency across projects, you would use following tags
   for a given functionality implementation and/or method development
 - `dataset` - for datasets
 
-Ultimate goals
-==============
+## Ultimate goals
 
-Reduce demand for prima ballerina projects
-------------------------------------------
+
+### Reduce demand for prima ballerina projects
 
 **Problem**: Scientific software is often developed to gain citations for
 original publication through the use of the software implementing it.
@@ -258,8 +281,7 @@ standardization of scientific software development, thus addressing
 many (if not all) core problems with scientific software development
 everyone likes to bash about (reproducibility, longevity, etc.).
 
-Adequately reference core libraries
------------------------------------
+### Adequately reference core libraries
 
 **Problem**: Scientific software often, if not always, uses 3rd party
 libraries (e.g., NumPy, SciPy, atlas) which might not even be visible
@@ -278,8 +300,7 @@ making new methodological developments readily available to even wider
 audiences without proliferation of the low quality scientific software.
 
 
-Similar/related projects
-========================
+## Similar/related projects
 
 [sempervirens](https://github.com/njsmith/sempervirens) -- *an
 experimental prototype for gathering anonymous, opt-in usage data for
@@ -287,8 +308,7 @@ open scientific software*.  Eventually in duecredit we aim either to
 provide similar functionality (since we are collecting such
 information as well) or just interface/report to sempervirens.
 
-Currently used by
-=================
+## Currently used by
 
 This is a running list of projects that use DueCredit natively. If you
 are using DueCredit, or plan to use it, please consider sending a pull
