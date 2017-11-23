@@ -36,7 +36,7 @@ cd /path/to/yourmodule # for ~/yourproject
 cd yourproject # change directory into where the main code base is
 python -m duecredit yourproject.py
 ```
-Or you can also them in BibTex format, using:
+Or you can also display them in BibTex format, using:
 ```bash
 duecredit summary --format=bibtex
 ```
@@ -49,7 +49,7 @@ See this gif animation for better illustration:
 
 For using duecredit in your software
 
-1. copy `duecredit/stub.py` to your codebase, e.g.
+1. Copy `duecredit/stub.py` to your codebase, e.g.
 
         wget -q -O /path/tomodule/yourmodule/due.py \
           https://raw.githubusercontent.com/duecredit/duecredit/master/duecredit/stub.py
@@ -62,11 +62,11 @@ For using duecredit in your software
 
         from .due import due, Doi, BibTeX
 
-     to provide reference for the entire module just use e.g.
+     To provide reference for the entire module just use e.g.
 
          due.cite(Doi("1.2.3/x.y.z"), description="Solves all your problems", path="magicpy")
 
-     To provide a reference for a function or a method, use dcite decorator
+     To provide a reference for a function or a method, use `dcite` decorator
 
          @due.dcite(Doi("1.2.3/x.y.z"), description="Resolves constipation issue")
          def pushit():
@@ -93,14 +93,14 @@ Once you obtained the references in the duecredit output, include them in in the
         
 ### Add injections for other existing modules
 
-We hope that eventually this somewhat cruel approach will not be necessary.  But
+We hope that eventually this somewhat cruel approach will not be necessary. But
 until other packages support duecredit "natively" we have provided a way to "inject"
-citations for modules and/or functions and methods via injections:  citations will be
+citations for modules and/or functions and methods via injections: citations will be
 added to the corresponding functionality upon those modules import.
 
 All injections are collected under
 [duecredit/injections](https://github.com/duecredit/duecredit/tree/master/duecredit/injections).
-See any file there with `mod_` prefix for a complete example.  But
+See any file there with `mod_` prefix for a complete example. But
 overall it is just a regular Python module defining a function
 `inject(injector)` which will then add new entries to the injector,
 which will in turn add those entries to the duecredit whenever the
@@ -177,7 +177,7 @@ ready for reuse, e.g.:
 
 and if by default only references for "implementation" are listed, we
 can enable listing of references for other tags as well (e.g. "edu"
-depicting instructional materials -- textbooks etc on the topic):
+depicting instructional materials -- textbooks etc. on the topic):
 
     $> DUECREDIT_REPORT_TAGS=* duecredit summary
     
