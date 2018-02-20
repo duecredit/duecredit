@@ -54,7 +54,7 @@ def import_doi(doi, sleep=0.5, retries=10):
 
     # else -- fetch it
     headers = {'Accept': 'application/x-bibtex; charset=utf-8'}
-    url = 'http://dx.doi.org/' + doi
+    url = 'https://doi.org/' + doi
     while retries > 0:
         r = requests.get(url, headers=headers)
         r.encoding = 'UTF-8'

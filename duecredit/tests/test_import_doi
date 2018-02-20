@@ -7,7 +7,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [python-requests/2.8.1]
     method: GET
-    uri: http://dx.doi.org/10.1038/nrd842
+    uri: https://doi.org/10.1038/nrd842
   response:
     body: {string: !!python/unicode '<html><head><title>Handle Redirect</title></head>
 
@@ -32,7 +32,7 @@ interactions:
     uri: http://data.crossref.org/10.1038%2Fnrd842
   response:
     body: {string: !!python/unicode "@article{Atkins_2002,\n\tdoi = {10.1038/nrd842},\n\turl
-        = {http://dx.doi.org/10.1038/nrd842},\n\tyear = 2002,\n\tmonth = {jul},\n\tpublisher
+        = {https://doi.org/10.1038/nrd842},\n\tyear = 2002,\n\tmonth = {jul},\n\tpublisher
         = {Nature Publishing Group},\n\tvolume = {1},\n\tnumber = {7},\n\tpages =
         {491--492},\n\tauthor = {Joshua H. Atkins and Leland J. Gershell},\n\ttitle
         = {From the analyst{\\textquotesingle}s couch: Selective anticancer drugs},\n\tjournal
@@ -45,7 +45,7 @@ interactions:
       content-length: ['390']
       content-type: [application/x-bibtex]
       date: ['Wed, 04 May 2016 18:52:40 GMT']
-      link: ['<http://dx.doi.org/10.1038/nrd842>; rel="canonical"']
+      link: ['<https://doi.org/10.1038/nrd842>; rel="canonical"']
       server: [http-kit]
     status: {code: 200, message: OK}
 - request:
@@ -56,7 +56,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [python-requests/2.8.1]
     method: GET
-    uri: http://dx.doi.org/fasljfdldaksj
+    uri: https://doi.org/fasljfdldaksj
   response:
     body: {string: !!python/unicode "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0
         Transitional//EN\"\n        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html>\n<head>\n<title>Error:
@@ -134,7 +134,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [python-requests/2.8.1]
     method: GET
-    uri: http://dx.doi.org/fasljfdldaksj
+    uri: https://doi.org/fasljfdldaksj
   response:
     body: {string: !!python/unicode "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0
         Transitional//EN\"\n        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html>\n<head>\n<title>Error:
@@ -212,7 +212,7 @@ interactions:
       Connection: [keep-alive]
       User-Agent: [python-requests/2.8.1]
     method: GET
-    uri: http://dx.doi.org/10.5281/zenodo.50186
+    uri: https://doi.org/10.5281/zenodo.50186
   response:
     body: {string: !!python/unicode '<html><head><title>Handle Redirect</title></head>
 
@@ -237,7 +237,7 @@ interactions:
     uri: http://data.datacite.org/10.5281%2Fzenodo.50186
   response:
     body: {string: !!python/unicode "@data{3835635f-efca-4ec0-949d-7fb5770ec4cb,\n
-        \ doi = {10.5281/zenodo.50186},\n  url = {http://dx.doi.org/10.5281/zenodo.50186},\n
+        \ doi = {10.5281/zenodo.50186},\n  url = {https://doi.org/10.5281/zenodo.50186},\n
         \ author = {Satrajit Ghosh; Chris Filo Gorgolewski; Oscar Esteban; Erik Ziegler;
         David Ellis; cindeem; Michael Waskom; Dav Clark; Michael; Fred Loney; Alexandre
         M. S.; Michael Notter; Hans Johnson; Anisha Keshavan; Yaroslav Halchenko;
