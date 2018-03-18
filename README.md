@@ -324,5 +324,6 @@ request and add your project to this list. Thanks to
 - [pybids](https://github.com/INCF/pybids)
 - [Quickshear](https://github.com/nipy/quickshear)
 - [meqc](https://github.com/emdupre/meqc)
+- [MDAnalysis](https://www.mdanalysis.org)
 
 Last updated 2017-06-27.
