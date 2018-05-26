@@ -444,7 +444,7 @@ class DueCreditCollector(object):
 class CollectorSummary(object):
     """A helper which would take care about exporting citations upon its Death
     """
-    def __init__(self, collector, outputs="stdout,pickle", fn=DUECREDIT_FILE):
+    def __init__(self, collector, outputs="stderr,pickle", fn=DUECREDIT_FILE):
         self._due = collector
         self.fn = fn
         # for now decide on output "format" right here
