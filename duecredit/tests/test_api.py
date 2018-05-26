@@ -163,7 +163,6 @@ def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_e
         monkeypatch.setitem(os.environ, key, fake_env_nolxml_[key])
 
     ret, out, err = run_python_command(**kwargs)
-    assert err == ''
     if os.environ.get('DUECREDIT_ENABLE', False) and on_windows:  # TODO this test fails on windows
         pytest.xfail("Fails for some reason on Windows")
     elif os.environ.get('DUECREDIT_ENABLE', False):  # we enabled duecredit
@@ -174,7 +173,7 @@ def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_e
         else:
             # there was nothing to format so we did not fail for no reason
             assert 'For formatted output we need citeproc' not in out
-            assert '0 packages cited' in out
+            assert '0 packages cited' in err
         assert 'done123' in out
     elif os.environ.get('DUECREDIT_TEST_EARLY_IMPORT_ERROR'):
         assert 'ImportError' in out
