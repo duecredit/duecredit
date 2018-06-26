@@ -1,6 +1,29 @@
 # Change Log
 
-## [0.6.0](https://github.com/duecredit/duecredit/tree/0.6.0) (2016-06-16)
+## [0.6.4](https://github.com/duecredit/duecredit/tree/0.6.4) (2018-06-25)
+
+- Added doi to numpy injection
+- Minor tune-ups to the docs
+
+## [0.6.3](https://github.com/duecredit/duecredit/tree/0.6.3) (2017-08-01)
+
+  Fixed a bug disallowing installation of duecredit in environments with
+  crippled/too-basic locale setting.
+
+## [0.6.2](https://github.com/duecredit/duecredit/tree/0.6.2) (2017-06-23)
+
+- Testing was converted to pytest
+- Various enhancements in supporting python3 and BiBTeX with utf-8
+- New tag 'dataset' to describe datasets
+
+## [0.6.1](https://github.com/duecredit/duecredit/tree/0.6.1) (2016-07-09)
+[Full Changelog](https://github.com/duecredit/duecredit/compare/0.6.0...0.6.1)
+
+**Merged pull requests:**
+
+- ENH: workaround for pages handling fixed in citeproc post 0.3.0 [\#98](https://github.com/duecredit/duecredit/pull/98) ([yarikoptic](https://github.com/yarikoptic))
+
+## [0.6.0](https://github.com/duecredit/duecredit/tree/0.6.0) (2016-06-17)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.5.0...0.6.0)
 
 **Implemented enhancements:**

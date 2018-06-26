@@ -7,37 +7,55 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-import atexit
 import sys
+import pytest
 
-from mock import patch
 from six.moves import StringIO
-from nose.tools import assert_raises, assert_equal
 
 from .. import __main__, __version__
 from .. import due
-from ..utils import with_tempfile
 
 
-@patch('sys.stdout', new_callable=StringIO)
-def test_main_help(stdout):
-    assert_raises(SystemExit, __main__.main, ['__main__.py', '--help'])
+def test_main_help(monkeypatch):
+    # Patch stdout
+    fakestdout = StringIO()
+    monkeypatch.setattr(sys, "stdout", fakestdout)
+
+    pytest.raises(SystemExit, __main__.main, ['__main__.py', '--help'])
     assert(
-        stdout.getvalue().startswith(
-        "Usage: %s -m duecredit [OPTIONS] <file> [ARGS]\n" % sys.executable
-    ))
+        fakestdout.getvalue().startswith(
+        "Usage: %s -m duecredit [OPTIONS] <file> [ARGS]\n" % sys.executable))
 
-@patch('sys.stdout', new_callable=StringIO)
-def test_main_version(stdout):
-    assert_raises(SystemExit, __main__.main, ['__main__.py', '--version'])
-    assert_equal(stdout.getvalue().rstrip(), "duecredit %s" % __version__)
 
-@patch.object(due, 'activate')
-@patch('sys.stdout', new_callable=StringIO)
-@with_tempfile(content='print("Running the script")\n'.encode())
-def test_main_run_a_script(stdout, mock_activate, f):
-    __main__.main(['__main__.py', f])
-    assert_equal(stdout.getvalue().rstrip(), "Running the script")
+def test_main_version(monkeypatch):
+    # Patch stdout
+    fakestdout = StringIO()
+    monkeypatch.setattr(sys, "stdout", fakestdout)
+
+    pytest.raises(SystemExit, __main__.main, ['__main__.py', '--version'])
+    assert fakestdout.getvalue().rstrip() == "duecredit %s" % __version__
+
+
+def test_main_run_a_script(tmpdir, monkeypatch):
+    tempfile = str(tmpdir.mkdir("sub").join("tempfile.txt"))
+    content = b'print("Running the script")\n'
+    with open(tempfile, 'wb') as f:
+        f.write(content)
+
+    # Patch stdout
+    fakestdout = StringIO()
+    monkeypatch.setattr(sys, "stdout", fakestdout)
+
+    # Patch due.activate
+    count = [0]
+
+    def count_calls(*args, **kwargs):
+        count[0] += 1
+
+    monkeypatch.setattr(due, "activate", count_calls)
+
+    __main__.main(['__main__.py', tempfile])
+    assert fakestdout.getvalue().rstrip() == "Running the script"
+
     # And we have "activated" the due
-    mock_activate.assert_called_once_with(True)
-
+    assert count[0] == 1

@@ -7,19 +7,65 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
+import os
+import sys
+import pytest
+import shutil
+
+from os.path import dirname, join as pathjoin, pardir, normpath
+from subprocess import Popen, PIPE
+
 from duecredit.collector import DueCreditCollector
 from duecredit.stub import InactiveDueCreditCollector
 from duecredit.entries import BibTeX, Doi
 
 from ..utils import on_windows
-from .utils import KnownFailure
+import tempfile
+# temporary location where stuff would be copied
+badlxml_path = pathjoin(dirname(__file__), 'envs', 'nolxml')
+stubbed_dir = tempfile.mktemp()
+stubbed_script = pathjoin(pathjoin(stubbed_dir, 'script.py'))
 
-from nose.tools import assert_equal
-from nose.tools import assert_in
-from nose import SkipTest
+
+@pytest.fixture(scope="module")
+def stubbed_env():
+    """Create stubbed module with a sample script"""
+    os.makedirs(stubbed_dir)
+    with open(stubbed_script, 'wb') as f:
+        f.write("""
+from due import due, Doi
+
+kwargs = dict(
+    entry=Doi("10.1007/s12021-008-9041-y"),
+    description="Multivariate pattern analysis of neural data",
+    tags=["use"]
+)
+
+due.cite(path="test", **kwargs)
 
 
-def _test_api(due):
+@due.dcite(**kwargs)
+def method(arg):
+    return arg+1
+
+assert method(1) == 2
+print("done123")
+""".encode())
+    # copy stub.py under stubbed
+    shutil.copy(
+        pathjoin(dirname(__file__), os.pardir, 'stub.py'),
+        pathjoin(stubbed_dir, 'due.py')
+    )
+    yield stubbed_script
+    # cleanup
+    shutil.rmtree(stubbed_dir)
+
+
+@pytest.mark.parametrize(
+    'collector_class', [DueCreditCollector, InactiveDueCreditCollector]
+)
+def test_api(collector_class):
+    due = collector_class()
     # add references
     due.add(BibTeX('@article{XXX00, ...}'))
     # could even be by DOI -- we need to fetch and cache those
@@ -30,7 +76,7 @@ def _test_api(due):
 
     # Cite entire module
     due.cite('XXX00', description="Answers to existential questions", path="module")
-    # Cita some method within some submodule
+    # Cite some method within some submodule
     due.cite('XXX01', description="More answers to existential questions",
              path="module.submodule:class1.whoknowswhat2.func1")
 
@@ -41,102 +87,104 @@ def _test_api(due):
         return None
 
     class Child(object):
-         # Conception process is usually way too easy to be referenced
-         def __init__(self):
-             pass
+        # Conception process is usually way too easy to be referenced
+        def __init__(self):
+            pass
 
-         # including functionality within/by the methods
-         @due.dcite('XXX00')
-         def birth(self, gender):
-             return "Rachel was born"
+        # including functionality within/by the methods
+        @due.dcite('XXX00')
+        def birth(self, gender):
+            return "Rachel was born"
 
     kid = Child()
     kid.birth("female")
 
 
-def test_api():
-    yield _test_api, DueCreditCollector()
-    yield _test_api, InactiveDueCreditCollector()
-
-import os
-import sys
-from os.path import dirname, join as pathjoin, pardir, normpath
-from mock import patch
-from subprocess import Popen, PIPE
-
-badlxml_path = pathjoin(dirname(__file__), 'envs', 'nolxml')
-stubbed_script = pathjoin(dirname(__file__), 'envs', 'stubbed', 'script.py')
-
 def run_python_command(cmd=None, script=None):
     """Just a tiny helper which runs command and returns exit code, stdout, stderr"""
-    assert(bool(cmd) != bool(script))  # one or another, not both
+    assert bool(cmd) != bool(script)  # one or another, not both
     args = ['-c', cmd] if cmd else [script]
-    python = Popen([sys.executable] + args, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = python.communicate()  # wait()
-    ret = python.poll()
-    return ret, stdout.decode(), stderr.decode()
-
-mock_env_nolxml = {'PYTHONPATH': "%s:%s" % (badlxml_path, os.environ.get('PYTHONPATH', ''))}
+    try:
+        # run script from some temporary directory so we do not breed .duecredit.p
+        # in current directory
+        tmpdir = tempfile.mkdtemp()
+        python = Popen([sys.executable] + args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
+        stdout, stderr = python.communicate()  # wait()
+        ret = python.poll()
+    finally:
+        shutil.rmtree(tmpdir)
+    # TODO stdout cannot decode on Windows special character /x introduced
+    return ret, stdout.decode(errors='ignore'), stderr.decode()
 
 
 # Since duecredit and possibly lxml already loaded, let's just test
 # ability to import in absence of lxml via external call to python
-def test_noincorrect_import_if_no_lxml():
+def test_noincorrect_import_if_no_lxml(monkeypatch):
     if on_windows:
-        raise KnownFailure("Fails for some reason on Windows")
-    with patch.dict(os.environ, mock_env_nolxml):
-        # make sure out mocking works here
-        ret, out, err = run_python_command('import lxml')
-        assert_equal(ret, 1)
-        assert_in('ImportError', err)
-        #
-        # make sure out mocking works here
-        ret, out, err = run_python_command('import duecredit')
-        assert_equal(err, '')
-        assert_equal(out, '')
-        assert_equal(ret, 0)
+        pytest.xfail("Fails for some reason on Windows")
+
+    monkeypatch.setitem(os.environ, 'PYTHONPATH', "%s:%s" % (badlxml_path, os.environ.get('PYTHONPATH', '')))
+    ret, out, err = run_python_command('import lxml')
+    assert ret == 1
+    assert 'ImportError' in err
+
+    ret, out, err = run_python_command('import duecredit')
+    assert err == ''
+    assert out == ''
+    assert ret == 0
 
 
-def check_noincorrect_import_if_no_lxml_numpy(kwargs, env):
+@pytest.mark.parametrize(
+    "env", [{},
+            {'DUECREDIT_ENABLE': 'yes'},
+            {'DUECREDIT_ENABLE': 'yes', 'DUECREDIT_REPORT_TAGS' :'*'},
+            {'DUECREDIT_TEST_EARLY_IMPORT_ERROR': 'yes'}
+            ])
+@pytest.mark.parametrize(
+    "kwargs", [
+        # direct command to evaluate
+        {'cmd': 'import duecredit; import numpy as np; print("done123")'},
+        # script with decorated funcs etc -- should be importable
+        {'script': stubbed_script}
+    ])
+def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_env):
     # Now make sure that we would not crash entire process at the end when unable to
     # produce sensible output when we have something to cite
     # we do inject for numpy
     try:
         import numpy
     except ImportError:
-        raise SkipTest("We need to have numpy to test correct operation")
+        pytest.skip("We need to have numpy to test correct operation")
 
-    mock_env_nolxml_ = mock_env_nolxml.copy()
-    mock_env_nolxml_.update(env)
+    fake_env_nolxml_ = {'PYTHONPATH': "%s:%s" % (badlxml_path, os.environ.get('PYTHONPATH', ''))}.copy()
+    fake_env_nolxml_.update(env)
 
-    with patch.dict(os.environ, mock_env_nolxml_):
-        ret, out, err = run_python_command(**kwargs)
-        assert_equal(err, '')
-        if os.environ.get('DUECREDIT_ENABLE', False):  # we enabled duecredit
-            assert_in('For formatted output we need citeproc', out)
-            assert_in('done123', out)
-        elif os.environ.get('DUECREDIT_TEST_EARLY_IMPORT_ERROR'):
-            assert_in('ImportError', out)
-            assert_in('DUECREDIT_TEST_EARLY_IMPORT_ERROR', out)
-            assert_in('done123', out)
+    for key in fake_env_nolxml_:
+        monkeypatch.setitem(os.environ, key, fake_env_nolxml_[key])
+
+    ret, out, err = run_python_command(**kwargs)
+    assert err == ''
+    if os.environ.get('DUECREDIT_ENABLE', False) and on_windows:  # TODO this test fails on windows
+        pytest.xfail("Fails for some reason on Windows")
+    elif os.environ.get('DUECREDIT_ENABLE', False):  # we enabled duecredit
+        if (os.environ.get('DUECREDIT_REPORT_TAGS', None) == '*' and kwargs.get('script')) \
+            or 'numpy' in kwargs.get('cmd', ''):
+            # we requested to have all tags output, and used bibtex in our entry
+            assert 'For formatted output we need citeproc' in out
         else:
-            assert_equal('done123\n', out)
-        assert_equal(ret, 0)  # but we must not fail overall regardless
-
-
-def test_noincorrect_import_if_no_lxml_numpy():
-    for kwargs in (
-        # direct command to evaluate
-        {'cmd': 'import duecredit; import numpy as np; print("done123")'},
-        # script with decorated funcs etc -- should be importable
-        {'script': stubbed_script}
-    ):
-        yield check_noincorrect_import_if_no_lxml_numpy, kwargs, {}
-        yield check_noincorrect_import_if_no_lxml_numpy, kwargs, {'DUECREDIT_ENABLE': 'yes'}
-        yield check_noincorrect_import_if_no_lxml_numpy, kwargs, {'DUECREDIT_TEST_EARLY_IMPORT_ERROR': 'yes'}
-
+            # there was nothing to format so we did not fail for no reason
+            assert 'For formatted output we need citeproc' not in out
+            assert '0 packages cited' in out
+        assert 'done123' in out
+    elif os.environ.get('DUECREDIT_TEST_EARLY_IMPORT_ERROR'):
+        assert 'ImportError' in out
+        assert 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in out
+        assert 'done123' in out
+    else:
+        assert 'done123\n' or 'done123\r\n' == out
+    assert ret == 0  # but we must not fail overall regardless
 
 
 if __name__ == '__main__':
     from duecredit import due
-    _test_api(due)
+    test_api(due)

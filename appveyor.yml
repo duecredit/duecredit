@@ -35,13 +35,13 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - "conda create -q -n test-environment python=%PYTHON_VERSION% mock contextlib2 nose coverage requests six"
+  - "conda create -q -n test-environment python=%PYTHON_VERSION% contextlib2 pytest coverage requests six"
   - activate test-environment
   - pip install -r requirements.txt
   - pip install -e .
 
 test_script:
-  - nosetests --with-doctest -v duecredit
+  - coverage run --source duecredit -m py.test
   - python setup.py install
 
 # for interactive debugging upon completion (have 30 min to react)
