@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.6.4](https://github.com/duecredit/duecredit/tree/0.6.4) (2018-06-25)
+
+- Added doi to numpy injection
+- Minor tune-ups to the docs
+
 ## [0.6.3](https://github.com/duecredit/duecredit/tree/0.6.3) (2017-08-01)
 
   Fixed a bug disallowing installation of duecredit in environments with
