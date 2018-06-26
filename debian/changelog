@@ -1,6 +1,8 @@
 duecredit (0.6.4-1) unstable; urgency=medium
 
   * Fresh upstream release
+  * debian/control
+    - upstream uses pytest now instead of nose
 
  -- Yaroslav Halchenko <debian@onerussian.com>  Tue, 26 Jun 2018 12:04:52 -0400
 
