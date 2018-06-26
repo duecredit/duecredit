@@ -34,10 +34,6 @@ def _get_active_due():
     from .config import CACHE_DIR, DUECREDIT_FILE
     from duecredit.collector import CollectorSummary, DueCreditCollector
     from .io import load_due
-    import atexit
-    # where to cache bibtex entries
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
 
     # TODO:  this needs to move to atexit handling, that we load previous
     # one and them merge with new ones.  Informative bits could be -- how
@@ -73,16 +69,23 @@ class DueSwitch(object):
         return self.__active
 
     @never_fail
-    def _dump_collector_summary(self):
+    def dump(self, **kwargs):
+        """Dumps summary of the citations
+
+        Parameters
+        ----------
+        **kwargs: dict
+           Passed to `CollectorSummary` constructor.
+        """
         from duecredit.collector import CollectorSummary
-        due_summary = CollectorSummary(self.__collectors[True])
+        due_summary = CollectorSummary(self.__collectors[True], **kwargs)
         due_summary.dump()
 
     def __prepare_exit_and_injections(self):
         # Wrapper to create and dump summary... passing method doesn't work:
         #  probably removes instance too early
 
-        atexit.register(self._dump_collector_summary)
+        atexit.register(self.dump)
 
         # Deal with injector
         from .injections import DueCreditInjector
@@ -97,7 +100,7 @@ class DueSwitch(object):
             is_public = lambda x: not x.startswith('_')
             # Clean up current bindings first
             for k in filter(is_public, dir(self)):
-                if k not in ('activate', 'active'):
+                if k not in ('activate', 'active', 'dump'):
                     delattr(self, k)
 
             new_due = self.__collectors[activate]

@@ -66,8 +66,16 @@ except OSError as e:
         __version__ = '0.0.0.dev'
 print("Version: %s" % __version__)
 
-with open('README.md') as file:
-    README = file.read()
+# In some environments with too basic locale settings
+# it might not be able to read the file with unicode, so we
+# would then just ignore the errors
+with open('README.md', 'rb') as f:
+    README = f.read()
+    # We need to decode it reliably
+    try:
+        README = README.decode()
+    except UnicodeDecodeError:
+        README = README.decode('ascii', errors='replace')
 
 def find_packages(path, prefix):
     yield prefix
@@ -82,17 +90,15 @@ setup(
     version=__version__,
     packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
     scripts=[],
-    install_requires=['requests', 'citeproc-py', 'six'],
+    install_requires=['requests', 'citeproc-py>=0.4', 'six'],
     extras_require={
         'tests': [
-            'mock',
-            'nose>=1.3.4',
+            'pytest',
             'vcrpy', 'contextlib2'
         ]
     },
     include_package_data=True,
     provides=[PACKAGE],
-    #test_suite='nose.collector',
     entry_points={
         'console_scripts': [
              'duecredit=duecredit.cmdline.main:main',

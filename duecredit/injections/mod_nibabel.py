@@ -10,7 +10,7 @@
 """
 
 
-from ..entries import Url
+from ..entries import Doi
 
 # If defined, would determine from which to which version of the corresponding
 # module to care about
@@ -19,6 +19,8 @@ max_version = None
 
 
 def inject(injector):
-    injector.add('nibabel', None, Url('http://nipy.org/nibabel'),
-                 description="Access a cacophony of neuro-imaging file formats", 
+    injector.add('nibabel', None,
+                 Doi('10.5281/zenodo.60847'),
+                 cite_module=True,
+                 description="I/O library to access to common neuroimaging file formats",
                  tags=['implementation'])

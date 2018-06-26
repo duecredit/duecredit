@@ -12,6 +12,7 @@ import os
 if 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in os.environ.keys():
     raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
 
+import re
 import locale
 import time
 from collections import defaultdict, Iterator
@@ -22,15 +23,22 @@ import requests
 import tempfile
 from six import PY2, itervalues, iteritems
 import warnings
+import platform
+from time import sleep
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi
 from .log import lgr
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
+platform_system = platform.system().lower()
+on_windows = platform_system == 'windows'
 
 
 def get_doi_cache_file(doi):
+    # where to cache bibtex entries
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
     return os.path.join(CACHE_DIR, doi)
 
 
@@ -95,7 +103,7 @@ class Output(object):
         """Given all the citations, filter only those that the user wants and
         those that were actually used"""
         if not tags:
-            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
+            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation,dataset').split(',')
         if all_ is None:
             # consult env var
             all_ = os.environ.get('DUECREDIT_REPORT_ALL', '').lower() in {'1', 'true', 'yes', 'on'}
@@ -240,6 +248,30 @@ def get_bibtex_rendering(entry):
         raise ValueError("Have no clue how to get bibtex out of %s" % entry)
 
 
+def condition_bibtex(bibtex):
+    """Given a bibtex entry, "condition" it for processing with citeproc
+
+    Primarily a set of workarounds for either non-standard BibTeX entries
+    or citeproc bugs
+    """
+    # XXX: workaround atm to fix zenodo bibtexs, convert @data to @misc
+    # and also ; into and
+    if bibtex.startswith('@data'):
+        bibtex = bibtex.replace('@data', '@misc', 1)
+        bibtex = bibtex.replace(';', ' and')
+    bibtex = bibtex.replace(u'\u2013', '--') + "\n"
+    # workaround for citeproc 0.3.0 failing to parse a single page pages field
+    # as for BIDS paper.  Workaround to add trailing + after pages number
+    # related issue asking for a new release: https://github.com/brechtm/citeproc-py/issues/72
+    bibtex = re.sub(r'(pages\s*=\s*["{]\d+)(["}])', r'\1+\2', bibtex)
+    # partial workaround for citeproc failing to parse page numbers when they contain non-numeric characters
+    # remove opening letter, e.g. 'S123' -> '123'
+    # related issue: https://github.com/brechtm/citeproc-py/issues/74
+    bibtex = re.sub(r'(pages\s*=\s*["{])([a-zA-Z])', r'\g<1>', bibtex)
+    bibtex = bibtex.encode('utf-8')
+    return bibtex
+
+
 def format_bibtex(bibtex_entry, style='harvard1'):
     try:
         from citeproc.source.bibtex import BibTeX as cpBibTeX
@@ -249,27 +281,30 @@ def format_bibtex(bibtex_entry, style='harvard1'):
             "For formatted output we need citeproc and all of its dependencies "
             "(such as lxml) but there is a problem while importing citeproc: %s"
             % str(e))
+    decode_exceptions = UnicodeDecodeError
+    try:
+        from citeproc.source.bibtex.bibparse import BibTeXDecodeError
+        decode_exceptions = (decode_exceptions, BibTeXDecodeError)
+    except ImportError:
+        # this version doesn't yet have this exception defined
+        pass
     key = bibtex_entry.get_key()
     # need to save it temporarily to use citeproc-py
     fname = tempfile.mktemp(suffix='.bib')
     try:
-        with open(fname, 'wt') as f:
-            bibtex = bibtex_entry.rawentry
-            # XXX: workaround atm to fix zenodo bibtexs, convert @data to @misc
-            # and also ; into and
-            if bibtex.startswith('@data'):
-                bibtex = bibtex.replace('@data', '@misc', 1)
-                bibtex = bibtex.replace(';', ' and')
-            bibtex = bibtex.replace(u'\u2013', '--') + "\n"
-            # TODO: manage to save/use UTF-8
-            if PY2:
-                bibtex = bibtex.encode('ascii', 'ignore')
-            f.write(bibtex)
+        with open(fname, 'wb') as f:
+            f.write(condition_bibtex(bibtex_entry.rawentry))
         # We need to avoid cpBibTex spitting out warnings
         old_filters = warnings.filters[:]  # store a copy of filters
         warnings.simplefilter('ignore', UserWarning)
         try:
-            bib_source = cpBibTeX(fname)
+            try:
+                bib_source = cpBibTeX(fname)
+            except decode_exceptions as e:
+                # So .bib must be having UTF-8 characters.  With
+                # a recent (not yet released past v0.3.0-68-g9800dad
+                # we should be able to provide encoding argument
+                bib_source = cpBibTeX(fname, encoding='utf-8')
         except Exception as e:
             lgr.error("Failed to process BibTeX file %s: %s" % (fname, e))
             return "ERRORED: %s" % str(e)
@@ -284,7 +319,17 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         bibliography.register(citation)
     finally:
         if not os.environ.get("DUECREDIT_KEEPTEMP"):
-            os.unlink(fname)
+            exceptions = (OSError, WindowsError) if on_windows else OSError
+            for i in range(50):
+                try:
+                    os.unlink(fname)
+                except exceptions:
+                    if i < 49:
+                        sleep(0.1)
+                        continue
+                    else:
+                        raise
+                break
 
     biblio_out = bibliography.bibliography()
     assert(len(biblio_out) == 1)
