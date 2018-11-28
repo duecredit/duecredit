@@ -19,7 +19,6 @@ from collections import defaultdict, Iterator
 import copy
 from os.path import dirname, exists
 import pickle
-import requests
 import tempfile
 from six import PY2, itervalues, iteritems
 import warnings
@@ -43,6 +42,7 @@ def get_doi_cache_file(doi):
 
 
 def import_doi(doi, sleep=0.5, retries=10):
+    import requests
     cached = get_doi_cache_file(doi)
 
     if exists(cached):
