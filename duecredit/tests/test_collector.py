@@ -37,7 +37,7 @@ _sample_bibtex2 = """
 @ARTICLE{Atkins_2002,
   title = {title},
   volume = {666},
-  url = {http://dx.doi.org/10.1038/nrd842},
+  url = {https://doi.org/10.1038/nrd842},
   DOI = {10.1038/nrd842},
   number = {3009},
   journal = {My Fancy. Journ.},

@@ -49,7 +49,7 @@ def test_pickleoutput(tmpdir):
     entry = BibTeX("@article{Atkins_2002,\n"
                    "title=title,\n"
                    "volume=1, \n"
-                   "url=http://dx.doi.org/10.1038/nrd842, \n"
+                   "url=https://doi.org/10.1038/nrd842, \n"
                    "DOI=10.1038/nrd842, \n"
                    "number=7, \n"
                    "journal={Nat. Rev. Drug Disc.}, \n"
@@ -513,7 +513,7 @@ def test_format_bibtex_zenodo_doi():
     bibtex_zenodo = """
     @data{0b1284ba-5ce5-4367-84f3-c44b4962ad90,
     doi = {10.5281/zenodo.50186},
-    url = {http://dx.doi.org/10.5281/zenodo.50186},
+    url = {https://doi.org/10.5281/zenodo.50186},
     author = {Satrajit Ghosh; Chris Filo Gorgolewski; Oscar Esteban;
     Erik Ziegler; David Ellis; cindeem; Michael Waskom; Dav Clark; Michael;
     Fred Loney; Alexandre M. S.; Michael Notter; Hans Johnson;

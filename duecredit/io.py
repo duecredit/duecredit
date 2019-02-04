@@ -19,7 +19,6 @@ from collections import defaultdict, Iterator
 import copy
 from os.path import dirname, exists
 import pickle
-import requests
 import tempfile
 from six import PY2, itervalues, iteritems
 import warnings
@@ -43,6 +42,7 @@ def get_doi_cache_file(doi):
 
 
 def import_doi(doi, sleep=0.5, retries=10):
+    import requests
     cached = get_doi_cache_file(doi)
 
     if exists(cached):
@@ -54,7 +54,7 @@ def import_doi(doi, sleep=0.5, retries=10):
 
     # else -- fetch it
     headers = {'Accept': 'application/x-bibtex; charset=utf-8'}
-    url = 'http://dx.doi.org/' + doi
+    url = 'https://doi.org/' + doi
     while retries > 0:
         r = requests.get(url, headers=headers)
         r.encoding = 'UTF-8'
