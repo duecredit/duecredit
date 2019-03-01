@@ -97,14 +97,18 @@ class DueSwitch(object):
         # 1st step -- if activating/deactivating switch between the two collectors
         if self.__active is not activate:
             # we need to switch the state
-            is_public = lambda x: not x.startswith('_')
+            # InactiveDueCollector also has those special methods defined
+            # in DueSwitch so that client code could query/call (for no effect).
+            # So we shouldn't delete or bind them either
+            is_public_or_special = \
+                lambda x: not (x.startswith('_')
+                               or x in ('activate', 'active', 'dump'))
             # Clean up current bindings first
-            for k in filter(is_public, dir(self)):
-                if k not in ('activate', 'active', 'dump'):
-                    delattr(self, k)
+            for k in filter(is_public_or_special, dir(self)):
+                delattr(self, k)
 
             new_due = self.__collectors[activate]
-            for k in filter(is_public, dir(new_due)):
+            for k in filter(is_public_or_special, dir(new_due)):
                 setattr(self, k, getattr(new_due, k))
 
             self.__active = activate

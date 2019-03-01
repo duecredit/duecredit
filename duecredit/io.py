@@ -26,7 +26,7 @@ import platform
 from time import sleep
 
 from .config import CACHE_DIR, DUECREDIT_FILE
-from .entries import BibTeX, Doi
+from .entries import BibTeX, Doi, Text, Url
 from .log import lgr
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
@@ -235,6 +235,10 @@ def get_text_rendering(citation, style='harvard1'):
         return get_text_rendering(bibtex_citation)
     elif isinstance(entry, BibTeX):
         return format_bibtex(entry, style=style)
+    elif isinstance(entry, Text):
+        return entry.format()
+    elif isinstance(entry, Url):
+        return "URL: {}".format(entry.format())
     else:
         return str(entry)
 
