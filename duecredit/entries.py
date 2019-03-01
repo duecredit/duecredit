@@ -58,8 +58,10 @@ class BibTeX(DueCreditEntry):
         self._key = matches['key']
 
 
-class FreeTextEntry(DueCreditEntry):
-    pass # nothing special I guess
+class Text(DueCreditEntry):
+    """Just a free text entry without any special super powers in rendering etc
+    """
+    pass  # nothing special I guess
 
 
 class Doi(DueCreditEntry):
