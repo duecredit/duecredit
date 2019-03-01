@@ -39,7 +39,8 @@ class InactiveDueCreditCollector(object):
             return func
         return nondecorating_decorator
 
-    cite = load = add = _donothing
+    active = False
+    activate = add = cite = dump = load = _donothing
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
