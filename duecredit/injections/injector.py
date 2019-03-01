@@ -371,11 +371,15 @@ class DueCreditInjector(object):
         self._active = False
 
     def __del__(self):
-        lgr.debug("%s is asked to be deleted", self)
-        if self._active:
-            self.deactivate()
+        if lgr:
+            lgr.debug("%s is asked to be deleted", self)
+        try:
+            if self._active:
+                self.deactivate()
+        except:  # noqa: E722
+            pass
         try:
             super(self.__class__, self).__del__()
-        except Exception:
+        except:  # noqa: E722
             pass
 
