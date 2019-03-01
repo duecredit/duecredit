@@ -28,6 +28,7 @@ from time import sleep
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, Text, Url
 from .log import lgr
+from .versions import external_versions
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
 platform_system = platform.system().lower()
@@ -310,8 +311,16 @@ def format_bibtex(bibtex_entry, style='harvard1'):
                 # we should be able to provide encoding argument
                 bib_source = cpBibTeX(fname, encoding='utf-8')
         except Exception as e:
-            lgr.error("Failed to process BibTeX file %s: %s" % (fname, e))
-            return "ERRORED: %s" % str(e)
+            msg = "Failed to process BibTeX file %s: %s." % (fname, e)
+            citeproc_version = external_versions['citeproc']
+            if 'unexpected keyword argument' in str(e) and \
+                    citeproc_version and citeproc_version < '0.4':
+                err = "need a newer citeproc-py >= 0.4.0"
+                msg += " You might just " + err
+            else:
+                err = str(e)
+            lgr.error(msg)
+            return "ERRORED: %s" % err
         finally:
             # return warnings back
             warnings.filters = old_filters
