@@ -19,7 +19,7 @@ from six import text_type
 import duecredit.io
 from ..collector import DueCreditCollector, Citation
 from .test_collector import _sample_bibtex, _sample_doi, _sample_bibtex2
-from ..entries import BibTeX, DueCreditEntry, Doi
+from ..entries import BibTeX, Doi, Text, Url
 from ..io import TextOutput, PickleOutput, import_doi, \
     get_text_rendering, format_bibtex, _is_contained, Output, BibTeXOutput
 
@@ -503,6 +503,18 @@ def test_get_text_rendering(monkeypatch):
     assert fmt_args["style"] == 'harvard1'
 
     assert bibtex_output == doi_output
+
+
+def test_text_text_rendering():
+    text = "I am so free"
+    citation = Citation(Text(text), path='mypath')
+    assert get_text_rendering(citation) == text
+
+
+def test_url_text_rendering():
+    url = "http://example.com"
+    citation = Citation(Url(url), path='mypath')
+    assert get_text_rendering(citation) == "URL: " + url
 
 
 def test_format_bibtex_zenodo_doi():

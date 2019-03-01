@@ -9,6 +9,7 @@
 
 from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
     CollectorSummary, Citation
+from ..dueswitch import DueSwitch
 from ..entries import BibTeX, Doi
 from ..io import PickleOutput
 
@@ -288,9 +289,9 @@ def test_get_output_handler_method(tmpdir, monkeypatch):
 
 
 def test_collectors_uniform_api():
-    get_api = lambda obj: [x for x in sorted(dir(obj))
+    get_api = lambda objs: [x for x in sorted(sum((dir(obj) for obj in objs), []))
                            if not x.startswith('_') or x in '__call__']
-    assert get_api(DueCreditCollector) == get_api(InactiveDueCreditCollector)
+    assert get_api([DueCreditCollector, DueSwitch]) == get_api([InactiveDueCreditCollector])
 
 
 def _test__docs__(method):

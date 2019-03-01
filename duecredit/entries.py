@@ -38,6 +38,10 @@ class DueCreditEntry(object):
         args = ", ".join(args)
         return self.__class__.__name__ + '({0})'.format(args)
 
+    def format(self):
+        # TODO: return nice formatting of the entry
+        return str(self._rawentry)
+
 
 class BibTeX(DueCreditEntry):
     def __init__(self, bibtex, key=None):
@@ -53,12 +57,11 @@ class BibTeX(DueCreditEntry):
         matches = reg.groupdict()
         self._key = matches['key']
 
-    def format(self):
-        # TODO: return nice formatting of the entry
-        return str(self._rawentry)
 
-class FreeTextEntry(DueCreditEntry):
-    pass # nothing special I guess
+class Text(DueCreditEntry):
+    """Just a free text entry without any special super powers in rendering etc
+    """
+    pass  # nothing special I guess
 
 
 class Doi(DueCreditEntry):
