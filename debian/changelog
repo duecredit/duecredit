@@ -1,3 +1,16 @@
+duecredit (0.7.0-1) experimental; urgency=medium
+
+  * Fresh upstream release
+
+ -- Yaroslav Halchenko <debian@onerussian.com>  Fri, 01 Mar 2019 13:10:33 -0500
+
+duecredit (0.6.5-1) unstable; urgency=medium
+
+  * Fresh upstream release
+    - should be faster to import now and avoid some import issues
+
+ -- Yaroslav Halchenko <debian@onerussian.com>  Mon, 04 Feb 2019 12:51:06 -0500
+
 duecredit (0.6.4-1) unstable; urgency=medium
 
   * Fresh upstream release

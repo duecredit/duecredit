@@ -1,5 +1,26 @@
 # Change Log
 
+## [0.7.0](https://github.com/duecredit/duecredit/tree/0.7.0) (2019-03-01)
+
+- Prevent warnings from the injector's `__del__`.
+- InactiveDueCollector in `stub.py` now provides also `active=False`
+  attribute (so external tools could directly query if duecredit is 
+  active) and no-op `activate` and `dump` for consistent API with a
+  `due` object whenever `duecredit` is available.
+- Provide `Text` citation entry for free form text. It does not have any
+  meaningful rendering in BibTex but is present in text rendering.
+  `Url` entry also acquired text rendering with prefix `URL: `.
+
+## [0.6.5](https://github.com/duecredit/duecredit/tree/0.6.5) (2019-02-04)
+
+- Delay import of imports (thanks [Chris Markiewicz (@effigies)](https://github.com/effigies)
+  - serves also as a workaround due to inconsistent installation of
+    3rd party modules/libraries such as openssl
+	[\#142](https://github.com/duecredit/duecredit/issues/142)
+- Use https://doi.org as preferred DOI resolver.
+  Thanks [Katrin Leinweber (@katrinleinweber)](https://github.com/katrinleinweber)
+  for the contribution
+
 ## [0.6.4](https://github.com/duecredit/duecredit/tree/0.6.4) (2018-06-25)
 
 - Added doi to numpy injection
