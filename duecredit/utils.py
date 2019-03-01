@@ -24,15 +24,10 @@ from functools import wraps
 #
 # Some useful variables
 #
-on_windows = platform.system() == 'Windows'
-on_osx = platform.system() == 'Darwin'
-on_linux = platform.system() == 'Linux'
-try:
-    on_debian_wheezy = platform.system() == 'Linux' \
-                and platform.linux_distribution()[0] == 'debian' \
-                and platform.linux_distribution()[1].startswith('7.')
-except:  # pragma: no cover
-    on_debian_wheezy = False
+platform_system = platform.system()
+on_windows = platform_system == 'Windows'
+on_osx = platform_system == 'Darwin'
+on_linux = platform_system == 'Linux'
 
 
 lgr = logging.getLogger("duecredit.utils")
