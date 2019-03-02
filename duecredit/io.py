@@ -15,7 +15,7 @@ if 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in os.environ.keys():
 import re
 import locale
 import time
-from collections import defaultdict, Iterator
+from collections import defaultdict
 import copy
 from os.path import dirname, exists
 import pickle
