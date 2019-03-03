@@ -62,6 +62,11 @@ class DueSwitch(object):
         self.__active = None
         self.__collectors = {False: inactive, True: active}
         self.__activations_done = False
+        if not (inactive and active):
+            raise ValueError(
+                "Both inactive and active collectors should be provided. "
+                "Got active=%r, inactive=%r" % (active, inactive)
+            )
         self.activate(activate)
 
     @property
