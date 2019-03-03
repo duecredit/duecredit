@@ -22,12 +22,12 @@ def _get_duecredit_enable():
                     "Use 'yes' or 'no', or '0' or '1'")
     return env_enable.lower() in ('1', 'yes', 'true')
 
+
 @never_fail
 def _get_inactive_due():
-    # keeping duplicate but separate so later we could even place it into a separate
-    # submodule to possibly minimize startup time impact even more
-    from .collector import InactiveDueCreditCollector
+    from .stub import InactiveDueCreditCollector
     return InactiveDueCreditCollector()
+
 
 @never_fail
 def _get_active_due():
