@@ -24,7 +24,7 @@ Copyright:  2015-2019  DueCredit developers
 License:    BSD-2
 """
 
-__version__ = '0.0.7'
+__version__ = '0.0.8'
 
 
 class InactiveDueCreditCollector(object):
@@ -57,7 +57,7 @@ try:
         raise RuntimeError(
             "Imported due lacks .cite. DueCredit is now disabled")
 except Exception as e:
-    if type(e).__name__ not in ('ImportError', 'ModuleNotFoundError'):
+    if not isinstance(e, ImportError):
         import logging
         logging.getLogger("duecredit").error(
             "Failed to import duecredit due to %s" % str(e))
