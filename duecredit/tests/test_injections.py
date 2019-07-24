@@ -228,7 +228,9 @@ def test_get_modules_for_injection():
                                            'mod_psychopy',
                                            'mod_scipy',
                                            'mod_skimage',
-                                           'mod_sklearn']
+                                           'mod_sklearn',
+                                           'mod_matplotlib'
+                                           ]
 
 
 def test_cover_our_injections():
