@@ -325,5 +325,6 @@ request and add your project to this list. Thanks to
 - [Quickshear](https://github.com/nipy/quickshear)
 - [meqc](https://github.com/emdupre/meqc)
 - [MDAnalysis](https://www.mdanalysis.org)
+- [bctpy](https://github.com/aestrivex/bctpy)
 
-Last updated 2017-06-27.
+Last updated 2019-07-24.
