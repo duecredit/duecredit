@@ -216,8 +216,10 @@ def test_no_double_activation():
 
 
 def test_get_modules_for_injection():
+    # output order is sorted by name (not that it matters for functionality)
     assert get_modules_for_injection() == ['mod_biosig',
                                            'mod_dipy',
+                                           'mod_matplotlib',
                                            'mod_mdp',
                                            'mod_mne',
                                            'mod_nibabel',
@@ -229,7 +231,6 @@ def test_get_modules_for_injection():
                                            'mod_scipy',
                                            'mod_skimage',
                                            'mod_sklearn',
-                                           'mod_matplotlib'
                                            ]
 
 
