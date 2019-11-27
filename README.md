@@ -308,6 +308,8 @@ open scientific software*.  Eventually in duecredit we aim either to
 provide similar functionality (since we are collecting such
 information as well) or just interface/report to sempervirens.
 
+[citepy](https://github.com/clbarnes/citepy) -- Easily cite software libraries using information from automatically gathered from their package repository.
+
 ## Currently used by
 
 This is a running list of projects that use DueCredit natively. If you
