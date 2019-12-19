@@ -1,6 +1,13 @@
+duecredit (0.7.0-3) unstable; urgency=medium
+
+  * Completely remove mentioining of python2 in debian/rules
+    (Closes: #936450)
+
+ -- Yaroslav Halchenko <debian@onerussian.com>  Wed, 18 Dec 2019 22:21:04 -0500
+
 duecredit (0.7.0-2) unstable; urgency=medium
 
-  * Drop python2 support (Closes: #936450)
+  * Drop python2 support (was intended to close #936450)
 
  -- Yaroslav Halchenko <debian@onerussian.com>  Tue, 10 Dec 2019 23:18:30 -0500
 
