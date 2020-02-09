@@ -57,6 +57,7 @@ def import_doi(doi, sleep=0.5, retries=10):
     headers = {'Accept': 'application/x-bibtex; charset=utf-8'}
     url = 'https://doi.org/' + doi
     while retries > 0:
+        lgr.debug("Submitting GET to %s with headers %s", url, headers)
         r = requests.get(url, headers=headers)
         r.encoding = 'UTF-8'
         bibtex = r.text.strip()
