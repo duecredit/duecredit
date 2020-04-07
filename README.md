@@ -330,5 +330,6 @@ request and add your project to this list. Thanks to
 - [meqc](https://github.com/emdupre/meqc)
 - [MDAnalysis](https://www.mdanalysis.org)
 - [bctpy](https://github.com/aestrivex/bctpy)
+- [TorchIO](https://github.com/fepegar/torchio)
 
-Last updated 2019-07-24.
+Last updated 2020-04-07.
