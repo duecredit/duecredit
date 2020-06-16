@@ -1,3 +1,9 @@
+duecredit (0.8.0-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Yaroslav Halchenko <debian@onerussian.com>  Tue, 16 Jun 2020 10:57:19 -0400
+
 duecredit (0.7.0-3) unstable; urgency=medium
 
   * Completely remove mentioining of python2 in debian/rules
