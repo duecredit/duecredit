@@ -1,5 +1,14 @@
 # Change Log
 
+## [0.8.0](https://github.com/duecredit/duecredit/tree/0.8.0) (2020-02-09)
+
+- Variety of small fixes
+- Added .zenodo.json for more proper citation of duecredit
+- drop testing for 3.4 -- rare beast, lxml does not provide pkg for it
+- Support for citing matplotlib via injection
+- Address a few deprecation warnings (#146)
+- Provide more informative message whenever using older citeproc without encoding arg
+
 ## [0.7.0](https://github.com/duecredit/duecredit/tree/0.7.0) (2019-03-01)
 
 - Prevent warnings from the injector's `__del__`.
