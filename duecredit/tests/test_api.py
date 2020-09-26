@@ -163,7 +163,16 @@ def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_e
         monkeypatch.setitem(os.environ, key, fake_env_nolxml_[key])
 
     ret, out, err = run_python_command(**kwargs)
-    assert err == ''
+    direct_duecredit_import = 'import duecredit' in kwargs.get('cmd', '')
+    if direct_duecredit_import and env.get('DUECREDIT_TEST_EARLY_IMPORT_ERROR', ''):
+        # We do fail then upon regular import but stubbed script should be ok
+        # since should use the stub
+        assert 'Both inactive and active collectors should be provided' in err
+        assert ret == 1
+    else:
+        assert err == ''
+        assert ret == 0  # but we must not fail overall regardless
+
     if os.environ.get('DUECREDIT_ENABLE', False) and on_windows:  # TODO this test fails on windows
         pytest.xfail("Fails for some reason on Windows")
     elif os.environ.get('DUECREDIT_ENABLE', False):  # we enabled duecredit
@@ -179,10 +188,12 @@ def test_noincorrect_import_if_no_lxml_numpy(monkeypatch, kwargs, env, stubbed_e
     elif os.environ.get('DUECREDIT_TEST_EARLY_IMPORT_ERROR'):
         assert 'ImportError' in out
         assert 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in out
-        assert 'done123' in out
+        if direct_duecredit_import:
+            assert 'Please report' in out
+        else:
+            assert 'done123' in out
     else:
         assert 'done123\n' or 'done123\r\n' == out
-    assert ret == 0  # but we must not fail overall regardless
 
 
 if __name__ == '__main__':

@@ -10,10 +10,20 @@
 import re
 from six import PY2
 
+import logging
+lgr = logging.getLogger('duecredit.entries')
+
+
 class DueCreditEntry(object):
     def __init__(self, rawentry, key=None):
         self._rawentry = rawentry
         self._key = key or rawentry.lower()
+
+    def __eq__(self, other):
+        return (
+            (self._rawentry == other._rawentry) and
+            (self._key == other._key)
+        )
 
     def get_key(self):
         return self._key
@@ -49,6 +59,11 @@ class BibTeX(DueCreditEntry):
         self._key = None
         self._reference = None
         self._process_rawentry()
+        if key is not None:
+            # use the one provided, not the parsed one
+            lgr.debug("Replacing parsed key %s for BibTeX with the provided %s",
+                      self._key, key)
+            self._key = key
 
     def _process_rawentry(self):
         reg = re.match("\s*@(?P<type>\S*)\s*\{\s*(?P<key>\S*)\s*,.*",
@@ -65,14 +80,15 @@ class Text(DueCreditEntry):
 
 
 class Doi(DueCreditEntry):
-    def __init__(self, doi, key=None):
-        super(Doi, self).__init__(doi, key)
-        self.doi = doi
-        # TODO
+
+    @property
+    def doi(self):
+        return self._rawentry
 
 
 class Url(DueCreditEntry):
-    def __init__(self, url, key=None):
-        super(Url, self).__init__(url, key)
-        self.url = url
+
+    @property
+    def url(self):
+        return self._rawentry
 
