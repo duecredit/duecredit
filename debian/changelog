@@ -1,8 +1,8 @@
 duecredit (0.8.0-1) unstable; urgency=medium
 
-  * New upstream release
+  * Most recent upstream release (Closes: #970895)
 
- -- Yaroslav Halchenko <debian@onerussian.com>  Tue, 16 Jun 2020 10:57:19 -0400
+ -- Yaroslav Halchenko <debian@onerussian.com>  Fri, 25 Sep 2020 20:08:29 -0400
 
 duecredit (0.7.0-3) unstable; urgency=medium
 
