@@ -2,6 +2,9 @@
 # travis-ci.org definition for DueCredit build
 language: python
 sudo: false
+arch:
+  - amd64
+  - ppc64le
 python:
   - "2.7"
   - "3.5"
@@ -13,6 +16,9 @@ cache:
   - pip
 before_install:
   # - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then travis_retry sudo apt-get update -qq; fi
+    - if [ "$TRAVIS_ARCH" = "ppc64le" ]; then 
+          sudo chown -Rvf $USER:$GROUP ~/.cache/pip/wheels; 
+      fi
 
 git:
   depth: 99999
