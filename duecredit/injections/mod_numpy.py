@@ -18,7 +18,7 @@ max_version = None
 
 
 def inject(injector):
-    injector.add('numpy', None, BibTeX("""
+    injector.add('numpy', None, BibTeX(r"""
     @article{van2011numpy,
         title={The NumPy array: a structure for efficient numerical computation},
         author={Van Der Walt, Stefan and Colbert, S Chris and Varoquaux, Gael},
