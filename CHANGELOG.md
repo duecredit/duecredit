@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.8.1](https://github.com/duecredit/duecredit/tree/0.8.0) (2021-01-26)
+
+- Announce lines with unescaped \ as r(aw)
+
 ## [0.8.0](https://github.com/duecredit/duecredit/tree/0.8.0) (2020-02-09)
 
 - Variety of small fixes
