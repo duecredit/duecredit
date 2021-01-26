@@ -88,7 +88,7 @@ def inject(injector):
                  min_version='0.4.3',
                  tags=['edu'])
 
-    injector.add('scipy.cluster.hierarchy', None, BibTeX("""
+    injector.add('scipy.cluster.hierarchy', None, BibTeX(r"""
     @article{edelbrock1979mixture,
         title={Mixture model tests of hierarchical clustering algorithms:
             the problem of classifying everybody},
@@ -131,7 +131,7 @@ def inject(injector):
                  tags=['edu'])
 
     # Here options for linkage
-    injector.add('scipy.cluster.hierarchy', 'linkage', BibTeX("""
+    injector.add('scipy.cluster.hierarchy', 'linkage', BibTeX(r"""
     @article{ward1963hierarchical,
         title={Hierarchical grouping to optimize an objective function},
         author={Ward Jr, Joe H},
