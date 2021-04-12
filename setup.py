@@ -90,7 +90,7 @@ setup(
     version=__version__,
     packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
     scripts=[],
-    install_requires=['requests', 'citeproc-py>=0.4', 'six'],
+    install_requires=['requests', 'citeproc-py>=0.4', 'setuptools', 'six'],
     extras_require={
         'tests': [
             'pytest',
