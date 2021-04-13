@@ -3,30 +3,27 @@
 duecredit -- publications (donations, etc) tracer
 """
 
+import os.path
 import re
-import os
 import sys
-import re
 
 from datetime import datetime
-from setuptools import setup
-from pkgutil import walk_packages
 from subprocess import Popen, PIPE
-from os.path import exists
+
+from setuptools import find_packages, setup
 
 # Adopted from citeproc-py
 #  License: BSD-2
 #  Copyright 2011-2013 Brecht Machiels
 
 PACKAGE = 'duecredit'
-PACKAGE_ABSPATH = os.path.abspath(PACKAGE)
 VERSION_FILE = PACKAGE + '/version.py'
 
 # retrieve the version number from git or VERSION_FILE
 # inspired by http://dcreager.net/2010/02/10/setuptools-git-version-numbers/
 
 try:
-    if exists('debian/copyright'):
+    if os.path.exists('debian/copyright'):
         print('Generating version.py out of debian/copyright information')
         # building debian package. Deduce version from debian/copyright
         with open('debian/changelog', 'r') as f:
@@ -66,30 +63,14 @@ except OSError as e:
         __version__ = '0.0.0.dev'
 print("Version: %s" % __version__)
 
-# In some environments with too basic locale settings
-# it might not be able to read the file with unicode, so we
-# would then just ignore the errors
-with open('README.md', 'rb') as f:
+with open('README.md', 'r', encoding='utf-8') as f:
     README = f.read()
-    # We need to decode it reliably
-    try:
-        README = README.decode()
-    except UnicodeDecodeError:
-        README = README.decode('ascii', errors='replace')
-
-def find_packages(path, prefix):
-    yield prefix
-    prefix = prefix + "."
-    for _, name, ispkg in walk_packages(path, prefix):
-        if ispkg:
-            yield name
-
 
 setup(
     name=PACKAGE,
     version=__version__,
-    packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
-    scripts=[],
+    packages=find_packages(),
+    python_requires=">=3.6",
     install_requires=[
         'requests',
         'citeproc-py>=0.4',
@@ -103,7 +84,6 @@ setup(
         ]
     },
     include_package_data=True,
-    provides=[PACKAGE],
     entry_points={
         'console_scripts': [
              'duecredit=duecredit.cmdline.main:main',
@@ -112,28 +92,9 @@ setup(
     author='Yaroslav Halchenko, Matteo Visconti di Oleggio Castello',
     author_email='yoh@onerussian.com',
     description='Publications (and donations) tracer',
-    long_description="""\
-duecredit is being conceived to address the problem of inadequate
-citation of scientific software and methods, and limited visibility of
-donation requests for open-source software.
-
-It provides a simple framework (at the moment for Python only) to
-embed publication or other references in the original code so they are
-automatically collected and reported to the user at the necessary
-level of reference detail, i.e. only references for actually used
-functionality will be presented back if software provides multiple
-citeable implementations.
-
-To get a sense of what duecredit is about, run for example shipped along
-example script, or your analysis script with `-m duecredit`, e.g.
-
-    python -m duecredit examples/example_scipy.py
-
-""",
+    long_description=README,
+    long_description_content_type='text/markdown',
     url='https://github.com/duecredit/duecredit',
-    # Download URL will point to the latest release, thus suffixes removed
-    download_url='https://github.com/duecredit/duecredit/releases/tag/%s'
-        % re.sub('-.*$', '', __version__),
     keywords=['citation tracing'],
     license='2-clause BSD License',
     classifiers=[
@@ -150,7 +111,6 @@ example script, or your analysis script with `-m duecredit`, e.g.
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Topic :: Documentation',
         'Topic :: Software Development :: Documentation',

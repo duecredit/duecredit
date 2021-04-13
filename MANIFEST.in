@@ -1,4 +1,5 @@
 include LICENSE README.md CHANGELOG.md requirements.txt tox.ini CONTRIBUTING.md setup.cfg
 include .coveragerc .travis.yml
 include examples/example_scipy.py
-include duecredit/tests/envs/*/*
+graft duecredit
+global-exclude *.py[cod]
