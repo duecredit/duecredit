@@ -70,7 +70,12 @@ setup(
     name=PACKAGE,
     version=__version__,
     packages=find_packages(),
-    install_requires=['requests', 'citeproc-py>=0.4', 'six'],
+    install_requires=[
+        'requests',
+        'citeproc-py>=0.4',
+        'six',
+        'importlib-metadata; python_version<"3.8"',
+    ],
     extras_require={
         'tests': [
             'pytest',
