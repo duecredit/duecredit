@@ -4,13 +4,12 @@ duecredit -- publications (donations, etc) tracer
 """
 
 import re
-import os
+import os.path
 import sys
 import re
 
 from datetime import datetime
-from setuptools import setup
-from pkgutil import walk_packages
+from setuptools import find_packages, setup
 from subprocess import Popen, PIPE
 from os.path import exists
 
@@ -19,7 +18,6 @@ from os.path import exists
 #  Copyright 2011-2013 Brecht Machiels
 
 PACKAGE = 'duecredit'
-PACKAGE_ABSPATH = os.path.abspath(PACKAGE)
 VERSION_FILE = PACKAGE + '/version.py'
 
 # retrieve the version number from git or VERSION_FILE
@@ -77,18 +75,10 @@ with open('README.md', 'rb') as f:
     except UnicodeDecodeError:
         README = README.decode('ascii', errors='replace')
 
-def find_packages(path, prefix):
-    yield prefix
-    prefix = prefix + "."
-    for _, name, ispkg in walk_packages(path, prefix):
-        if ispkg:
-            yield name
-
-
 setup(
     name=PACKAGE,
     version=__version__,
-    packages=list(find_packages([PACKAGE_ABSPATH], PACKAGE)),
+    packages=find_packages(),
     scripts=[],
     install_requires=['requests', 'citeproc-py>=0.4', 'six'],
     extras_require={
