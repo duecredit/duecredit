@@ -3,15 +3,14 @@
 duecredit -- publications (donations, etc) tracer
 """
 
-import re
 import os.path
-import sys
 import re
+import sys
 
 from datetime import datetime
-from setuptools import find_packages, setup
 from subprocess import Popen, PIPE
-from os.path import exists
+
+from setuptools import find_packages, setup
 
 # Adopted from citeproc-py
 #  License: BSD-2
@@ -24,7 +23,7 @@ VERSION_FILE = PACKAGE + '/version.py'
 # inspired by http://dcreager.net/2010/02/10/setuptools-git-version-numbers/
 
 try:
-    if exists('debian/copyright'):
+    if os.path.exists('debian/copyright'):
         print('Generating version.py out of debian/copyright information')
         # building debian package. Deduce version from debian/copyright
         with open('debian/changelog', 'r') as f:
