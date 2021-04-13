@@ -63,16 +63,8 @@ except OSError as e:
         __version__ = '0.0.0.dev'
 print("Version: %s" % __version__)
 
-# In some environments with too basic locale settings
-# it might not be able to read the file with unicode, so we
-# would then just ignore the errors
-with open('README.md', 'rb') as f:
+with open('README.md', 'r', encoding='utf-8') as f:
     README = f.read()
-    # We need to decode it reliably
-    try:
-        README = README.decode()
-    except UnicodeDecodeError:
-        README = README.decode('ascii', errors='replace')
 
 setup(
     name=PACKAGE,
@@ -95,24 +87,8 @@ setup(
     author='Yaroslav Halchenko, Matteo Visconti di Oleggio Castello',
     author_email='yoh@onerussian.com',
     description='Publications (and donations) tracer',
-    long_description="""\
-duecredit is being conceived to address the problem of inadequate
-citation of scientific software and methods, and limited visibility of
-donation requests for open-source software.
-
-It provides a simple framework (at the moment for Python only) to
-embed publication or other references in the original code so they are
-automatically collected and reported to the user at the necessary
-level of reference detail, i.e. only references for actually used
-functionality will be presented back if software provides multiple
-citeable implementations.
-
-To get a sense of what duecredit is about, run for example shipped along
-example script, or your analysis script with `-m duecredit`, e.g.
-
-    python -m duecredit examples/example_scipy.py
-
-""",
+    long_description=README,
+    long_description_content_type='text/markdown',
     url='https://github.com/duecredit/duecredit',
     keywords=['citation tracing'],
     license='2-clause BSD License',
