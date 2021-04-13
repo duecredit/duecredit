@@ -70,7 +70,6 @@ setup(
     name=PACKAGE,
     version=__version__,
     packages=find_packages(),
-    scripts=[],
     install_requires=['requests', 'citeproc-py>=0.4', 'six'],
     extras_require={
         'tests': [
