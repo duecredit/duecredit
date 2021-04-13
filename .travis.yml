@@ -51,4 +51,4 @@ deploy:
     tags: true
     branch: master
     repo: duecredit/duecredit
-    condition: "$TRAVIS_PYTHON_VERSION == 2.7 && $TRAVIS_TAG =~ ^[0-9][.][0-9][.0-9]*"
+    condition: "$TRAVIS_PYTHON_VERSION == 3.8 && $TRAVIS_TAG =~ ^[0-9][.][0-9][.0-9]*"
