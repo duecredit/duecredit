@@ -1,3 +1,17 @@
+# 0.9.1 (Tue Apr 13 2021)
+
+#### 🐛 Bug Fix
+
+- Set up intuit auto to automate releases [#178](https://github.com/duecredit/duecredit/pull/178) ([@jwodder](https://github.com/jwodder) [@yarikoptic](https://github.com/yarikoptic))
+- BF: make pypi upload happen in py 3.8 matrix (2.7 was removed) [#178](https://github.com/duecredit/duecredit/pull/178) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 2
+
+- John T. Wodder II ([@jwodder](https://github.com/jwodder))
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
 # [0.9.0](https://github.com/duecredit/duecredit/tree/0.9.0) (2021-04-13)
 
 - Drop support for Python < 3.6
