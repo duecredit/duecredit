@@ -4,12 +4,12 @@ language: python
 sudo: false
 arch:
   - amd64
-  - ppc64le
+  # no longer works -- might troubleshoot later
+  #- ppc64le
 python:
-  - "2.7"
-  - "3.5"
   - "3.6"
-  - "3.7-dev"
+  - "3.7"
+  - "3.8"
 #  - "pypy"
 #  - "pypy3"
 cache:
@@ -51,4 +51,4 @@ deploy:
     tags: true
     branch: master
     repo: duecredit/duecredit
-    condition: "$TRAVIS_PYTHON_VERSION == 2.7 && $TRAVIS_TAG =~ ^[0-9][.][0-9][.0-9]*"
+    condition: "$TRAVIS_PYTHON_VERSION == 3.8 && $TRAVIS_TAG =~ ^[0-9][.][0-9][.0-9]*"

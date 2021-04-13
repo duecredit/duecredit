@@ -21,10 +21,7 @@ import logging
 from ..log import lgr
 
 from six import iteritems
-if sys.version_info < (3,):
-    import __builtin__
-else:
-    import builtins as __builtin__
+import builtins as __builtin__
 
 
 __all__ = ['DueCreditInjector', 'find_object']
