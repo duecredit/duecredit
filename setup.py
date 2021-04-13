@@ -88,7 +88,6 @@ setup(
         ]
     },
     include_package_data=True,
-    provides=[PACKAGE],
     entry_points={
         'console_scripts': [
              'duecredit=duecredit.cmdline.main:main',
