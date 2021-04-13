@@ -1,5 +1,12 @@
 # Change Log
 
+
+## [0.9.0](https://github.com/duecredit/duecredit/tree/0.9.0) (2021-04-13)
+
+- Drop support for Python < 3.6
+- Python packaging is reworked, importlib-metadata is added
+  as a dependency for python < 3.8
+
 ## [0.8.1](https://github.com/duecredit/duecredit/tree/0.8.0) (2021-01-26)
 
 - Announce lines with unescaped \ as r(aw)
