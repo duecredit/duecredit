@@ -116,9 +116,6 @@ example script, or your analysis script with `-m duecredit`, e.g.
 
 """,
     url='https://github.com/duecredit/duecredit',
-    # Download URL will point to the latest release, thus suffixes removed
-    download_url='https://github.com/duecredit/duecredit/releases/tag/%s'
-        % re.sub('-.*$', '', __version__),
     keywords=['citation tracing'],
     license='2-clause BSD License',
     classifiers=[
