@@ -20,11 +20,11 @@ Then use in your code as
 See  https://github.com/duecredit/duecredit/blob/master/README.md for examples.
 
 Origin:     Originally a part of the duecredit
-Copyright:  2015-2019  DueCredit developers
+Copyright:  2015-2021  DueCredit developers
 License:    BSD-2
 """
 
-__version__ = '0.0.8'
+__version__ = '0.0.9'
 
 
 class InactiveDueCreditCollector(object):
