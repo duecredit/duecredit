@@ -3,6 +3,8 @@
 
 [![Build Status](https://travis-ci.org/duecredit/duecredit.svg?branch=master)](https://travis-ci.org/duecredit/duecredit)
 [![Coverage Status](https://coveralls.io/repos/duecredit/duecredit/badge.svg)](https://coveralls.io/r/duecredit/duecredit)
+[![DOI](https://zenodo.org/badge/DOI/110.5281/zenodo.3376260.svg)](https://doi.org/10.5281/zenodo.3376260)
+[![PyPI version fury.io](https://badge.fury.io/py/duecredit.svg)](https://pypi.python.org/pypi/duecredit/)
 
 duecredit is being conceived to address the problem of inadequate
 citation of scientific software and methods, and limited visibility of
@@ -328,5 +330,6 @@ request and add your project to this list. Thanks to
 - [meqc](https://github.com/emdupre/meqc)
 - [MDAnalysis](https://www.mdanalysis.org)
 - [bctpy](https://github.com/aestrivex/bctpy)
+- [TorchIO](https://github.com/fepegar/torchio)
 
-Last updated 2019-07-24.
+Last updated 2020-04-07.
