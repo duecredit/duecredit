@@ -33,7 +33,7 @@ def test_main_help(monkeypatch):
 def test_main_version(monkeypatch):
     # Patch stdout or stderr for different Python versions -- catching both
     fakestdout = StringIO()
-    fakeout = 'std' + ('err' if sys.version_info < (3, 4) else 'out')
+    fakeout = 'stdout'
     monkeypatch.setattr(sys, fakeout, fakestdout)
 
     pytest.raises(SystemExit, main.main, ['--version'])
