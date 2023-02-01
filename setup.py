@@ -19,6 +19,23 @@ from setuptools import find_packages, setup
 PACKAGE = 'duecredit'
 VERSION_FILE = PACKAGE + '/version.py'
 
+
+def make_pep440_compliant(version: str, local_prefix: str) -> str:
+    """Convert the version into a PEP440 compliant version."""
+    public_version_re = re.compile(
+        r"^([0-9][0-9.]*(?:(?:a|b|rc|.post|.dev)[0-9]+)*)\+?"
+    )
+    _, public, local = public_version_re.split(version, maxsplit=1)
+    if not local:
+        return version
+    sanitized_local = re.sub("[+~-]+", ".", local).strip(".")
+    pep440_version = f"{public}+{local_prefix}{sanitized_local}"
+    assert re.match(
+        "^[a-zA-Z0-9.]+$", sanitized_local
+    ), f"'{pep440_version}' not PEP440 compliant"
+    return pep440_version
+
+
 # retrieve the version number from git or VERSION_FILE
 # inspired by http://dcreager.net/2010/02/10/setuptools-git-version-numbers/
 
@@ -28,9 +45,7 @@ try:
         # building debian package. Deduce version from debian/copyright
         with open('debian/changelog', 'r') as f:
             lines = f.readlines()
-        __version__ = re.sub('(.*)-(.*?)$', r'\1.debian\2',
-                             lines[0].split()[1].strip('()')
-                             ).replace('-', '.')
+        __version__ = make_pep440_compliant(lines[0].split()[1].strip('()'), 'debian.')
         # TODO: unify format whenever really bored ;)
         __release_date__ = re.sub('^ -- .*>\s*(.*)', r'\1',
                                   list(filter(lambda x: x.startswith(' -- '), lines))[0].rstrip())
