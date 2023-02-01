@@ -1,3 +1,20 @@
+# 0.9.2 (Wed Feb 01 2023)
+
+#### 🐛 Bug Fix
+
+- Tell LGTM to ignore unused imports in stub.py [#179](https://github.com/duecredit/duecredit/pull/179) ([@jwodder](https://github.com/jwodder))
+
+#### 🏠 Internal
+
+- Make Debian Python version PEP440 compliant [#184](https://github.com/duecredit/duecredit/pull/184) ([@bdrung](https://github.com/bdrung))
+
+#### Authors: 2
+
+- Benjamin Drung ([@bdrung](https://github.com/bdrung))
+- John T. Wodder II ([@jwodder](https://github.com/jwodder))
+
+---
+
 # 0.9.1 (Tue Apr 13 2021)
 
 #### 🐛 Bug Fix
