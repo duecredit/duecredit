@@ -1,0 +1,55 @@
+From 9021104af462275906d42a2215028fe3300cbb68 Mon Sep 17 00:00:00 2001
+From: Benjamin Drung <benjamin.drung@canonical.com>
+Date: Wed, 1 Feb 2023 11:39:41 +0100
+Subject: [PATCH] Make Debian Python version PEP440 compliant
+
+Python versions like `0.9.1.debian1` or `0.9.1.debian1ubuntu1` are not
+PEP440 compliant. With setuptools 66, the versions of all packages
+visible in the Python environment *must* obey PEP440.
+
+Bug: https://github.com/pypa/setuptools/issues/3772
+Bug-Ubuntu: https://launchpad.net/bugs/1991606
+Signed-off-by: Benjamin Drung <benjamin.drung@canonical.com>
+---
+ setup.py | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 38e67d5..85a16aa 100755
+--- a/setup.py
++++ b/setup.py
+@@ -19,6 +19,23 @@
+ PACKAGE = 'duecredit'
+ VERSION_FILE = PACKAGE + '/version.py'
+ 
++
++def make_pep440_compliant(version: str, local_prefix: str) -> str:
++    """Convert the version into a PEP440 compliant version."""
++    public_version_re = re.compile(
++        r"^([0-9][0-9.]*(?:(?:a|b|rc|.post|.dev)[0-9]+)*)\+?"
++    )
++    _, public, local = public_version_re.split(version, maxsplit=1)
++    if not local:
++        return version
++    sanitized_local = re.sub("[+~-]+", ".", local).strip(".")
++    pep440_version = f"{public}+{local_prefix}{sanitized_local}"
++    assert re.match(
++        "^[a-zA-Z0-9.]+$", sanitized_local
++    ), f"'{pep440_version}' not PEP440 compliant"
++    return pep440_version
++
++
+ # retrieve the version number from git or VERSION_FILE
+ # inspired by http://dcreager.net/2010/02/10/setuptools-git-version-numbers/
+ 
+@@ -28,9 +45,7 @@
+         # building debian package. Deduce version from debian/copyright
+         with open('debian/changelog', 'r') as f:
+             lines = f.readlines()
+-        __version__ = re.sub('(.*)-(.*?)$', r'\1.debian\2',
+-                             lines[0].split()[1].strip('()')
+-                             ).replace('-', '.')
++        __version__ = make_pep440_compliant(lines[0].split()[1].strip('()'), 'debian.')
+         # TODO: unify format whenever really bored ;)
+         __release_date__ = re.sub('^ -- .*>\s*(.*)', r'\1',
+                                   list(filter(lambda x: x.startswith(' -- '), lines))[0].rstrip())

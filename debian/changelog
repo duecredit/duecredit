@@ -1,3 +1,11 @@
+duecredit (0.9.1-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * debian patch fix_version_PR184.patch applies upstream PR#184 to
+    fix package version. Closes: #1030408.
+
+ -- Drew Parsons <dparsons@debian.org>  Sun, 19 Feb 2023 11:09:20 +0100
+
 duecredit (0.9.1-1) unstable; urgency=medium
 
   * Most recent upstream release
