@@ -470,5 +470,5 @@ class CollectorSummary(object):
             output.dump()
 
 
-# TODO:  provide HTML, MD, RST etc formattings
+# TODO:  provide HTML, MD, RST etc output formats
 
