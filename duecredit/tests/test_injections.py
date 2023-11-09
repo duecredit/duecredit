@@ -37,7 +37,7 @@ lgr = getLogger('duecredit.tests.injector')
 
 
 class TestActiveInjector(object):
-    def setup(self):
+    def setup_method(self):
         lgr.log(5, "Setting up for a TestActiveInjector test")
         self._cleanup_modules()
         self.due = DueCreditCollector()
