@@ -24,9 +24,12 @@ from ..io import TextOutput, PickleOutput, import_doi, \
     get_text_rendering, format_bibtex, _is_contained, Output, BibTeXOutput
 
 try:
-    import vcr
+	# TODO: for some reason test below started to complain that we are trying
+	# to overwrite the cassette.
+	# 
+    # import vcr
 
-    @vcr.use_cassette()
+    # @vcr.use_cassette()
     def test_import_doi():
         doi_good = '10.1038/nrd842'
         kw = dict(sleep=0.00001, retries=2)
