@@ -11,12 +11,7 @@ import gc
 import sys
 import pytest
 
-from six import viewvalues, PY2
-
-if PY2:
-    import __builtin__
-else:
-    import builtins as __builtin__
+import builtins as __builtin__
 _orig__import__ = __builtin__.__import__
 
 from duecredit.collector import DueCreditCollector
@@ -36,7 +31,7 @@ from logging import getLogger
 lgr = getLogger('duecredit.tests.injector')
 
 
-class TestActiveInjector(object):
+class TestActiveInjector:
     def setup_method(self):
         lgr.log(5, "Setting up for a TestActiveInjector test")
         self._cleanup_modules()
@@ -88,7 +83,7 @@ class TestActiveInjector(object):
         assert len(self.due.citations) == 1
 
         # TODO: there must be a cleaner way to get first value
-        citation = list(viewvalues(self.due.citations))[0]
+        citation = list(self.due.citations.values())[0]
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version
@@ -135,7 +130,7 @@ class TestActiveInjector(object):
         assert len(self.due.citations) == 2
 
         # TODO: there must be a cleaner way to get first value
-        citation = list(viewvalues(self.due.citations))[0]
+        citation = list(self.due.citations.values())[0]
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version

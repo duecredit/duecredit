@@ -20,7 +20,6 @@ import copy
 from os.path import dirname, exists
 import pickle
 import tempfile
-from six import PY2, itervalues, iteritems
 import warnings
 import platform
 from time import sleep
@@ -49,8 +48,6 @@ def import_doi(doi, sleep=0.5, retries=10):
     if exists(cached):
         with open(cached) as f:
             doi = f.read()
-            if PY2:
-                return doi.decode('utf-8')
             return doi
 
     # else -- fetch it
@@ -78,10 +75,7 @@ def import_doi(doi, sleep=0.5, retries=10):
         if not exists(cache_dir):
             os.makedirs(cache_dir)
         with open(cached, 'w') as f:
-            if PY2:
-                f.write(bibtex.encode('utf-8'))
-            else:
-                f.write(bibtex)
+            f.write(bibtex)
     return bibtex
 
 
@@ -94,7 +88,7 @@ def _is_contained(toppath, subpath):
         return subpath.startswith(toppath + '.')
 
 
-class Output(object):
+class Output:
     """A generic class for setting up citations that then will be outputted
     differently (e.g., Bibtex, Text, etc.)"""
     def __init__(self, fd, collector):
@@ -115,7 +109,7 @@ class Output(object):
         if tags != {'*'}:
             # Filter out citations based on tags
             citations = dict((k, c)
-                             for k, c in iteritems(citations)
+                             for k, c in citations.items()
                              if tags.intersection(c.tags))
 
         packages = defaultdict(list)
@@ -124,7 +118,7 @@ class Output(object):
 
         # store the citations according to their path and divide them into
         # the right level
-        for (path, entry_key), citation in iteritems(citations):
+        for (path, entry_key), citation in citations.items():
             if ':' in path:
                 objects[path].append(citation)
             elif '.' in path:
@@ -351,7 +345,7 @@ def format_bibtex(bibtex_entry, style='harvard1'):
     return biblio_out # if biblio_out else str(bibtex_entry)
 
 # TODO: harmonize order of arguments
-class PickleOutput(object):
+class PickleOutput:
     def __init__(self, collector, fn=DUECREDIT_FILE):
         self.collector = collector
         self.fn = fn

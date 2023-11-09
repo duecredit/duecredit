@@ -86,7 +86,7 @@ def test_api(collector_class):
     def purpose_of_life():
         return None
 
-    class Child(object):
+    class Child:
         # Conception process is usually way too easy to be referenced
         def __init__(self):
             pass

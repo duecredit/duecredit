@@ -52,7 +52,7 @@ def _get_active_due():
     return due_
 
 
-class DueSwitch(object):
+class DueSwitch:
     """Adapter between two types of collectors -- Inactive and Active
 
     Once activated though, cannot be fully deactivated since it would inject

@@ -13,9 +13,11 @@ import os
 import logging
 import sys
 import platform
+import shutil
+import stat
 import tempfile
+import time
 
-from six import binary_type
 from os.path import exists, join as opj, isabs, expandvars, expanduser, abspath
 
 from os.path import realpath
@@ -141,7 +143,7 @@ def rmtemp(f, *args, **kwargs):
                     os.unlink(f)
                 except OSError as e:
                     if i < 9:
-                        sleep(0.1)
+                        time.sleep(0.1)
                         continue
                     else:
                         raise

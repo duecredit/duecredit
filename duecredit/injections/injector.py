@@ -20,7 +20,6 @@ from functools import wraps
 import logging
 from ..log import lgr
 
-from six import iteritems
 import builtins as __builtin__
 
 
@@ -63,7 +62,7 @@ def find_object(mod, path):
 # stay friendly to anyone else who might decorate __import__ as well
 _very_orig_import = __builtin__.__import__
 
-class DueCreditInjector(object):
+class DueCreditInjector:
     """Takes care about "injecting" duecredit references into 3rd party modules upon their import
 
     First entries to be "injected" need to be add'ed to the instance.
@@ -197,7 +196,7 @@ class DueCreditInjector(object):
         # go through the known entries and register them within the collector, and
         # decorate corresponding methods
         # There could be multiple records per module
-        for obj_path, obj_entry_records in iteritems(self._entry_records[mod_name]):
+        for obj_path, obj_entry_records in self._entry_records[mod_name].items():
             parent, obj_name = None, None
             if obj_path:
                 # so we point to an object within the mod

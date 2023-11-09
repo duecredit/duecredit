@@ -1,5 +1,3 @@
-import re
-
 def extract_references_from_rst(rst):
     # for now will be very simple, just trying to separate
     # then up until the end or another section starting

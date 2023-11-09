@@ -12,8 +12,6 @@ import os
 import sys
 from functools import wraps
 
-from six import iteritems, itervalues
-
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
 from .stub import InactiveDueCreditCollector
@@ -27,7 +25,7 @@ lgr = logging.getLogger('duecredit.collector')
 
 CitationKey = namedtuple('CitationKey', ['path', 'entry_key'])
 
-class Citation(object):
+class Citation:
     """Encapsulates citations and information on their use"""
 
     def __init__(self, entry, description=None, path=None, version=None,
@@ -174,7 +172,7 @@ class Citation(object):
         self._entry = newentry
 
 
-class DueCreditCollector(object):
+class DueCreditCollector:
     """Collect the references
 
     The mighty beast which will might become later a proxy on the way to
@@ -274,7 +272,7 @@ class DueCreditCollector(object):
                 # package_loaded = sys.modules.get(package)
                 # if package_loaded:
                 #     # find the citation for that module
-                #     for citation in itervalues(self.citations):
+                #     for citation in self.citations.values():
                 #         if citation.package == package \
                 #                 and not citation.version:
                 version = external_versions[package]
@@ -285,7 +283,7 @@ class DueCreditCollector(object):
     def _citations_fromentrykey(self):
         """Return a dictionary with the current citations indexed by the entry key"""
         citations_key = dict()
-        for (path, entry_key), citation in iteritems(self.citations):
+        for (path, entry_key), citation in self.citations.items():
             if entry_key not in citations_key:
                 citations_key[entry_key] = citation
 
@@ -296,7 +294,7 @@ class DueCreditCollector(object):
     def _args_match_conditions(conditions, *fargs, **fkwargs):
         """Helper to identify when to trigger citation given parameters to the function call
         """
-        for (argpos, kwarg), values in iteritems(conditions):
+        for (argpos, kwarg), values in conditions.items():
             # main logic -- assess default and if get to the next one if
             # given argument is not present
             if not ((len(fargs) > argpos) or (kwarg in fkwargs)):
@@ -369,7 +367,7 @@ class DueCreditCollector(object):
 
         Conditional based on the state of the object
 
-        >>> class Citeable(object):
+        >>> class Citeable:
         ...     def __init__(self, param=None):
         ...         self.param = param
         ...     @due.dcite('XXX00', description="The same good old relief",
@@ -441,7 +439,7 @@ class DueCreditCollector(object):
 
 
 # TODO: redo heavily -- got very messy
-class CollectorSummary(object):
+class CollectorSummary:
     """A helper which would take care about exporting citations upon its Death
     """
     def __init__(self, collector, outputs="stdout,pickle", fn=DUECREDIT_FILE):
