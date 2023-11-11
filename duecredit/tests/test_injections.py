@@ -44,7 +44,7 @@ class TestActiveInjector(object):
         self.injector = DueCreditInjector(collector=self.due)
         self.injector.activate(retrospect=False)  # numpy might be already loaded...
 
-    def teardown(self):
+    def teardown_method(self):
         lgr.log(5, "Tearing down after a TestActiveInjector test")
         # gc might not pick up inj after some tests complete
         # so we will always deactivate explicitly
