@@ -8,51 +8,55 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 import re
+from typing import Optional
 
 import logging
 lgr = logging.getLogger('duecredit.entries')
 
 
 class DueCreditEntry:
-    def __init__(self, rawentry, key=None):
+    _key : str
+
+    def __init__(self, rawentry:str, key: Optional[str] = None) -> None:
         self._rawentry = rawentry
         self._key = key or rawentry.lower()
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, DueCreditEntry):
+            raise NotImplemented
         return (
             (self._rawentry == other._rawentry) and
             (self._key == other._key)
         )
 
-    def get_key(self):
+    def get_key(self) -> str:
         return self._key
 
     @property
-    def key(self):
+    def key(self) -> str:
         return self.get_key()
 
     @property
-    def rawentry(self):
+    def rawentry(self) -> str:
         return self._rawentry
 
-    def _process_rawentry(self):
+    def _process_rawentry(self) -> None:
         pass
 
-    def __repr__(self):
-        args = [repr(self._rawentry),
+    def __repr__(self) -> str:
+        argl = [repr(self._rawentry),
                 "key={0}".format(repr(self._key))]
-        args = ", ".join(args)
+        args = ", ".join(argl)
         return self.__class__.__name__ + '({0})'.format(args)
 
-    def format(self):
+    def format(self) -> str:
         # TODO: return nice formatting of the entry
         return str(self._rawentry)
 
 
 class BibTeX(DueCreditEntry):
-    def __init__(self, bibtex, key=None):
+    def __init__(self, bibtex: str, key: Optional[str] = None) -> None:
         super(BibTeX, self).__init__(bibtex.strip())
-        self._key = None
         self._reference = None
         self._process_rawentry()
         if key is not None:
@@ -61,7 +65,7 @@ class BibTeX(DueCreditEntry):
                       self._key, key)
             self._key = key
 
-    def _process_rawentry(self):
+    def _process_rawentry(self) -> None:
         reg = re.match(r"\s*@(?P<type>\S*)\s*\{\s*(?P<key>\S*)\s*,.*",
                        self._rawentry, flags=re.MULTILINE)
         assert(reg)
@@ -78,13 +82,13 @@ class Text(DueCreditEntry):
 class Doi(DueCreditEntry):
 
     @property
-    def doi(self):
+    def doi(self) -> str:
         return self._rawentry
 
 
 class Url(DueCreditEntry):
 
     @property
-    def url(self):
+    def url(self) -> str:
         return self._rawentry
 

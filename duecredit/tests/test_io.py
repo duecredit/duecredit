@@ -438,7 +438,7 @@ def test_bibtex_output():
     value = strio.getvalue()
     value_ = sorted(value.strip().split('\n'))
     bibtex = sorted((_sample_bibtex.strip() + _sample_bibtex2.rstrip()).split('\n'))
-    assert value_ == bibtex, 'Value was {0}'.format(value_, bibtex)
+    assert value_ == bibtex, 'Value was {0} instead of {1}'.format(value_, bibtex)
 
     # assert_equal(value_, bibtex,
     #              msg='Value was {0}'.format(value_, bibtex))

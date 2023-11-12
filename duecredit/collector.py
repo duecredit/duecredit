@@ -95,10 +95,6 @@ class Citation:
     def path(self):
         return self._path
 
-    @property
-    def cite_module(self):
-        return self._cite_module
-
     @path.setter
     def path(self, path):
         # TODO: verify value, if we are not up for it -- just make _path public
@@ -111,6 +107,10 @@ class Citation:
     @property
     def description(self):
         return self._description
+
+    @property
+    def cite_module(self):
+        return self._cite_module
 
     @property
     def cites_module(self):
