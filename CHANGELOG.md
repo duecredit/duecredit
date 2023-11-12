@@ -1,3 +1,26 @@
+# 0.9.3 (Sun Nov 12 2023)
+
+#### 🐛 Bug Fix
+
+- ENH: codespell [#185](https://github.com/duecredit/duecredit/pull/185) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### 🏠 Internal
+
+- RF: remove remaining usage of SIX, and thus move away fully from Python 2 [#186](https://github.com/duecredit/duecredit/pull/186) ([@a-detiste](https://github.com/a-detiste) [@yarikoptic](https://github.com/yarikoptic))
+- Ignore "vor" which is now detected as typo [#186](https://github.com/duecredit/duecredit/pull/186) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### 🧪 Tests
+
+- Use teardown_method instead of nose-y teardown [#190](https://github.com/duecredit/duecredit/pull/190) ([@yarikoptic](https://github.com/yarikoptic))
+- Move from Travis to github workflow, disable coveralls [#187](https://github.com/duecredit/duecredit/pull/187) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 2
+
+- Alexandre Detiste ([@a-detiste](https://github.com/a-detiste))
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
 # 0.9.2 (Wed Feb 01 2023)
 
 #### 🐛 Bug Fix
