@@ -13,8 +13,7 @@ import pickle
 import os
 import pytest
 
-from six.moves import StringIO
-from six import text_type
+from io import StringIO
 
 import duecredit.io
 from ..collector import DueCreditCollector, Citation

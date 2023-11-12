@@ -112,7 +112,7 @@ def test_dcite_method():
             assert kwarg2 == 1
             return "load"
 
-        class SomeClass(object):
+        class SomeClass:
             @due.dcite("XXX0", path='someclass:method')
             def method(self, arg1, kwarg2="blah"):
                 """docstring"""
@@ -149,7 +149,7 @@ def test_dcite_method():
             # And we explicitly stated that module need to be cited
             assert citation.cite_module
 
-        class SomeClass2(object):
+        class SomeClass2:
             # Used to test for classes that are not instantiated
             @due.dcite("XXX0", path="some.module.without.method")
             def method2(self, arg1, kwarg2="blah"):
@@ -249,7 +249,7 @@ def test_dcite_match_conditions_method():
     due = DueCreditCollector()
     due.add(BibTeX(_sample_bibtex))
 
-    class Citeable(object):
+    class Citeable:
         def __init__(self, param=None):
             self.param = param
 

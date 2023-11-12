@@ -10,7 +10,6 @@
 """
 import sys
 from os import linesep
-from six import string_types
 
 from distutils.version import StrictVersion, LooseVersion
 
@@ -34,7 +33,7 @@ class UnknownVersion:
         raise TypeError("UNKNOWN version is not comparable")
 
 
-class ExternalVersions(object):
+class ExternalVersions:
     """Helper to figure out/use versions of the external modules.
 
     It maintains a dictionary of `distuil.version.StrictVersion`s to make
@@ -85,7 +84,7 @@ class ExternalVersions(object):
     def __getitem__(self, module):
         # when ran straight in its source code -- fails to discover nipy's version.. TODO
         #if module == 'nipy':
-        if not isinstance(module, string_types):
+        if not isinstance(module, str):
             modname = module.__name__
         else:
             modname = module

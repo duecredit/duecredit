@@ -88,7 +88,7 @@ def parser_add_common_opt(parser, opt, names=None, **kwargs):
     else:
         parser.add_argument(*names, **opt_kwargs)
 
-class RegexpType(object):
+class RegexpType:
     """Factory for creating regular expression types for argparse
 
     DEPRECATED AFAIK -- now things are in the config file...

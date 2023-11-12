@@ -8,17 +8,15 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 from os import linesep
+
 import pytest
 
 from ..version import __version__
 from ..versions import ExternalVersions, StrictVersion
 
-from six import PY3
-
-if PY3:
-    # just to ease testing
-    def cmp(a, b):
-        return (a > b) - (a < b)
+# just to ease testing
+def cmp(a, b):
+    return (a > b) - (a < b)
 
 
 def test_external_versions_basic():

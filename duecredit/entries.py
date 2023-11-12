@@ -8,13 +8,12 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 import re
-from six import PY2
 
 import logging
 lgr = logging.getLogger('duecredit.entries')
 
 
-class DueCreditEntry(object):
+class DueCreditEntry:
     def __init__(self, rawentry, key=None):
         self._rawentry = rawentry
         self._key = key or rawentry.lower()
@@ -34,10 +33,7 @@ class DueCreditEntry(object):
 
     @property
     def rawentry(self):
-        if PY2:
-            return unicode(self._rawentry)
-        else:
-            return self._rawentry
+        return self._rawentry
 
     def _process_rawentry(self):
         pass

@@ -8,8 +8,8 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 import sys
+from io import StringIO
 
-from six.moves import StringIO
 import pytest
 
 from .. import __version__

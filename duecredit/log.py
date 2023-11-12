@@ -33,7 +33,7 @@ def mbasename(s):
         base = basename(dirname(s)) + '.' + base
     return base
 
-class TraceBack(object):
+class TraceBack:
     """Customized traceback to be included in debug messages
     """
 
@@ -138,7 +138,7 @@ class ColorFormatter(logging.Formatter):
         return logging.Formatter.format(self, record)
 
 
-class LoggerHelper(object):
+class LoggerHelper:
     """Helper to establish and control a Logger"""
 
     def __init__(self, name='duecredit'):

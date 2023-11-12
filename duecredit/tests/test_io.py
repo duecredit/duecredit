@@ -12,9 +12,7 @@ import re
 import pickle
 import os
 import pytest
-
-from six.moves import StringIO
-from six import text_type
+from io import StringIO
 
 import duecredit.io
 from ..collector import DueCreditCollector, Citation
@@ -33,14 +31,14 @@ try:
     def test_import_doi():
         doi_good = '10.1038/nrd842'
         kw = dict(sleep=0.00001, retries=2)
-        assert isinstance(import_doi(doi_good, **kw), text_type)
+        assert isinstance(import_doi(doi_good, **kw), str)
 
         doi_bad = 'fasljfdldaksj'
         with pytest.raises(ValueError):
             import_doi(doi_bad, **kw)
 
         doi_zenodo = '10.5281/zenodo.50186'
-        assert isinstance(import_doi(doi_zenodo, **kw), text_type)
+        assert isinstance(import_doi(doi_zenodo, **kw), str)
 
 except ImportError:
     # no vcr, and that is in 2015!

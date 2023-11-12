@@ -10,7 +10,7 @@
 import sys
 import pytest
 
-from six.moves import StringIO
+from io import StringIO
 
 from .. import __main__, __version__
 from .. import due

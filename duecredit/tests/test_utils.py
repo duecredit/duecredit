@@ -14,7 +14,7 @@ from ..utils import is_interactive
 
 
 def test_is_interactive_crippled_stdout(monkeypatch):
-    class MockedOut(object):
+    class MockedOut:
         """the one which has no isatty
         """
         def write(self, *args, **kwargs):
