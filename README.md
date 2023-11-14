@@ -119,7 +119,7 @@ which uses your code and sets `DUECREDIT_ENABLE=yes` environment
 variable or uses `python -m duecredit`, and invokes any of the cited
 function/methods, at the end of the run all collected bibliography
 will be presented to the screen and pickled into `.duecredit.p` file
-in current directory:
+in current directory or to your `DUECREDIT_FILE` environment variable:
 
     $> python -m duecredit examples/example_scipy.py
     I: Simulating 4 blobs
