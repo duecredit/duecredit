@@ -29,10 +29,10 @@ Duecredit is easy to install via pip, simply type:
 
 You can already start "registering" citations using duecredit in your
 Python modules and even registering citations (we call this approach "injections")
-for modules which do not (yet) use duecredit.  duecredit will remain an optional
+for modules that do not (yet) use duecredit.  duecredit will remain an optional
 dependency, i.e. your software will work correctly even without duecredit installed.
 
-For example, list citations of the modules and methods `yourproject` uses with few simple commands:
+For example, list citations of the modules and methods `yourproject` uses with a few simple commands:
 ```bash
 cd /path/to/yourmodule # for ~/yourproject
 cd yourproject # change directory into where the main code base is
@@ -42,7 +42,7 @@ Or you can also display them in BibTex format, using:
 ```bash
 duecredit summary --format=bibtex
 ```
-See this gif animation for better illustration:
+See this gif animation for a better illustration:
 ![Example](examples/duecredit_example.gif)
 
 
@@ -64,17 +64,25 @@ For using duecredit in your software
 
         from .due import due, Doi, BibTeX
 
-     To provide reference for the entire module just use e.g.
+    To provide a generic reference for the entire module just use e.g.
 
          due.cite(Doi("1.2.3/x.y.z"), description="Solves all your problems", path="magicpy")
 
-     To provide a reference for a function or a method, use `dcite` decorator
+    By default, the added reference does not show up in the summary report (but see the
+    `User-view` section below). If your reference is to a core package and you find that it
+    should be listed in the summary then set `cite_module=True` (see [here](https://github.com/duecredit/duecredit/blob/master/duecredit/collector.py#L35) for a complete
+    description of the arguments)
+   
+         due.cite(Doi("1.2.3/x.y.z"), description="The Answer to Everything", path="magicpy", cite_module=True)
+   
+    Similarly, to provide a direct reference for a function or a method, use the `dcite` decorator (by default
+    this decorator sets cite_module=True)
 
          @due.dcite(Doi("1.2.3/x.y.z"), description="Resolves constipation issue")
          def pushit():
              ...
 
-    You can easily obtain DOI for your software using Zenodo.org and few other DOI providers.
+    You can easily obtain a DOI for your software using Zenodo.org and a few other DOI providers.
 
 References can also be entered as BibTeX entries
 
@@ -91,7 +99,7 @@ References can also be entered as BibTeX entries
         
 ### Do the due
 
-Once you obtained the references in the duecredit output, include them in in the references section of your paper or software, which used the cited software.
+Once you obtained the references in the duecredit output, include them in in the references section of your paper or software.
         
 ### Add injections for other existing modules
 
@@ -119,7 +127,7 @@ which uses your code and sets `DUECREDIT_ENABLE=yes` environment
 variable or uses `python -m duecredit`, and invokes any of the cited
 function/methods, at the end of the run all collected bibliography
 will be presented to the screen and pickled into `.duecredit.p` file
-in current directory or to your `DUECREDIT_FILE` environment variable:
+in the current directory or to your `DUECREDIT_FILE` environment setting:
 
     $> python -m duecredit examples/example_scipy.py
     I: Simulating 4 blobs
@@ -238,14 +246,14 @@ an uncited function from that package.
 ## Tags
 
 
-You are welcome to introduce new tags specific for your citations but we hope
-that for consistency across projects, you would use following tags
+You are welcome to introduce new tags specific to your citations but we hope
+that for consistency across projects, you would use the following tags
 
 - `implementation` (default) — an implementation of the cited method
 - `reference-implementation` — the original implementation (ideally by
   the authors of the paper) of the cited method
 - `another-implementation` — some other implementation of
-   the method, e.g. if you would like to provide citation for another
+   the method, e.g. if you would like to provide a citation for another
    implementation of the method you have implemented in your code and for
    which you have already provided `implementation` or
    `reference-implementation` tag
@@ -253,7 +261,7 @@ that for consistency across projects, you would use following tags
   method
 - `edu` — tutorials, textbooks and other materials useful to learn
   more about cited functionality
-- `donate` — should be commonly used with Url entries to point to the
+- `donate` — should be commonly used with URL entries to point to the
   websites  describing how to contribute some funds to the referenced
   project
 - `funding` — to point to the sources of funding which provided support
@@ -267,7 +275,7 @@ that for consistency across projects, you would use following tags
 
 **Problem**: Scientific software is often developed to gain citations for
 original publication through the use of the software implementing it.
-Unfortunately such established procedure discourages contributions
+Unfortunately, such an established procedure discourages contributions
 to existing projects and fosters new projects to be developed from
 scratch.
 
@@ -289,7 +297,7 @@ everyone likes to bash about (reproducibility, longevity, etc.).
 libraries (e.g., NumPy, SciPy, atlas) which might not even be visible
 at the user level.  Therefore they are rarely referenced in the
 publications despite providing the fundamental core for solving a
-scientific problem at hands.
+scientific problem at hand.
 
 **Solution**: With automated bibliography compilation for all used
 libraries, such projects and their authors would get a chance to
@@ -306,7 +314,7 @@ audiences without proliferation of the low quality scientific software.
 
 [sempervirens](https://github.com/njsmith/sempervirens) -- *an
 experimental prototype for gathering anonymous, opt-in usage data for
-open scientific software*.  Eventually in duecredit we aim either to
+open scientific software*.  Eventually, in duecredit we aim either to
 provide similar functionality (since we are collecting such
 information as well) or just interface/report to sempervirens.
 
