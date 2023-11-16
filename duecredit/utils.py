@@ -17,11 +17,10 @@ import shutil
 import stat
 import tempfile
 import time
-
 from os.path import exists, join as opj, isabs, expandvars, expanduser, abspath
-
 from os.path import realpath
 from functools import wraps
+from typing import Any, Union
 
 #
 # Some useful variables
@@ -39,7 +38,7 @@ lgr = logging.getLogger("duecredit.utils")
 #
 
 
-def is_interactive():
+def is_interactive() -> bool:
     """Return True if all in/outs are tty"""
     if any(not hasattr(inout, 'isatty') for inout in (sys.stdin, sys.stdout, sys.stderr)):
         lgr.warning("Assuming non interactive session since isatty found missing")
@@ -49,7 +48,7 @@ def is_interactive():
     return sys.stdin.isatty() and sys.stdout.isatty() and sys.stderr.isatty()
 
 
-def expandpath(path, force_absolute=True):
+def expandpath(path: str, force_absolute: bool = True) -> str:
     """Expand all variables and user handles in a path.
 
     By default return an absolute path
@@ -60,7 +59,7 @@ def expandpath(path, force_absolute=True):
     return path
 
 
-def is_explicit_path(path):
+def is_explicit_path(path: str) -> bool:
     """Return whether a path explicitly points to a location
 
     Any absolute path, or relative path starting with either '../' or
@@ -71,7 +70,7 @@ def is_explicit_path(path):
         or path.startswith(os.curdir + os.sep) \
         or path.startswith(os.pardir + os.sep)
 
-def rotree(path, ro=True, chmod_files=True):
+def rotree(path: str, ro: bool = True, chmod_files: bool = True) -> None:
     """To make tree read-only or writable
 
     Parameters
@@ -98,7 +97,7 @@ def rotree(path, ro=True, chmod_files=True):
         chmod(root)
 
 
-def rmtree(path, chmod_files='auto', *args, **kwargs):
+def rmtree(path: str, chmod_files: Union[str, bool] = 'auto', *args: Any, **kwargs: Any) -> None:
     """To remove git-annex .git it is needed to make all files and directories writable again first
 
     Parameters
@@ -113,17 +112,20 @@ def rmtree(path, chmod_files='auto', *args, **kwargs):
     """
     # Give W permissions back only to directories, no need to bother with files
     if chmod_files == 'auto':
-        chmod_files = on_windows
+        chmod_files_ = on_windows
+    else:
+        assert type(chmod_files) is bool
+        chmod_files_ = chmod_files
 
     if not os.path.islink(path):
-        rotree(path, ro=False, chmod_files=chmod_files)
+        rotree(path, ro=False, chmod_files=chmod_files_)
         shutil.rmtree(path, *args, **kwargs)
     else:
         # just remove the symlink
         os.unlink(path)
 
 
-def rmtemp(f, *args, **kwargs):
+def rmtemp(f: str, *args: Any, **kwargs: Any) -> None:
     """Wrapper to centralize removing of temp files so we could keep them around
 
     It will not remove the temporary file/directory if DATALAD_TESTS_KEEPTEMP
@@ -274,14 +276,14 @@ def get_tempfile_kwargs(tkwargs={}, prefix="", wrapped=None):
 _sys_excepthook = sys.excepthook  # Just in case we ever need original one
 
 
-def setup_exceptionhook():
+def setup_exceptionhook() -> None:
     """Overloads default sys.excepthook with our exceptionhook handler.
 
        If interactive, our exceptionhook handler will invoke
        pdb.post_mortem; if not interactive, then invokes default handler.
     """
 
-    def _duecredit_pdb_excepthook(type, value, tb):
+    def _duecredit_pdb_excepthook(type, value, tb) -> None:
 
         if is_interactive():
             import traceback, pdb
