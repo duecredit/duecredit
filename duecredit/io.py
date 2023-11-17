@@ -23,7 +23,7 @@ import warnings
 from collections import defaultdict
 from distutils.version import StrictVersion
 from os.path import dirname, exists
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Type, Union
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, Text, Url
@@ -286,7 +286,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = 'harvard1') -> str:
             "For formatted output we need citeproc and all of its dependencies "
             "(such as lxml) but there is a problem while importing citeproc: %s"
             % str(e))
-    decode_exceptions: Tuple[type[Exception], ...]
+    decode_exceptions: Tuple[Type[Exception], ...]
     try:
         from citeproc.source.bibtex.bibparse import BibTeXDecodeError
         decode_exceptions = (UnicodeDecodeError, BibTeXDecodeError)
