@@ -127,7 +127,7 @@ class Output:
             # Filter out citations based on tags
             citations = dict((k, c)
                              for k, c in citations.items()
-                             if tagset.intersection(c.tagset))
+                             if tagset.intersection(c.tags))
 
         packages = defaultdict(list)
         modules = defaultdict(list)
