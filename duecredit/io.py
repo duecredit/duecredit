@@ -154,7 +154,7 @@ class Output:
 
 
 class TextOutput(Output):
-    def __init__(self, fd, collector, style) -> None:
+    def __init__(self, fd, collector, style=None) -> None:
         super(TextOutput, self).__init__(fd, collector)
         self.style = style
         if 'DUECREDIT_STYLE' in os.environ.keys():
