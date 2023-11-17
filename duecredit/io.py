@@ -21,9 +21,10 @@ import tempfile
 import time
 import warnings
 from collections import defaultdict
+from collector import Citation
 from distutils.version import StrictVersion
 from os.path import dirname, exists
-from typing import Any, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, Text, Url
@@ -101,22 +102,30 @@ class Output:
         self.fd = fd
         self.collector = collector
 
-    def _get_collated_citations(self, tags=None, all_=None):
+    def _get_collated_citations(
+        self,
+        tags: Optional[List[str]] = None,
+        all_: Optional[bool] = None
+    ) -> 'Tuple[Dict[str, List[Citation]], Dict[str, List[Citation]], Dict[str, List[Citation]]]':
         """Given all the citations, filter only those that the user wants and
         those that were actually used"""
         if not tags:
-            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation,dataset').split(',')
+            env = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation,dataset')
+            assert type(env) is str
+            tags = env.split(',')
         if all_ is None:
             # consult env var
-            all_ = os.environ.get('DUECREDIT_REPORT_ALL', '').lower() in {'1', 'true', 'yes', 'on'}
-        tags = set(tags)
+            env = os.environ.get('DUECREDIT_REPORT_ALL', '').lower()
+            assert type(env) is str
+            all_ = env in {'1', 'true', 'yes', 'on'}
+        tagset = set(tags)
 
         citations = self.collector.citations
-        if tags != {'*'}:
+        if tagset != {'*'}:
             # Filter out citations based on tags
             citations = dict((k, c)
                              for k, c in citations.items()
-                             if tags.intersection(c.tags))
+                             if tagset.intersection(c.tagset))
 
         packages = defaultdict(list)
         modules = defaultdict(list)
@@ -139,8 +148,8 @@ class Output:
         for package in cited_packages:
             package_citations = packages[package]
             if all_ or \
-                any(filter(lambda x: x.cite_module, package_citations)) or \
-                any(filter(lambda x: _is_contained(package, x), cited_modobj)):
+                any(filter(lambda x: x.cite_module, package_citations)) or any(filter(lambda x: _is_contained(package, x), cited_modobj)):  # type: ignore
+                # WIP, mypy doesn(t understand the 'ignore' on a continuated line
                 continue
             else:
                 # we don't need it
@@ -218,6 +227,7 @@ class TextOutput(Output):
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
             for path in paths:
                 for cit in pmo[path]:
+                    assert type(cit) is Citation
                     ek = cit.entry.key
                     if ek not in printed_keys:
                         self.fd.write('\n[{0}] '.format(citation_nr[ek]))

@@ -13,7 +13,7 @@ import pickle
 import os
 import pytest
 from io import StringIO
-from typing import List, TYPE_CHECKING
+from typing import Any, List, TYPE_CHECKING
 
 import duecredit.io
 from ..collector import DueCreditCollector, Citation, CitationKey
@@ -311,7 +311,7 @@ def test_text_output_dump_formatting() -> None:
     # XXX: atm just to see if it spits out stuff
     @due.dcite(BibTeX(_sample_bibtex), description='solution to life',
                path='mymodule', version='0.0.16')
-    def mymodule(arg1, kwarg2="blah"):
+    def mymodule(arg1: Any, kwarg2: Any = "blah") -> Any:
         """docstring"""
         assert arg1 == "magical"
         assert kwarg2 == 1
@@ -348,7 +348,7 @@ def test_text_output_dump_formatting() -> None:
 
     @due.dcite(BibTeX(samples_bibtex[0]), description='another solution',
                path='myothermodule', version='0.0.666')
-    def myothermodule(arg1, kwarg2="blah"):
+    def myothermodule(arg1: Any, kwarg2: Any = "blah") -> Any:
         """docstring"""
         assert arg1 == "magical"
         assert kwarg2 == 1
@@ -479,7 +479,7 @@ def test_get_text_rendering(monkeypatch: 'MonkeyPatch') -> None:
     # Patch bibtex_rendering
     sample_bibtex = BibTeX(_sample_bibtex)
 
-    def get_bibtex_rendering(*args, **kwargs):
+    def get_bibtex_rendering(*args: Any, **kwargs: Any) -> BibTeX:
         return sample_bibtex
 
     monkeypatch.setattr(duecredit.io, 'get_bibtex_rendering', get_bibtex_rendering)
@@ -487,7 +487,7 @@ def test_get_text_rendering(monkeypatch: 'MonkeyPatch') -> None:
     # Patch format_bibtex
     fmt_args = {}
 
-    def format_bibtex(entry, style):
+    def format_bibtex(entry: str, style: str) -> None:
         fmt_args["entry"] = entry
         fmt_args["style"] = style
 
