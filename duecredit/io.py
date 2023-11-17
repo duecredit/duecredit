@@ -85,7 +85,7 @@ def import_doi(doi: str, sleep: float = 0.5, retries: int = 10) -> str:
     return bibtex
 
 
-def _is_contained(toppath, subpath):
+def _is_contained(toppath: str, subpath: str) -> bool:
     if ':' not in toppath:
         return ((toppath == subpath) or
                 (subpath.startswith(toppath + '.')) or

@@ -21,7 +21,7 @@ from .test_collector import _sample_bibtex, _sample_doi, _sample_bibtex2
 from ..entries import BibTeX, Doi, Text, Url
 
 
-def test_comparison():
+def test_comparison() -> None:
     assert Text("123") == Text("123")
     assert Text("123") != Text("124")
     assert Text("123", 'key') == Text("123", 'key')
@@ -32,6 +32,6 @@ def test_comparison():
     assert Url("http://123/1", 'key') == Url("http://123/1", 'key')
 
 
-def test_sugaring_api():
+def test_sugaring_api() -> None:
     assert Url("http://1.com").url == "http://1.com"
     assert Doi("1.com").doi == "1.com"

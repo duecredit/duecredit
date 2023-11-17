@@ -17,7 +17,7 @@ from distutils.version import StrictVersion, LooseVersion
 try:
     from importlib.metadata import version as metadata_version
 except ImportError:
-    from importlib_metadata import version as metadata_version
+    from importlib_metadata import version as metadata_version  # type: ignore
 
 
 # To depict an unknown version, which can't be compared by mistake etc
