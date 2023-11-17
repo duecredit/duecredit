@@ -13,13 +13,17 @@ import pickle
 import os
 import pytest
 from io import StringIO
+from typing import Any, List, TYPE_CHECKING
 
 import duecredit.io
-from ..collector import DueCreditCollector, Citation
+from ..collector import DueCreditCollector, Citation, CitationKey
 from .test_collector import _sample_bibtex, _sample_doi, _sample_bibtex2
 from ..entries import BibTeX, Doi, Text, Url
 from ..io import TextOutput, PickleOutput, import_doi, \
     get_text_rendering, format_bibtex, _is_contained, Output, BibTeXOutput
+
+if TYPE_CHECKING:
+    from pytest import MonkeyPatch
 
 try:
 	# TODO: for some reason test below started to complain that we are trying
@@ -28,24 +32,23 @@ try:
     # import vcr
 
     # @vcr.use_cassette()
-    def test_import_doi():
+    def test_import_doi() -> None:
         doi_good = '10.1038/nrd842'
-        kw = dict(sleep=0.00001, retries=2)
-        assert isinstance(import_doi(doi_good, **kw), str)
+        assert isinstance(import_doi(doi_good, sleep=0.00001, retries=2), str)
 
         doi_bad = 'fasljfdldaksj'
         with pytest.raises(ValueError):
-            import_doi(doi_bad, **kw)
+            import_doi(doi_bad, sleep=0.00001, retries=2)
 
         doi_zenodo = '10.5281/zenodo.50186'
-        assert isinstance(import_doi(doi_zenodo, **kw), str)
+        assert isinstance(import_doi(doi_zenodo, sleep=0.00001, retries=2), str)
 
 except ImportError:
     # no vcr, and that is in 2015!
     pass
 
 
-def test_pickleoutput(tmpdir):
+def test_pickleoutput(tmpdir) -> None:
     #entry = BibTeX('@article{XXX0, ...}')
     entry = BibTeX("@article{Atkins_2002,\n"
                    "title=title,\n"
@@ -71,7 +74,7 @@ def test_pickleoutput(tmpdir):
     for collector in collectors:
         pickler = PickleOutput(collector, fn=tempfile)
         assert pickler.fn == tempfile
-        assert pickler.dump() is None
+        assert pickler.dump() is None  # type: ignore
 
         with open(tempfile, 'rb') as f:
             collector_loaded = pickle.load(f)
@@ -82,7 +85,7 @@ def test_pickleoutput(tmpdir):
         os.unlink(tempfile)
 
 
-def test_output():
+def test_output() -> None:
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -99,8 +102,8 @@ def test_output():
     assert len(modules) == 1
     assert len(objects) == 0
 
-    assert packages['package'][0] == collector.citations[('package', entry.get_key())]
-    assert modules['package.module'][0] == collector.citations[('package.module', entry.get_key())]
+    assert packages['package'][0] == collector.citations[CitationKey('package', entry.get_key())]
+    assert modules['package.module'][0] == collector.citations[CitationKey('package.module', entry.get_key())]
 
     # no toppackage
     collector = DueCreditCollector()
@@ -115,7 +118,7 @@ def test_output():
     assert len(modules) == 1
     assert len(objects) == 0
 
-    assert modules['package2.module'][0] == collector.citations[('package2.module', entry.get_key())]
+    assert modules['package2.module'][0] == collector.citations[CitationKey('package2.module', entry.get_key())]
 
     # toppackage because required
     collector = DueCreditCollector()
@@ -130,8 +133,8 @@ def test_output():
     assert len(modules) == 1
     assert len(objects) == 0
 
-    assert packages['package'][0] == collector.citations[('package', entry.get_key())]
-    assert modules['package2.module'][0] == collector.citations[('package2.module', entry.get_key())]
+    assert packages['package'][0] == collector.citations[CitationKey('package', entry.get_key())]
+    assert modules['package2.module'][0] == collector.citations[CitationKey('package2.module', entry.get_key())]
 
     # check it returns multiple entries
     collector = DueCreditCollector()
@@ -153,9 +156,9 @@ def test_output():
     # entry key is XX..
     packs = sorted(packages['package'], key=lambda x: x.entry.key)
 
-    assert packs[0] == collector.citations[('package', entry2.get_key())]
-    assert packs[1] == collector.citations[('package', entry.get_key())]
-    assert modules['package.module'][0] == collector.citations[('package.module', entry.get_key())]
+    assert packs[0] == collector.citations[CitationKey('package', entry2.get_key())]
+    assert packs[1] == collector.citations[CitationKey('package', entry.get_key())]
+    assert modules['package.module'][0] == collector.citations[CitationKey('package.module', entry.get_key())]
 
     # check that filtering works
     collector = DueCreditCollector()
@@ -172,11 +175,11 @@ def test_output():
     assert len(modules) == 1
     assert len(objects) == 0
 
-    assert packages['package'][0] == collector.citations[('package', entry.get_key())]
-    assert modules['package.module'][0] == collector.citations[('package.module', entry.get_key())]
+    assert packages['package'][0] == collector.citations[CitationKey('package', entry.get_key())]
+    assert modules['package.module'][0] == collector.citations[CitationKey('package.module', entry.get_key())]
 
 
-def test_output_return_all(monkeypatch):
+def test_output_return_all(monkeypatch: 'MonkeyPatch') -> None:
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -206,7 +209,7 @@ def test_output_return_all(monkeypatch):
         assert not objects
 
 
-def test_output_tags(monkeypatch):
+def test_output_tags(monkeypatch: 'MonkeyPatch') -> None:
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -241,7 +244,7 @@ def test_output_tags(monkeypatch):
         assert not objects
 
 
-def test_text_output():
+def test_text_output() -> None:
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -302,13 +305,13 @@ def test_text_output():
     assert '[3]' not in value, "value was %s" %value
 
 
-def test_text_output_dump_formatting():
+def test_text_output_dump_formatting() -> None:
     due = DueCreditCollector()
 
     # XXX: atm just to see if it spits out stuff
     @due.dcite(BibTeX(_sample_bibtex), description='solution to life',
                path='mymodule', version='0.0.16')
-    def mymodule(arg1, kwarg2="blah"):
+    def mymodule(arg1: Any, kwarg2: Any = "blah") -> Any:
         """docstring"""
         assert arg1 == "magical"
         assert kwarg2 == 1
@@ -345,7 +348,7 @@ def test_text_output_dump_formatting():
 
     @due.dcite(BibTeX(samples_bibtex[0]), description='another solution',
                path='myothermodule', version='0.0.666')
-    def myothermodule(arg1, kwarg2="blah"):
+    def myothermodule(arg1: Any, kwarg2: Any = "blah") -> Any:
         """docstring"""
         assert arg1 == "magical"
         assert kwarg2 == 1
@@ -372,7 +375,7 @@ def test_text_output_dump_formatting():
     value = strio.getvalue()
     lines = value.split('\n')
 
-    citation_numbers = []
+    citation_numbers: List[str] = []
     reference_numbers = []
     references = []
     for line in lines:
@@ -392,7 +395,7 @@ def test_text_output_dump_formatting():
     assert ('ignore', None, UserWarning, None, 0) not in warnings.filters
 
 
-def test_bibtex_output():
+def test_bibtex_output() -> None:
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -438,13 +441,13 @@ def test_bibtex_output():
     value = strio.getvalue()
     value_ = sorted(value.strip().split('\n'))
     bibtex = sorted((_sample_bibtex.strip() + _sample_bibtex2.rstrip()).split('\n'))
-    assert value_ == bibtex, 'Value was {0}'.format(value_, bibtex)
+    assert value_ == bibtex, 'Value was {0} instead of {1}'.format(value_, bibtex)
 
     # assert_equal(value_, bibtex,
     #              msg='Value was {0}'.format(value_, bibtex))
 
 
-def _generate_sample_bibtex():
+def _generate_sample_bibtex() -> str:
     """
     Generate a random sample bibtex to test multiple references
     """
@@ -472,11 +475,11 @@ def _generate_sample_bibtex():
     return sample_bibtex
 
 
-def test_get_text_rendering(monkeypatch):
+def test_get_text_rendering(monkeypatch: 'MonkeyPatch') -> None:
     # Patch bibtex_rendering
     sample_bibtex = BibTeX(_sample_bibtex)
 
-    def get_bibtex_rendering(*args, **kwargs):
+    def get_bibtex_rendering(*args: Any, **kwargs: Any) -> BibTeX:
         return sample_bibtex
 
     monkeypatch.setattr(duecredit.io, 'get_bibtex_rendering', get_bibtex_rendering)
@@ -484,7 +487,7 @@ def test_get_text_rendering(monkeypatch):
     # Patch format_bibtex
     fmt_args = {}
 
-    def format_bibtex(entry, style):
+    def format_bibtex(entry: str, style: str) -> None:
         fmt_args["entry"] = entry
         fmt_args["style"] = style
 
@@ -506,19 +509,19 @@ def test_get_text_rendering(monkeypatch):
     assert bibtex_output == doi_output
 
 
-def test_text_text_rendering():
+def test_text_text_rendering() -> None:
     text = "I am so free"
     citation = Citation(Text(text), path='mypath')
     assert get_text_rendering(citation) == text
 
 
-def test_url_text_rendering():
+def test_url_text_rendering() -> None:
     url = "http://example.com"
     citation = Citation(Url(url), path='mypath')
     assert get_text_rendering(citation) == "URL: " + url
 
 
-def test_format_bibtex_zenodo_doi():
+def test_format_bibtex_zenodo_doi() -> None:
     """
     test that we can correctly parse bibtex entries obtained from a zenodo doi
     """
@@ -543,7 +546,7 @@ def test_format_bibtex_zenodo_doi():
             """Ghosh, S. et al., 2016. nipype: Release candidate 1 for version 0.12.0.""")
 
 
-def test_format_bibtex_with_utf_characters():
+def test_format_bibtex_with_utf_characters() -> None:
     """
     test that we can correctly parse bibtex entry if it contains utf-8 characters
     """
@@ -561,7 +564,7 @@ def test_format_bibtex_with_utf_characters():
     assert (format_bibtex(BibTeX(bibtex_utf8)) == u'Brótt, M. et al., 2015. nibabel 2.0.1.')
 
 
-def test_is_contained():
+def test_is_contained() -> None:
     toppath = 'package'
     assert _is_contained(toppath, 'package.module')
     assert _is_contained(toppath, 'package.module.submodule')

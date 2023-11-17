@@ -55,6 +55,7 @@ try:
                     stdout=PIPE, stderr=sys.stderr)
         if git.wait() != 0:
             raise OSError
+        assert git.stdout
         line = git.stdout.readlines()[0].strip().decode('ascii')
         if line.count('-') >= 2:
             # we should parse it to make version compatible with PEP440

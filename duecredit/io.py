@@ -12,36 +12,45 @@ import os
 if 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in os.environ.keys():
     raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
 
-import re
-import locale
-import time
-from collections import defaultdict
 import copy
-from os.path import dirname, exists
+import locale
 import pickle
+import re
+import sys
 import tempfile
+import time
 import warnings
-import platform
-from time import sleep
+from collections import defaultdict
+from distutils.version import StrictVersion
+from os.path import dirname, exists
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, TYPE_CHECKING
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, Text, Url
 from .log import lgr
 from .versions import external_versions
 
+if TYPE_CHECKING:
+    from collector import Citation
+
 _PREFERRED_ENCODING = locale.getpreferredencoding()
-platform_system = platform.system().lower()
-on_windows = platform_system == 'windows'
+
+# https://github.com/python/mypy/issues/9242#issuecomment-667586397
+# https://github.com/spack/spack/pull/35640
+if sys.platform == "win32":
+    OSExceptions = (OSError, WindowsError)
+else:
+    OSExceptions = (OSError,)
 
 
-def get_doi_cache_file(doi):
+def get_doi_cache_file(doi: str) -> str:
     # where to cache bibtex entries
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
     return os.path.join(CACHE_DIR, doi)
 
 
-def import_doi(doi, sleep=0.5, retries=10):
+def import_doi(doi: str, sleep: float = 0.5, retries: int = 10) -> str:
     import requests
     cached = get_doi_cache_file(doi)
 
@@ -79,7 +88,7 @@ def import_doi(doi, sleep=0.5, retries=10):
     return bibtex
 
 
-def _is_contained(toppath, subpath):
+def _is_contained(toppath: str, subpath: str) -> bool:
     if ':' not in toppath:
         return ((toppath == subpath) or
                 (subpath.startswith(toppath + '.')) or
@@ -91,26 +100,34 @@ def _is_contained(toppath, subpath):
 class Output:
     """A generic class for setting up citations that then will be outputted
     differently (e.g., Bibtex, Text, etc.)"""
-    def __init__(self, fd, collector):
+    def __init__(self, fd, collector) -> None:
         self.fd = fd
         self.collector = collector
 
-    def _get_collated_citations(self, tags=None, all_=None):
+    def _get_collated_citations(
+        self,
+        tags: Optional[List[str]] = None,
+        all_: Optional[bool] = None
+    ) -> 'Tuple[Dict[str, List[Citation]], Dict[str, List[Citation]], Dict[str, List[Citation]]]':
         """Given all the citations, filter only those that the user wants and
         those that were actually used"""
         if not tags:
-            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation,dataset').split(',')
+            env = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation,dataset')
+            assert type(env) is str
+            tags = env.split(',')
         if all_ is None:
             # consult env var
-            all_ = os.environ.get('DUECREDIT_REPORT_ALL', '').lower() in {'1', 'true', 'yes', 'on'}
-        tags = set(tags)
+            env = os.environ.get('DUECREDIT_REPORT_ALL', '').lower()
+            assert type(env) is str
+            all_ = env in {'1', 'true', 'yes', 'on'}
+        tagset = set(tags)
 
         citations = self.collector.citations
-        if tags != {'*'}:
+        if tagset != {'*'}:
             # Filter out citations based on tags
             citations = dict((k, c)
                              for k, c in citations.items()
-                             if tags.intersection(c.tags))
+                             if tagset.intersection(c.tags))
 
         packages = defaultdict(list)
         modules = defaultdict(list)
@@ -133,8 +150,8 @@ class Output:
         for package in cited_packages:
             package_citations = packages[package]
             if all_ or \
-                any(filter(lambda x: x.cite_module, package_citations)) or \
-                any(filter(lambda x: _is_contained(package, x), cited_modobj)):
+                any(filter(lambda x: x.cite_module, package_citations)) or any(filter(lambda x: _is_contained(package, x), cited_modobj)):  # type: ignore
+                # WIP, mypy doesn(t understand the 'ignore' on a continuated line
                 continue
             else:
                 # we don't need it
@@ -142,13 +159,13 @@ class Output:
 
         return packages, modules, objects
 
-    def dump(self, tags=None):
+    def dump(self, tags=None) -> None:
         raise NotImplementedError
 
 
 
 class TextOutput(Output):
-    def __init__(self, fd, collector, style=None):
+    def __init__(self, fd, collector, style=None) -> None:
         super(TextOutput, self).__init__(fd, collector)
         self.style = style
         if 'DUECREDIT_STYLE' in os.environ.keys():
@@ -158,7 +175,7 @@ class TextOutput(Output):
 
 
     @staticmethod
-    def _format_citations(citations, citation_nr):
+    def _format_citations(citations, citation_nr) -> str:
         descriptions = map(str, set(str(r.description) for r in citations))
         versions = map(str, set(str(r.version) for r in citations))
         refnrs = map(str, [citation_nr[c.entry.key] for c in citations])
@@ -167,7 +184,7 @@ class TextOutput(Output):
         return '- {0} / {1} (v {2}) [{3}]\n'.format(
             ", ".join(descriptions), path, ', '.join(versions), ', '.join(refnrs))
 
-    def dump(self, tags=None):
+    def dump(self, tags=None) -> None:
         # get 'model' of citations
         packages, modules, objects = self._get_collated_citations(tags)
         # put everything into a single dict
@@ -212,7 +229,8 @@ class TextOutput(Output):
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
             for path in paths:
                 for cit in pmo[path]:
-                    ek = cit.entry.key
+                    # 'import Citation / assert type(cit) is Citation' would pollute environment
+                    ek = cit.entry.key  # type: ignore
                     if ek not in printed_keys:
                         self.fd.write('\n[{0}] '.format(citation_nr[ek]))
                         self.fd.write(get_text_rendering(cit,
@@ -221,7 +239,7 @@ class TextOutput(Output):
             self.fd.write('\n')
 
 
-def get_text_rendering(citation, style='harvard1'):
+def get_text_rendering(citation, style: str = 'harvard1') -> str:
     from .collector import Citation
     entry = citation.entry
     if isinstance(entry, Doi):
@@ -239,7 +257,7 @@ def get_text_rendering(citation, style='harvard1'):
         return str(entry)
 
 
-def get_bibtex_rendering(entry):
+def get_bibtex_rendering(entry: Union[Doi, BibTeX]) -> BibTeX:
     if isinstance(entry, Doi):
         return BibTeX(import_doi(entry.doi))
     elif isinstance(entry, BibTeX):
@@ -248,7 +266,7 @@ def get_bibtex_rendering(entry):
         raise ValueError("Have no clue how to get bibtex out of %s" % entry)
 
 
-def condition_bibtex(bibtex):
+def condition_bibtex(bibtex: str) -> bytes:
     """Given a bibtex entry, "condition" it for processing with citeproc
 
     Primarily a set of workarounds for either non-standard BibTeX entries
@@ -268,11 +286,10 @@ def condition_bibtex(bibtex):
     # remove opening letter, e.g. 'S123' -> '123'
     # related issue: https://github.com/brechtm/citeproc-py/issues/74
     bibtex = re.sub(r'(pages\s*=\s*["{])([a-zA-Z])', r'\g<1>', bibtex)
-    bibtex = bibtex.encode('utf-8')
-    return bibtex
+    return bibtex.encode('utf-8')
 
 
-def format_bibtex(bibtex_entry, style='harvard1'):
+def format_bibtex(bibtex_entry: BibTeX, style: str = 'harvard1') -> str:
     try:
         from citeproc.source.bibtex import BibTeX as cpBibTeX
         import citeproc as cp
@@ -281,13 +298,13 @@ def format_bibtex(bibtex_entry, style='harvard1'):
             "For formatted output we need citeproc and all of its dependencies "
             "(such as lxml) but there is a problem while importing citeproc: %s"
             % str(e))
-    decode_exceptions = UnicodeDecodeError
+    decode_exceptions: Tuple[Type[Exception], ...]
     try:
         from citeproc.source.bibtex.bibparse import BibTeXDecodeError
-        decode_exceptions = (decode_exceptions, BibTeXDecodeError)
+        decode_exceptions = (UnicodeDecodeError, BibTeXDecodeError)
     except ImportError:
         # this version doesn't yet have this exception defined
-        pass
+        decode_exceptions = (UnicodeDecodeError, )
     key = bibtex_entry.get_key()
     # need to save it temporarily to use citeproc-py
     fname = tempfile.mktemp(suffix='.bib')
@@ -307,11 +324,12 @@ def format_bibtex(bibtex_entry, style='harvard1'):
                 bib_source = cpBibTeX(fname, encoding='utf-8')
         except Exception as e:
             msg = "Failed to process BibTeX file %s: %s." % (fname, e)
-            citeproc_version = external_versions['citeproc']
-            if 'unexpected keyword argument' in str(e) and \
-                    citeproc_version and citeproc_version < '0.4':
-                err = "need a newer citeproc-py >= 0.4.0"
-                msg += " You might just " + err
+            if 'unexpected keyword argument' in str(e):
+                citeproc_version = external_versions['citeproc']
+                if type(citeproc_version) is StrictVersion:
+                     if citeproc_version < StrictVersion('0.4'):
+                         err = "need a newer citeproc-py >= 0.4.0"
+                         msg += " You might just " + err
             else:
                 err = str(e)
             lgr.error(msg)
@@ -327,13 +345,12 @@ def format_bibtex(bibtex_entry, style='harvard1'):
         bibliography.register(citation)
     finally:
         if not os.environ.get("DUECREDIT_KEEPTEMP"):
-            exceptions = (OSError, WindowsError) if on_windows else OSError
             for i in range(50):
                 try:
                     os.unlink(fname)
-                except exceptions:
+                except OSExceptions:
                     if i < 49:
-                        sleep(0.1)
+                        time.sleep(0.1)
                         continue
                     else:
                         raise
@@ -346,24 +363,24 @@ def format_bibtex(bibtex_entry, style='harvard1'):
 
 # TODO: harmonize order of arguments
 class PickleOutput:
-    def __init__(self, collector, fn=DUECREDIT_FILE):
+    def __init__(self, collector, fn=DUECREDIT_FILE) -> None:
         self.collector = collector
         self.fn = fn
 
-    def dump(self):
+    def dump(self) -> None:
         with open(self.fn, 'wb') as f:
             pickle.dump(self.collector, f)
 
     @classmethod
-    def load(cls, filename=DUECREDIT_FILE):
+    def load(cls, filename: str = DUECREDIT_FILE) -> Any:
         with open(filename, 'rb') as f:
             return pickle.load(f)
 
 class BibTeXOutput(Output):
-    def __init__(self, fd, collector):
+    def __init__(self, fd, collector) -> None:
         super(BibTeXOutput, self).__init__(fd, collector)
 
-    def dump(self, tags=None):
+    def dump(self, tags=None) -> None:
         packages, modules, objects = self._get_collated_citations(tags)
         # get all the citations in order
         pmo = {}
@@ -389,5 +406,5 @@ class BibTeXOutput(Output):
             self.fd.write(bibtex.rawentry + "\n")
 
 
-def load_due(filename):
+def load_due(filename: str) -> Any:
     return PickleOutput.load(filename)

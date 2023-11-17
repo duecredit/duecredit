@@ -9,7 +9,7 @@
 """
 Automatic injection of bibliography entries for skimage module
 """
-
+from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX
 
@@ -18,8 +18,10 @@ from ..entries import Doi, BibTeX
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
+def inject(injector: 'DueCreditInjector') -> None:
     #http://scikit-image.org
     injector.add('skimage', None, Doi('10.7717/peerj.453'),
                     description='scikit-image: Image processing in Python.',

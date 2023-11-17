@@ -9,19 +9,22 @@
 
 import sys
 from io import StringIO
+from typing import TYPE_CHECKING
 
 import pytest
 
 from .. import __version__
 from ..cmdline import main
 
+if TYPE_CHECKING:
+    from pytest import MonkeyPatch
 
-def test_import():
+def test_import() -> None:
     import duecredit.cmdline
     import duecredit.cmdline.main
 
 
-def test_main_help(monkeypatch):
+def test_main_help(monkeypatch: 'MonkeyPatch') -> None:
     # Patch stdout
     fakestdout = StringIO()
     monkeypatch.setattr(sys, "stdout", fakestdout)
@@ -30,7 +33,7 @@ def test_main_help(monkeypatch):
     assert fakestdout.getvalue().lstrip().startswith("Usage: ")
 
 
-def test_main_version(monkeypatch):
+def test_main_version(monkeypatch: 'MonkeyPatch') -> None:
     # Patch stdout or stderr for different Python versions -- catching both
     fakestdout = StringIO()
     fakeout = 'stdout'
@@ -42,9 +45,9 @@ def test_main_version(monkeypatch):
 
 # smoke test the cmd_summary
 # TODO: carry sample .duecredit.p, point to that file, monkeypatch TextOutput and BibTeXOutput .dumps
-def test_smoke_cmd_summary():
+def test_smoke_cmd_summary() -> None:
     main.main(['summary'])
 
 
-def test_cmd_test():  # test the not implemented cmd_test
+def test_cmd_test() -> None:  # test the not implemented cmd_test
     pytest.raises(SystemExit, main.main, ['test'])

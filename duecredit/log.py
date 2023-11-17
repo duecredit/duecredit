@@ -8,8 +8,15 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-import logging, os, sys, platform
+import logging
 import logging.handlers
+import os
+import platform
+import re
+import sys
+import traceback
+from os.path import basename, dirname
+from typing import Optional, Union
 
 from .utils import is_interactive
 
@@ -17,11 +24,8 @@ __all__ = ['ColorFormatter', 'log']
 
 # Snippets from traceback borrowed from PyMVPA upstream/2.4.0-39-g69ad545  MIT license
 
-import traceback
-import re
-from os.path import basename, dirname
 
-def mbasename(s):
+def mbasename(s: str) -> str:
     """Custom function to include directory name if filename is too common
 
     Also strip .py at the end
@@ -37,7 +41,7 @@ class TraceBack:
     """Customized traceback to be included in debug messages
     """
 
-    def __init__(self, collide=False):
+    def __init__(self, collide: bool=False) -> None:
         """Initialize TraceBack metric
 
         Parameters
@@ -49,7 +53,7 @@ class TraceBack:
         self.__prev = ""
         self.__collide = collide
 
-    def __call__(self):
+    def __call__(self) -> str:
         ftb = traceback.extract_stack(limit=100)[:-2]
         entries = [[mbasename(x[0]), str(x[1])] for x in ftb if mbasename(x[0]) != 'logging.__init__']
         entries = [ e for e in entries if e[0] != 'unittest' ]
@@ -96,7 +100,7 @@ class ColorFormatter(logging.Formatter):
       'ERROR': RED
     }
 
-    def __init__(self, use_color=None, log_name=False):
+    def __init__(self, use_color: Optional[bool] = None, log_name: bool = False) -> None:
         if use_color is None:
             # if 'auto' - use color only if all streams are tty
             use_color = is_interactive()
@@ -106,21 +110,21 @@ class ColorFormatter(logging.Formatter):
             if os.environ.get('DUECREDIT_LOGTRACEBACK', False) else None
         logging.Formatter.__init__(self, msg)
 
-    def _get_format(self, log_name=False):
+    def _get_format(self, log_name: bool = False) -> str:
         return ("$BOLD%(asctime)-15s$RESET "
                 + ("%(name)-15s " if log_name else "")
                 + "[%(levelname)s] "
                 "%(message)s "
                 "($BOLD%(filename)s$RESET:%(lineno)d)")
 
-    def formatter_msg(self, fmt, use_color=False):
+    def formatter_msg(self, fmt: str, use_color: bool = False) -> str:
         if use_color:
             fmt = fmt.replace("$RESET", self.RESET_SEQ).replace("$BOLD", self.BOLD_SEQ)
         else:
             fmt = fmt.replace("$RESET", "").replace("$BOLD", "")
         return fmt
 
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
         if record.msg.startswith('| '):
             # If we already log smth which supposed to go without formatting, like
             # output for running a command, just return the message and be done
@@ -141,14 +145,22 @@ class ColorFormatter(logging.Formatter):
 class LoggerHelper:
     """Helper to establish and control a Logger"""
 
-    def __init__(self, name='duecredit'):
+    def __init__(self, name: str = 'duecredit') -> None:
         self.name = name
         self.lgr = logging.getLogger(name)
 
-    def _get_environ(self, var, default=None):
+    def _get_environ(
+        self,
+        var: str,
+        default: Union[str, None, bool] = None
+    ) -> Union[str, None, bool]:
         return os.environ.get(self.name.upper() + '_%s' % var.upper(), default)
 
-    def set_level(self, level=None, default='WARNING'):
+    def set_level(
+        self,
+        level: Optional[str] = None,
+        default: str = 'WARNING'
+    ) -> None:
         """Helper to set loglevel for an arbitrary logger
 
         By default operates for 'duecredit'.
@@ -156,7 +168,9 @@ class LoggerHelper:
         """
         if level is None:
             # see if nothing in the environment
-            level = self._get_environ('LOGLEVEL')
+            l = self._get_environ('LOGLEVEL')
+            assert type(l) is not bool
+            level = l
         if level is None:
             level = default
 
@@ -170,7 +184,10 @@ class LoggerHelper:
         self.lgr.setLevel(log_level)
 
 
-    def get_initialized_logger(self, logtarget=None):
+    def get_initialized_logger(
+        self,
+        logtarget: Optional[str] = None
+    ) -> logging.Logger:
         """Initialize and return the logger
 
         Parameters
@@ -187,29 +204,31 @@ class LoggerHelper:
         logging.Logger
         """
         # By default mimic previously talkative behavior
-        logtarget = self._get_environ('LOGTARGET', logtarget or 'stdout')
+        logtarget_ = self._get_environ('LOGTARGET', logtarget or 'stdout')
+        assert type(logtarget_) is str
 
         # Allow for multiple handlers being specified, comma-separated
-        if ',' in logtarget:
-            for handler_ in logtarget.split(','):
+        if ',' in logtarget_:
+            for handler_ in logtarget_.split(','):
                 self.get_initialized_logger(logtarget=handler_)
             return self.lgr
 
-        if logtarget.lower() in ('stdout', 'stderr') :
-            loghandler = logging.StreamHandler(getattr(sys, logtarget.lower()))
+        if logtarget_.lower() in ('stdout', 'stderr') :
+            loghandler = logging.StreamHandler(getattr(sys, logtarget_.lower()))
             use_color = is_interactive()  # explicitly decide here
         else:
             # must be a simple filename
             # Use RotatingFileHandler for possible future parametrization to keep
             # log succinct and rotating
-            loghandler = logging.handlers.RotatingFileHandler(logtarget)
+            loghandler = logging.handlers.RotatingFileHandler(logtarget_)
             use_color = False
             # I had decided not to guard this call and just raise exception to go
             # out happen that specified file location is not writable etc.
         # But now improve with colors and useful information such as time
+        log_name = self._get_environ("LOGNAME", False)
+        assert type(log_name) is bool
         loghandler.setFormatter(
-            ColorFormatter(use_color=use_color,
-                           log_name=self._get_environ("LOGNAME", False)))
+            ColorFormatter(use_color=use_color, log_name=log_name))
         #logging.Formatter('%(asctime)-15s %(levelname)-6s %(message)s'))
         self.lgr.addHandler(loghandler)
 

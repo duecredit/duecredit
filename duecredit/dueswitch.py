@@ -8,14 +8,18 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Provides an adapter to switch between two (active, inactive) collectors
 """
-
 import os
 import atexit
+from typing import Any, Optional, Union, TYPE_CHECKING
 
 from .log import lgr
 from .utils import never_fail
+if TYPE_CHECKING:
+    from duecredit.collector import DueCreditCollector
+    from .stub import InactiveDueCreditCollector
 
-def _get_duecredit_enable():
+
+def _get_duecredit_enable() -> bool:
     env_enable = os.environ.get('DUECREDIT_ENABLE', 'no')
     if not env_enable.lower() in ('0', '1', 'yes', 'no', 'true', 'false'):
         lgr.warning("Misunderstood value %s for DUECREDIT_ENABLE. "
@@ -24,13 +28,13 @@ def _get_duecredit_enable():
 
 
 @never_fail
-def _get_inactive_due():
+def _get_inactive_due() -> 'InactiveDueCreditCollector':
     from .stub import InactiveDueCreditCollector
     return InactiveDueCreditCollector()
 
 
 @never_fail
-def _get_active_due():
+def _get_active_due() -> 'Union[DueCreditCollector, InactiveDueCreditCollector]':
     from .config import CACHE_DIR, DUECREDIT_FILE
     from duecredit.collector import CollectorSummary, DueCreditCollector
     from .io import load_due
@@ -58,8 +62,8 @@ class DueSwitch:
     Once activated though, cannot be fully deactivated since it would inject
     duecredit decorators and register an event atexit.
     """
-    def __init__(self, inactive, active, activate=False):
-        self.__active = None
+    def __init__(self, inactive, active, activate: bool = False) -> None:
+        self.__active: Optional[bool] = None
         self.__collectors = {False: inactive, True: active}
         self.__activations_done = False
         if not (inactive and active):
@@ -74,7 +78,7 @@ class DueSwitch:
         return self.__active
 
     @never_fail
-    def dump(self, **kwargs):
+    def dump(self, **kwargs: Any) -> None:
         """Dumps summary of the citations
 
         Parameters
@@ -86,7 +90,7 @@ class DueSwitch:
         due_summary = CollectorSummary(self.__collectors[True], **kwargs)
         due_summary.dump()
 
-    def __prepare_exit_and_injections(self):
+    def __prepare_exit_and_injections(self) -> None:
         # Wrapper to create and dump summary... passing method doesn't work:
         #  probably removes instance too early
 
@@ -98,7 +102,7 @@ class DueSwitch:
         injector.activate()
 
     @never_fail
-    def activate(self, activate=True):
+    def activate(self, activate: bool = True) -> None:
         # 1st step -- if activating/deactivating switch between the two collectors
         if self.__active is not activate:
             # we need to switch the state

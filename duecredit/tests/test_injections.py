@@ -7,6 +7,8 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
+from typing import Any, Dict
+
 import gc
 import sys
 import pytest
@@ -32,14 +34,14 @@ lgr = getLogger('duecredit.tests.injector')
 
 
 class TestActiveInjector:
-    def setup_method(self):
+    def setup_method(self) -> None:
         lgr.log(5, "Setting up for a TestActiveInjector test")
         self._cleanup_modules()
         self.due = DueCreditCollector()
         self.injector = DueCreditInjector(collector=self.due)
         self.injector.activate(retrospect=False)  # numpy might be already loaded...
 
-    def teardown_method(self):
+    def teardown_method(self) -> None:
         lgr.log(5, "Tearing down after a TestActiveInjector test")
         # gc might not pick up inj after some tests complete
         # so we will always deactivate explicitly
@@ -47,11 +49,11 @@ class TestActiveInjector:
         assert __builtin__.__import__ is _orig__import__
         self._cleanup_modules()
 
-    def _cleanup_modules(self):
+    def _cleanup_modules(self) -> None:
         if 'duecredit.tests.mod' in sys.modules:
             sys.modules.pop('duecredit.tests.mod')
 
-    def _test_simple_injection(self, func, import_stmt, func_call=None):
+    def _test_simple_injection(self, func, import_stmt, func_call=None) -> None:
         assert 'duecredit.tests.mod' not in sys.modules
         self.injector.add('duecredit.tests.mod', func,
                           Doi('1.2.3.4'),
@@ -62,7 +64,8 @@ class TestActiveInjector:
         assert len(self.due._entries) == 0
         assert len(self.due.citations) == 0
 
-        globals_, locals_ = {}, {}
+        globals_: Dict[str, Any] = {}
+        locals_: Dict[str, Any] = {}
         exec(import_stmt, globals_, locals_)
 
         assert len(self.due._entries) == 1   # we should get an entry now
@@ -91,7 +94,7 @@ class TestActiveInjector:
 
         assert(citation.tags == ['implementation', 'very custom'])
 
-    def _test_double_injection(self, func, import_stmt, func_call=None):
+    def _test_double_injection(self, func, import_stmt, func_call=None) -> None:
         assert 'duecredit.tests.mod' not in sys.modules
         # add one injection
         self.injector.add('duecredit.tests.mod', func,
@@ -109,7 +112,8 @@ class TestActiveInjector:
         assert len(self.due._entries) == 0
         assert len(self.due.citations) == 0
 
-        globals_, locals_ = {}, {}
+        globals_: Dict[str, Any] = {}
+        locals_: Dict[str, Any] = {}
         exec(import_stmt, globals_, locals_)
 
         assert len(self.due._entries) == 2  # we should get two entries now
@@ -144,14 +148,14 @@ class TestActiveInjector:
              'c.testmeth1')
 
     @pytest.mark.parametrize("func, import_stmt, func_call", [test1, test2, test3])
-    def test_simple_injection(self, func, import_stmt, func_call):
+    def test_simple_injection(self, func, import_stmt, func_call) -> None:
         self._test_simple_injection(func, import_stmt, func_call)
 
     @pytest.mark.parametrize("func, import_stmt, func_call", [test1, test2, test3])
-    def test_double_injection(self, func, import_stmt, func_call):
+    def test_double_injection(self, func, import_stmt, func_call) -> None:
         self._test_double_injection(func, import_stmt, func_call)
 
-    def test_delayed_entries(self):
+    def test_delayed_entries(self) -> None:
         # verify that addition of delayed injections happened
         modules_for_injection = get_modules_for_injection()
         assert len(self.injector._delayed_injections) == len(modules_for_injection)
@@ -164,13 +168,13 @@ class TestActiveInjector:
         except ImportError as e:
             pytest.skip("scipy was not found: %s" % (e,))
 
-    def test_import_mvpa2_suite(self):
+    def test_import_mvpa2_suite(self) -> None:
         if not _have_mvpa2:
             pytest.skip("no mvpa2 found")
         # just a smoke test for now
         import mvpa2.suite as mv
 
-    def _test_incorrect_path(self, mod, obj):
+    def _test_incorrect_path(self, mod, obj) -> None:
         ref = Doi('1.2.3.4')
         # none of them should lead to a failure
         self.injector.add(mod, obj, ref)
@@ -186,7 +190,7 @@ class TestActiveInjector:
         self._test_incorrect_path(mod, obj)
 
 
-def test_find_iobject():
+def test_find_iobject() -> None:
     assert find_object(mod, 'testfunc1') == (mod, 'testfunc1', mod.testfunc1)
     assert find_object(mod, 'TestClass1') == (mod, 'TestClass1', mod.TestClass1)
     assert find_object(mod, 'TestClass1.testmeth1') == (mod.TestClass1, 'testmeth1', mod.TestClass1.testmeth1)
@@ -194,7 +198,7 @@ def test_find_iobject():
                                                                'testmeth1', mod.TestClass12.Embed.testmeth1)
 
 
-def test_no_double_activation():
+def test_no_double_activation() -> None:
     orig__import__ = __builtin__.__import__
     try:
         due = DueCreditCollector()
@@ -210,7 +214,7 @@ def test_no_double_activation():
         __builtin__.__import__ = orig__import__
 
 
-def test_get_modules_for_injection():
+def test_get_modules_for_injection() -> None:
     # output order is sorted by name (not that it matters for functionality)
     assert get_modules_for_injection() == ['mod_biosig',
                                            'mod_dipy',
@@ -229,7 +233,7 @@ def test_get_modules_for_injection():
                                            ]
 
 
-def test_cover_our_injections():
+def test_cover_our_injections() -> None:
     # this one tests only import/syntax/api for the injections
     due = DueCreditCollector()
     inj = DueCreditInjector(collector=due)
@@ -238,13 +242,13 @@ def test_cover_our_injections():
         mod.inject(inj)
 
 
-def test_no_harm_from_deactivate():
+def test_no_harm_from_deactivate() -> None:
     # if we have not activated one -- shouldn't blow if we deactivate it
     # TODO: catch warning being spitted out
     DueCreditInjector().deactivate()
 
 
-def test_injector_del():
+def test_injector_del() -> None:
     orig__import__ = __builtin__.__import__
     try:
         due = DueCreditCollector()
@@ -256,8 +260,9 @@ def test_injector_del():
         assert __builtin__.__import__ is not orig__import__
         assert inj._orig_import is not None
         del inj   # delete active but not used
-        inj = None
-        __builtin__.__import__ = None # We need to do that since otherwise gc will not pick up inj
+        inj = None  # type: ignore
+        __builtin__.__import__ = None # type: ignore
+        # /\ We need to do that since otherwise gc will not pick up inj
         gc.collect()  # To cause __del__
         assert __builtin__.__import__ is orig__import__
         import abc   # and new imports work just fine
@@ -265,7 +270,7 @@ def test_injector_del():
         __builtin__.__import__ = orig__import__
 
 
-def test_injector_delayed_del():
+def test_injector_delayed_del() -> None:
     # interesting case -- if we still have an instance of injector hanging around
     # and then create a new one, activate it but then finally delete/gc old one
     # it would (currently) reset import back (because atm defined as class var)
@@ -287,8 +292,8 @@ def test_injector_delayed_del():
         inj2.activate(retrospect=False)
         assert __builtin__.__import__ is not orig__import__
         assert inj2._orig_import is not None
-        del inj
-        inj = None
+        del inj  # type: ignore
+        inj = None  # type: ignore
         gc.collect()  # To cause __del__
         assert __builtin__.__import__ is not orig__import__  # would fail if del had side-effect
         assert inj2._orig_import is not None

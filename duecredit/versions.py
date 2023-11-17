@@ -10,13 +10,14 @@
 """
 import sys
 from os import linesep
+from typing import Any, Dict, List, Union
 
 from distutils.version import StrictVersion, LooseVersion
 
 try:
     from importlib.metadata import version as metadata_version
 except ImportError:
-    from importlib_metadata import version as metadata_version
+    from importlib_metadata import version as metadata_version  # type: ignore
 
 
 # To depict an unknown version, which can't be compared by mistake etc
@@ -24,12 +25,12 @@ class UnknownVersion:
     """For internal use
     """
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "UNKNOWN"
 
-    def __cmp__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if other is self:
-            return 0
+            return True
         raise TypeError("UNKNOWN version is not comparable")
 
 
@@ -44,11 +45,11 @@ class ExternalVersions:
 
     UNKNOWN = UnknownVersion()
 
-    def __init__(self):
-        self._versions = {}
+    def __init__(self) -> None:
+        self._versions: Dict[str, Union[StrictVersion, LooseVersion, UnknownVersion]] = {}
 
     @classmethod
-    def _deduce_version(klass, module):
+    def _deduce_version(klass, module) -> Union[StrictVersion, LooseVersion, UnknownVersion]:
         version = None
         for attr in ('__version__', 'version'):
             if hasattr(module, attr):
@@ -81,7 +82,7 @@ class ExternalVersions:
         else:
             return klass.UNKNOWN
 
-    def __getitem__(self, module):
+    def __getitem__(self, module: Any) -> Union[StrictVersion, LooseVersion, UnknownVersion, None]:
         # when ran straight in its source code -- fails to discover nipy's version.. TODO
         #if module == 'nipy':
         if not isinstance(module, str):
@@ -112,11 +113,15 @@ class ExternalVersions:
         return item in self._versions
 
     @property
-    def versions(self):
+    def versions(self) -> Dict[str, Union[StrictVersion, LooseVersion, UnknownVersion]]:
         """Return dictionary (copy) of versions"""
         return self._versions.copy()
 
-    def dumps(self, indent=False, preamble="Versions:"):
+    def dumps(
+        self,
+        indent: Union[bool, str] = False,
+        preamble: str = "Versions:"
+    ) -> str:
         """Return listing of versions as a string
 
         Parameters
@@ -127,12 +132,11 @@ class ExternalVersions:
         preamble: str, optional
           What preamble to the listing to use
         """
-        if indent and (indent is True):
-            indent = ' '
         items = ["%s=%s" % (k, self._versions[k]) for k in sorted(self._versions)]
         out = "%s" % preamble
         if indent:
-            out += (linesep + indent).join([''] + items) + linesep
+            indent_ = ' ' if indent is True else indent
+            out += (linesep + indent_).join([''] + items) + linesep
         else:
             out += " " + ' '.join(items)
         return out

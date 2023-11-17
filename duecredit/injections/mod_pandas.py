@@ -8,6 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for pandas module
 """
+from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX, Url
 
@@ -16,8 +17,10 @@ from ..entries import Doi, BibTeX, Url
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
+def inject(injector: 'DueCreditInjector') -> None:
     injector.add('pandas', None, BibTeX("""
         @InProceedings{ mckinney-proc-scipy-2010,
           author    = { McKinney, Wes },

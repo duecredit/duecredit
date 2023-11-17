@@ -11,6 +11,7 @@
 import os
 import sys
 from functools import wraps
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
@@ -28,8 +29,15 @@ CitationKey = namedtuple('CitationKey', ['path', 'entry_key'])
 class Citation:
     """Encapsulates citations and information on their use"""
 
-    def __init__(self, entry, description=None, path=None, version=None,
-                 cite_module=False, tags=['implementation']):
+    def __init__(
+        self,
+        entry: DueCreditEntry,
+        description: Optional[str] = None,
+        path: Optional[str] = None,
+        version: Union[None, str, Tuple[str, str]] = None,
+        cite_module: bool = False,
+        tags: List[str] = ['implementation']
+    ):
         """Cite a reference
 
         Parameters
@@ -76,63 +84,63 @@ class Citation:
         self.version = version
         self.count = 0
 
-    def __repr__(self):
-        args = [repr(self._entry)]
+    def __repr__(self) -> str:
+        argl = [repr(self._entry)]
         if self._description:
-            args.append("description={0}".format(repr(self._description)))
+            argl.append("description={0}".format(repr(self._description)))
         if self._path:
-            args.append("path={0}".format(repr(self._path)))
+            argl.append("path={0}".format(repr(self._path)))
         if self._cite_module:
-            args.append("cite_module={0}".format(repr(self._cite_module)))
+            argl.append("cite_module={0}".format(repr(self._cite_module)))
 
-        if args:
-            args = ", ".join(args)
+        if argl:
+            args = ", ".join(argl)
         else:
             args = ""
         return self.__class__.__name__ + '({0})'.format(args)
 
     @property
-    def path(self):
+    def path(self) -> str:
         return self._path
 
-    @property
-    def cite_module(self):
-        return self._cite_module
-
     @path.setter
-    def path(self, path):
+    def path(self, path: str) -> None:
         # TODO: verify value, if we are not up for it -- just make _path public
         self._path = path
 
     @property
-    def entry(self):
+    def entry(self) -> DueCreditEntry:
         return self._entry
 
     @property
-    def description(self):
+    def description(self) -> Optional[str]:
         return self._description
 
     @property
-    def cites_module(self):
+    def cite_module(self) -> bool:
+        return self._cite_module
+
+    @property
+    def cites_module(self) -> Optional[bool]:
         if not self.path:
             return None
         return not (':' in self.path)
 
     @property
-    def module(self):
+    def module(self) -> Optional[str]:
         if not self.path:
             return None
         return self.path.split(':', 1)[0]
 
     @property
-    def package(self):
+    def package(self) -> Optional[str]:
         module = self.module
         if not module:
             return None
         return module.split('.', 1)[0]
 
     @property
-    def objname(self):
+    def objname(self) -> Optional[str]:
         if not self.path:
             return None
         spl = self.path.split(':', 1)
@@ -141,7 +149,7 @@ class Citation:
         else:
             return None
 
-    def __contains__(self, entry):
+    def __contains__(self, entry: 'Citation') -> bool:  # Self PEP673
         """Checks if provided entry 'contained' in this one given its path
 
         If current entry is associated with a module, contained will be an entry
@@ -161,14 +169,14 @@ class Citation:
 
 
     @property
-    def key(self):
+    def key(self) -> CitationKey:
         return CitationKey(self.path, self.entry.key)
 
     @staticmethod
-    def get_key(path, entry_key):
+    def get_key(path: str, entry_key: str) -> CitationKey:
         return CitationKey(path, entry_key)
 
-    def set_entry(self, newentry):
+    def set_entry(self, newentry: DueCreditEntry) -> None:
         self._entry = newentry
 
 
@@ -188,12 +196,19 @@ class DueCreditCollector:
     """
 
     # TODO?  rename "entries" to "references"?  or "references" is closer to "citations"
-    def __init__(self, entries=None, citations=None):
+    def __init__(
+        self,
+        entries: Optional[Dict[str, DueCreditEntry]] = None,
+        citations: Optional[Dict[CitationKey, Citation]] = None
+    ) -> None:
         self._entries = entries or {}
         self.citations = citations or {}
 
     @never_fail
-    def add(self, entry):
+    def add(
+        self,
+        entry: Union[DueCreditEntry, List[DueCreditEntry]]
+    ) -> None:
         """entry should be a DueCreditEntry object"""
         if isinstance(entry, list):
             for e in entry:
@@ -204,7 +219,7 @@ class DueCreditCollector:
             lgr.log(1, "Collector added entry %s", key)
 
     @never_fail
-    def load(self, src):
+    def load(self, src: str) -> None:
         """Loads references from a file or other recognizable source
 
         ATM supported only
@@ -219,7 +234,7 @@ class DueCreditCollector:
         else:
             raise ValueError('Must be a string')
 
-    def _load_bib(self, src):
+    def _load_bib(self, src: str) -> None:
         lgr.debug("Loading %s" % src)
 
     # # TODO: figure out what would be the optimal use for the __call__
@@ -232,7 +247,7 @@ class DueCreditCollector:
 
     @never_fail
     @borrowdoc(Citation, "__init__")
-    def cite(self, entry, **kwargs):
+    def cite(self, entry: Union[DueCreditEntry, str], **kwargs: Any) -> Citation:
         # TODO: if cite is invoked but no path is provided -- we must figure it out
         # I guess from traceback, otherwise how would we know later to associate it
         # with modules???
@@ -253,7 +268,8 @@ class DueCreditCollector:
             citation = self.citations[citation_key]
         except KeyError:
             self.citations[citation_key] = citation = Citation(entry_, **kwargs)
-        assert(citation.key == citation_key)
+        assert type(citation) is Citation
+        assert citation.key == citation_key
         # update citation count
         citation.count += 1
 
@@ -280,7 +296,7 @@ class DueCreditCollector:
 
         return citation
 
-    def _citations_fromentrykey(self):
+    def _citations_fromentrykey(self) -> Dict[str, Citation]:
         """Return a dictionary with the current citations indexed by the entry key"""
         citations_key = dict()
         for (path, entry_key), citation in self.citations.items():
@@ -291,7 +307,11 @@ class DueCreditCollector:
 
 
     @staticmethod
-    def _args_match_conditions(conditions, *fargs, **fkwargs):
+    def _args_match_conditions(
+        conditions: Dict[Any, Any],
+        *fargs: Any,
+        **fkwargs: Any
+    ) -> bool:
         """Helper to identify when to trigger citation given parameters to the function call
         """
         for (argpos, kwarg), values in conditions.items():
@@ -310,7 +330,7 @@ class DueCreditCollector:
                 value = fargs[argpos]
             if kwarg in fkwargs:
                 value = fkwargs[kwarg]
-            assert(value != "__duecredit_magical_undefined__")
+            assert value != "__duecredit_magical_undefined__"
 
             if '.' in kwarg:
                 # we were requested to condition based on the value of the attribute
@@ -418,21 +438,21 @@ class DueCreditCollector:
         return func_wrapper
 
     @never_fail
-    def __repr__(self):
-        args = []
+    def __repr__(self) -> str:
+        argl = []
         if self.citations:
-            args.append("citations={0}".format(repr(self.citations)))
+            argl.append("citations={0}".format(repr(self.citations)))
         if self._entries:
-            args.append("entries={0}".format(repr(self._entries)))
+            argl.append("entries={0}".format(repr(self._entries)))
 
-        if args:
-            args = ", ".join(args)
+        if argl:
+            args = ", ".join(argl)
         else:
             args = ""
         return self.__class__.__name__ + '({0})'.format(args)
 
     @never_fail
-    def __str__(self):
+    def __str__(self) -> str:
         return self.__class__.__name__ + \
             ' {0:d} entries, {1:d} citations'.format(
                 len(self._entries), len(self.citations))
@@ -442,7 +462,12 @@ class DueCreditCollector:
 class CollectorSummary:
     """A helper which would take care about exporting citations upon its Death
     """
-    def __init__(self, collector, outputs="stdout,pickle", fn=DUECREDIT_FILE):
+    def __init__(
+        self,
+        collector: DueCreditCollector,
+        outputs: str = "stdout,pickle",
+        fn: str = DUECREDIT_FILE
+    ) -> None:
         self._due = collector
         self.fn = fn
         # for now decide on output "format" right here
@@ -454,7 +479,11 @@ class CollectorSummary:
         ]
 
     @staticmethod
-    def _get_output_handler(type_, collector, fn=None):
+    def _get_output_handler(
+        type_: str,
+        collector: DueCreditCollector,
+        fn: Optional[str] = None
+    ) -> Union[TextOutput, PickleOutput]:
         # just a little factory
         if type_ in ("stdout", "stderr"):
             return TextOutput(getattr(sys, type_), collector)
@@ -463,7 +492,7 @@ class CollectorSummary:
         else:
             raise NotImplementedError()
 
-    def dump(self):
+    def dump(self) -> None:
         for output in self._outputs:
             output.dump()
 

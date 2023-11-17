@@ -16,17 +16,20 @@ from os.path import basename, join as pathjoin, dirname
 from glob import glob
 import sys
 from functools import wraps
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, TYPE_CHECKING
 
 import logging
 from ..log import lgr
 
 import builtins as __builtin__
 
+if TYPE_CHECKING:
+    from ..entries import Doi, BibTeX, Url
 
 __all__ = ['DueCreditInjector', 'find_object']
 
 # TODO: move elsewhere
-def _short_str(obj, l=30):
+def _short_str(obj: Any, l: int = 30) -> str:
     """Return a shortened str of an object -- for logging"""
     s = str(obj)
     if len(s) > l:
@@ -34,14 +37,14 @@ def _short_str(obj, l=30):
     else:
         return s
 
-def get_modules_for_injection():
+def get_modules_for_injection() -> List[str]:
     """Get local modules which provide "inject" method to provide delayed population of injector
     """
     return sorted([basename(x)[:-3]
                    for x in glob(pathjoin(dirname(__file__), "mod_*.py"))
                    ])
 
-def find_object(mod, path):
+def find_object(mod: Any, path: str) -> Tuple[Any, str, Any]:
     """Finds object among present within module "mod" given path specification within
 
     Returns
@@ -81,30 +84,30 @@ class DueCreditInjector:
         return DueCreditInjector.__orig_import
 
     @_orig_import.setter
-    def _orig_import(self, value):
+    def _orig_import(self, value) -> None:
         lgr.log(2, "Reassigning _orig_import from %r to %r", DueCreditInjector.__orig_import, value)
         DueCreditInjector.__orig_import = value
 
 
-    def __init__(self, collector=None):
+    def __init__(self, collector=None) -> None:
         if collector is None:
             from duecredit import due
             collector = due
         self._collector = collector
-        self._delayed_injections = {}
-        self._entry_records = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
-        self._processed_modules = set()
+        self._delayed_injections: Dict[str, str] = {}
+        self._entry_records: Dict[str, Dict[Union[str, None], Any]] = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
+        self._processed_modules: Set[str] = set()
         # We need to process modules only after we are done with all nested imports, otherwise we
         # might be trying to process them too early -- whenever they are not yet linked to their
         # parent's namespace. So we will keep track of import level and set of modules which
         # would need to be processed whenever we are back at __import_level == 1
         self.__import_level = 0
-        self.__queue_to_process = set()
+        self.__queue_to_process: Set[str] = set()
         self.__processing_queue = False
         self._active = False
         lgr.debug("Created injector %r", self)
 
-    def _populate_delayed_injections(self):
+    def _populate_delayed_injections(self) -> None:
         self._delayed_injections = {}
         for inj_mod_name in get_modules_for_injection():
             assert(inj_mod_name.startswith('mod_'))
@@ -112,9 +115,15 @@ class DueCreditInjector:
             lgr.debug("Adding delayed injection for %s", (mod_name,))
             self._delayed_injections[mod_name] = inj_mod_name
 
-    def add(self, modulename, obj, entry,
-            min_version=None, max_version=None,
-            **kwargs):
+    def add(
+        self,
+        modulename: str,
+        obj: Optional[str],
+        entry: 'Union[Doi, BibTeX, Url]',
+        min_version=None,
+        max_version=None,
+        **kwargs: Any
+    ) -> None:
         """Add a citation for a given module or object within it
 
         Parameters
@@ -144,10 +153,10 @@ class DueCreditInjector:
                             'max_version': max_version})
 
     @property
-    def _import_level_prefix(self):
+    def _import_level_prefix(self) -> str:
         return "." * self.__import_level
 
-    def _process_delayed_injection(self, mod_name):
+    def _process_delayed_injection(self, mod_name: str) -> None:
         lgr.debug("%sProcessing delayed injection for %s", self._import_level_prefix, mod_name)
         inj_mod_name = self._delayed_injections[mod_name]
         assert(not hasattr(self._orig_import, '__duecredited__'))
@@ -167,7 +176,7 @@ class DueCreditInjector:
         lgr.log(3, "Calling injector of %s", inj_mod_name_full)
         inj_mod.inject(self)
 
-    def process(self, mod_name):
+    def process(self, mod_name: str) -> None:
         """Process import of the module, possibly decorating some methods with duecredit entries
         """
         assert(self.__import_level == 0) # we should never process while nested within imports
@@ -205,6 +214,7 @@ class DueCreditInjector:
                 except (KeyError, AttributeError) as e:
                     lgr.warning("Could not find %s in module %s: %s" % (obj_path, mod, e))
                     continue
+            assert obj_name
 
             # there could be multiple per func
             lgr.log(4, "Considering %d records for decoration of %s:%s", len(obj_entry_records), parent, obj_name)
@@ -225,7 +235,7 @@ class DueCreditInjector:
 
         lgr.log(3, "Done processing injections for module %s", mod_name)
 
-    def _mitigate_None_orig_import(self, name, *args, **kwargs):
+    def _mitigate_None_orig_import(self, name: str, *args: Any, **kwargs: Any) -> Any:
         lgr.error("For some reason self._orig_import is None"
                   ". Importing using stock importer to mitigate and adjusting _orig_import")
         self._orig_import = _very_orig_import
@@ -309,7 +319,7 @@ class DueCreditInjector:
             lgr.warning("Seems that we are calling duecredit_importer twice."
                         " No harm is done but shouldn't happen")
 
-    def _handle_fresh_imports(self, name, import_level_prefix, level):
+    def _handle_fresh_imports(self, name: str, import_level_prefix: str, level) -> None:
         """Check which modules were imported since last point we checked and add them to the queue
         """
         new_imported_modules = set(sys.modules.keys()) - self._processed_modules - self.__queue_to_process
@@ -335,7 +345,7 @@ class DueCreditInjector:
                 self.__queue_to_process.add(package)
             self.__queue_to_process.add(imported_mod)
 
-    def _process_queue(self):
+    def _process_queue(self) -> None:
         """Process the queue of collected imported modules
         """
         # process the queue
@@ -354,7 +364,7 @@ class DueCreditInjector:
         finally:
             self.__processing_queue = False
 
-    def deactivate(self):
+    def deactivate(self) -> None:
         if not self._orig_import:
             lgr.warning("_orig_import is not yet known, so we haven't decorated default importer yet."
                         " Nothing TODO")
@@ -366,7 +376,7 @@ class DueCreditInjector:
         self._orig_import = None
         self._active = False
 
-    def __del__(self):
+    def __del__(self) -> None:
         if lgr:
             lgr.debug("%s is asked to be deleted", self)
         try:
@@ -375,7 +385,7 @@ class DueCreditInjector:
         except:  # noqa: E722
             pass
         try:
-            super(self.__class__, self).__del__()
+            super(self.__class__, self).__del__()  # type: ignore
         except:  # noqa: E722
             pass
 

@@ -42,7 +42,7 @@ class InactiveDueCreditCollector:
     active = False
     activate = add = cite = dump = load = _donothing
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__class__.__name__ + '()'
 
 
@@ -62,8 +62,8 @@ except Exception as e:
         logging.getLogger("duecredit").error(
             "Failed to import duecredit due to %s" % str(e))
     # Initiate due stub
-    due = InactiveDueCreditCollector()
-    BibTeX = Doi = Url = Text = _donothing_func
+    due = InactiveDueCreditCollector()  # type: ignore
+    BibTeX = Doi = Url = Text = _donothing_func  # type: ignore
 
 # Emacs mode definitions
 # Local Variables:

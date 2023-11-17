@@ -65,11 +65,11 @@ def test_external_versions_basic():
     assert ev['duecredit'] == __version__
 
 
-def test_external_versions_unknown():
+def test_external_versions_unknown() -> None:
     assert str(ExternalVersions.UNKNOWN) == 'UNKNOWN'
 
 
-def _test_external(ev, modname):
+def _test_external(ev, modname: str) -> None:
     try:
         exec("import %s" % modname, globals(), locals())
     except ImportError:
@@ -83,7 +83,7 @@ def _test_external(ev, modname):
 
 @pytest.mark.parametrize("modname", ['scipy', 'numpy', 'mvpa2', 'sklearn', 'statsmodels',
                                      'pandas', 'matplotlib', 'psychopy'])
-def test_external_versions_popular_packages(modname):
+def test_external_versions_popular_packages(modname: str) -> None:
     ev = ExternalVersions()
 
     _test_external(ev, modname)

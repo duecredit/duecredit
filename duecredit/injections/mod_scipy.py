@@ -8,6 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for scipy module
 """
+from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX
 
@@ -16,8 +17,10 @@ from ..entries import Doi, BibTeX
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
+def inject(injector: 'DueCreditInjector') -> None:
     injector.add('scipy', None, BibTeX("""
     @Misc{JOP+01,
       author =    {Eric Jones and Travis Oliphant and Pearu Peterson and others},

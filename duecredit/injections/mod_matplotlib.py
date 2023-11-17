@@ -9,6 +9,7 @@
 """
 Automatic injection of bibliography entries for matplotlib module
 """
+from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX
 
@@ -17,6 +18,9 @@ from ..entries import Doi, BibTeX
 # module to care about
 min_version = None
 max_version = None
+
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
 bib_str = """
 @Article{Hunter:2007,
@@ -36,7 +40,7 @@ bib_str = """
 """.strip()
 
 
-def inject(injector):
+def inject(injector: 'DueCreditInjector') -> None:
     injector.add("matplotlib", None, BibTeX(bib_str), description="Plotting with Python", tags=["implementation"])
 
     doi_prefix = "10.5281/zenodo."

@@ -9,7 +9,7 @@
 """
 Automatic injection of bibliography entries for psychopy module
 """
-
+from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX, Url
 
@@ -18,12 +18,14 @@ from ..entries import Doi, BibTeX, Url
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
+def inject(injector: 'DueCreditInjector') -> None:
     injector.add('psychopy', None, Doi('doi:10.1016/j.jneumeth.2006.11.017'),
                  description="PsychoPy -- Psychophysics software in Python.",
                  tags=['implementation'])
-    
+
     injector.add('psychopy', None, Doi('10.3389/neuro.11.010.2008'),
                  description="Generating stimuli for neuroscience using PsychoPy.",
                  tags=['implementation'])
