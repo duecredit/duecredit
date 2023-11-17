@@ -23,7 +23,7 @@ import warnings
 from collections import defaultdict
 from distutils.version import StrictVersion
 from os.path import dirname, exists
-from typing import Optional, Tuple, Type, Union
+from typing import Any, Optional, Tuple, Type, Union
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, Text, Url
@@ -360,7 +360,7 @@ class PickleOutput:
             pickle.dump(self.collector, f)
 
     @classmethod
-    def load(cls, filename: str = DUECREDIT_FILE) -> bytes:
+    def load(cls, filename: str = DUECREDIT_FILE) -> Any:
         with open(filename, 'rb') as f:
             return pickle.load(f)
 
@@ -394,5 +394,5 @@ class BibTeXOutput(Output):
             self.fd.write(bibtex.rawentry + "\n")
 
 
-def load_due(filename):
+def load_due(filename: str) -> Any:
     return PickleOutput.load(filename)

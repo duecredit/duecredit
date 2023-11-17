@@ -9,19 +9,20 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 import sys
+from typing import Any
 
 from ..utils import is_interactive
 
 
-def test_is_interactive_crippled_stdout(monkeypatch):
+def test_is_interactive_crippled_stdout(monkeypatch: Any) -> None:
     class MockedOut:
         """the one which has no isatty
         """
-        def write(self, *args, **kwargs):
+        def write(self, *args: Any, **kwargs: Any) -> None:
             pass
 
     class MockedIsaTTY(MockedOut):
-        def isatty(self):
+        def isatty(self) -> bool:
             return True
 
     for inout in ('in', 'out', 'err'):
