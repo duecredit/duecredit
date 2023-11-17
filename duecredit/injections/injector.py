@@ -95,7 +95,7 @@ class DueCreditInjector:
             collector = due
         self._collector = collector
         self._delayed_injections: Dict[str, str] = {}
-        self._entry_records: Dict[str, Dict[Union[str | None], Any]] = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
+        self._entry_records: Dict[str, Dict[Union[str, None], Any]] = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
         self._processed_modules: Set[str] = set()
         # We need to process modules only after we are done with all nested imports, otherwise we
         # might be trying to process them too early -- whenever they are not yet linked to their
