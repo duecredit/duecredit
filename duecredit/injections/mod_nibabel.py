@@ -8,7 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for nibabel module
 """
-
+from typing import TYPE_CHECKING
 
 from ..entries import Doi
 
@@ -17,8 +17,10 @@ from ..entries import Doi
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
+def inject(injector: 'DueCreditInjector') -> None:
     injector.add('nibabel', None,
                  Doi('10.5281/zenodo.60847'),
                  cite_module=True,

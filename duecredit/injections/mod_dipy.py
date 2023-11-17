@@ -9,7 +9,7 @@
 """
 Automatic injection of bibliography entries for dipy module
 """
-
+from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX
 
@@ -18,8 +18,10 @@ from ..entries import Doi, BibTeX
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
+def inject(injector: 'DueCreditInjector') -> None:
     #http://nipy.org/dipy/cite.html#a-note-on-citing-our-work
     injector.add('dipy', None, Doi('10.3389/fninf.2014.00008'),
                     description='Dipy, a library for the analysis of diffusion MRI data.',
