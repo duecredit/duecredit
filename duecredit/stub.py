@@ -42,7 +42,7 @@ class InactiveDueCreditCollector:
     active = False
     activate = add = cite = dump = load = _donothing
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__class__.__name__ + '()'
 
 
