@@ -19,7 +19,7 @@ if  TYPE_CHECKING:
     from pytest import MonkeyPatch
 
 
-def test_dueswitch_activate(monkeypatch: MonkeyPatch) -> None:
+def test_dueswitch_activate(monkeypatch: 'MonkeyPatch') -> None:
     if due.active:
        pytest.skip("due is already active, can't test more at this point")
 

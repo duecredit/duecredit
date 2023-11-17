@@ -9,12 +9,14 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 import sys
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from ..utils import is_interactive
 
+if TYPE_CHECKING:
+    from pytest import MonkeyPatch
 
-def test_is_interactive_crippled_stdout(monkeypatch: Any) -> None:
+def test_is_interactive_crippled_stdout(monkeypatch: 'MonkeyPatch') -> None:
     class MockedOut:
         """the one which has no isatty
         """

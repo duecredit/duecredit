@@ -8,15 +8,18 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 import sys
-import pytest
-
 from io import StringIO
+from typing import TYPE_CHECKING
+
+import pytest
 
 from .. import __main__, __version__
 from .. import due
 
+if TYPE_CHECKING:
+    from pytest import MonkeyPatch, TempdirFactory
 
-def test_main_help(monkeypatch):
+def test_main_help(monkeypatch: 'MonkeyPatch') -> None:
     # Patch stdout
     fakestdout = StringIO()
     monkeypatch.setattr(sys, "stdout", fakestdout)
@@ -27,7 +30,7 @@ def test_main_help(monkeypatch):
         "Usage: %s -m duecredit [OPTIONS] <file> [ARGS]\n" % sys.executable))
 
 
-def test_main_version(monkeypatch):
+def test_main_version(monkeypatch: 'MonkeyPatch') -> None:
     # Patch stdout
     fakestdout = StringIO()
     monkeypatch.setattr(sys, "stdout", fakestdout)
@@ -36,7 +39,10 @@ def test_main_version(monkeypatch):
     assert fakestdout.getvalue().rstrip() == "duecredit %s" % __version__
 
 
-def test_main_run_a_script(tmpdir, monkeypatch):
+def test_main_run_a_script(
+    tmpdir: 'TempdirFactory',
+    monkeypatch: 'MonkeyPatch'
+) -> None:
     tempfile = str(tmpdir.mkdir("sub").join("tempfile.txt"))
     content = b'print("Running the script")\n'
     with open(tempfile, 'wb') as f:
