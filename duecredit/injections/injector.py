@@ -119,7 +119,7 @@ class DueCreditInjector:
         self,
         modulename: str,
         obj: Optional[str],
-        entry: Union[Doi, BibTeX, Url],
+        entry: 'Union[Doi, BibTeX, Url]',
         min_version=None,
         max_version=None,
         **kwargs: Any
