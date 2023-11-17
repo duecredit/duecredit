@@ -21,15 +21,17 @@ import tempfile
 import time
 import warnings
 from collections import defaultdict
-from collector import Citation
 from distutils.version import StrictVersion
 from os.path import dirname, exists
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, TYPE_CHECKING
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, Text, Url
 from .log import lgr
 from .versions import external_versions
+
+if TYPE_CHECKING:
+    from collector import Citation
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
 
@@ -227,8 +229,8 @@ class TextOutput(Output):
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
             for path in paths:
                 for cit in pmo[path]:
-                    assert type(cit) is Citation
-                    ek = cit.entry.key
+                    # 'import Citation / assert type(cit) is Citation' would pollute environment
+                    ek = cit.entry.key  # type: ignore
                     if ek not in printed_keys:
                         self.fd.write('\n[{0}] '.format(citation_nr[ek]))
                         self.fd.write(get_text_rendering(cit,
