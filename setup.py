@@ -86,7 +86,7 @@ setup(
     name=PACKAGE,
     version=__version__,
     packages=find_packages(),
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     install_requires=[
         'requests',
         'citeproc-py>=0.4',
