@@ -49,7 +49,7 @@ def main(argv=None):
         # probably needs to hook in somehow into commands/options available
         # under cmdline/
     except getopt.error as msg:
-        sys.stderr.write("%s: %s\n" % (sys.argv[0], msg))
+        sys.stderr.write("{}: {}\n".format(sys.argv[0], msg))
         sys.stderr.write("Try `%s --help' for more information\n"
                          % sys.argv[0])
         sys.exit(1)
@@ -84,8 +84,8 @@ def main(argv=None):
         due.activate(True)
         runctx(code, globs, globs)
         # TODO: see if we could hide our presence from the final tracebacks if execution fails
-    except IOError as err:
-        lgr.error("Cannot run file %r because: %s" % (sys.argv[0], err))
+    except OSError as err:
+        lgr.error("Cannot run file {!r} because: {}".format(sys.argv[0], err))
         sys.exit(1)
     except SystemExit:
         pass

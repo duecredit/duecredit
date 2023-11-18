@@ -3,9 +3,9 @@
 
 def testfunc(arg1, kwarg1=None):
     """testfunc docstring"""
-    return "testfunc: %s, %s" % (arg1, kwarg1)
+    return "testfunc: {}, {}".format(arg1, kwarg1)
 
 
 class TestClass:
     def testmeth(self, arg1, kwarg1=None):
-        return "testmeth: %s, %s" % (arg1, kwarg1)
+        return "testmeth: {}, {}".format(arg1, kwarg1)

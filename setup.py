@@ -43,11 +43,11 @@ try:
     if os.path.exists('debian/copyright'):
         print('Generating version.py out of debian/copyright information')
         # building debian package. Deduce version from debian/copyright
-        with open('debian/changelog', 'r') as f:
+        with open('debian/changelog') as f:
             lines = f.readlines()
         __version__ = make_pep440_compliant(lines[0].split()[1].strip('()'), 'debian.')
         # TODO: unify format whenever really bored ;)
-        __release_date__ = re.sub('^ -- .*>\s*(.*)', r'\1',
+        __release_date__ = re.sub(r'^ -- .*>\s*(.*)', r'\1',
                                   list(filter(lambda x: x.startswith(' -- '), lines))[0].rstrip())
     else:
         print('Attempting to get version number from git...')
@@ -66,8 +66,8 @@ try:
         __version__ = line
         __release_date__ = datetime.now().strftime('%b %d %Y, %H:%M:%S')
     with open(VERSION_FILE, 'w') as version_file:
-        version_file.write("__version__ = '{0}'\n".format(__version__))
-        version_file.write("__release_date__ = '{0}'\n".format(__release_date__))
+        version_file.write(f"__version__ = '{__version__}'\n")
+        version_file.write(f"__release_date__ = '{__release_date__}'\n")
 except OSError as e:
     print('Assume we are running from a source distribution.')
     # read version from VERSION_FILE
@@ -79,7 +79,7 @@ except OSError as e:
         __version__ = '0.0.0.dev'
 print("Version: %s" % __version__)
 
-with open('README.md', 'r', encoding='utf-8') as f:
+with open('README.md', encoding='utf-8') as f:
     README = f.read()
 
 setup(

@@ -166,7 +166,7 @@ class TestActiveInjector:
             # We do have injections for scipy
             import scipy
         except ImportError as e:
-            pytest.skip("scipy was not found: %s" % (e,))
+            pytest.skip("scipy was not found: {}".format(e))
 
     def test_import_mvpa2_suite(self) -> None:
         if not _have_mvpa2:

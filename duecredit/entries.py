@@ -45,9 +45,9 @@ class DueCreditEntry:
 
     def __repr__(self) -> str:
         argl = [repr(self._rawentry),
-                "key={0}".format(repr(self._key))]
+                f"key={repr(self._key)}"]
         args = ", ".join(argl)
-        return self.__class__.__name__ + '({0})'.format(args)
+        return self.__class__.__name__ + f'({args})'
 
     def format(self) -> str:
         # TODO: return nice formatting of the entry
@@ -56,7 +56,7 @@ class DueCreditEntry:
 
 class BibTeX(DueCreditEntry):
     def __init__(self, bibtex: str, key: Optional[str] = None) -> None:
-        super(BibTeX, self).__init__(bibtex.strip())
+        super().__init__(bibtex.strip())
         self._reference = None
         self._process_rawentry()
         if key is not None:

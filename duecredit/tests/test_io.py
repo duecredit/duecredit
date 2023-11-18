@@ -1,4 +1,3 @@
-# emacs: -*- mode: python; py-indent-offset: 4; tab-width: 4; indent-tabs-mode: nil; coding: utf-8 -*-
 # ex: set sts=4 ts=4 sw=4 noet:
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 #
@@ -328,18 +327,18 @@ def test_text_output_dump_formatting() -> None:
     strio = StringIO()
     TextOutput(strio, due).dump(tags=['*'])
     value = strio.getvalue()
-    assert '0 modules cited' in value, 'value was {0}'.format(value)
-    assert '0 functions cited' in value, 'value was {0}'.format(value)
+    assert '0 modules cited' in value, f'value was {value}'
+    assert '0 functions cited' in value, f'value was {value}'
 
     # now we call it -- check it prints stuff
     strio = StringIO()
     mymodule('magical', kwarg2=1)
     TextOutput(strio, due).dump(tags=['*'])
     value = strio.getvalue()
-    assert '1 package cited' in value, 'value was {0}'.format(value)
-    assert '1 function cited' in value, 'value was {0}'.format(value)
-    assert '(v 0.0.16)' in value, 'value was {0}'.format(value)
-    assert len(value.split('\n')) == 16, 'value was {0}'.format(len(value.split('\n')))
+    assert '1 package cited' in value, f'value was {value}'
+    assert '1 function cited' in value, f'value was {value}'
+    assert '(v 0.0.16)' in value, f'value was {value}'
+    assert len(value.split('\n')) == 16, 'value was {}'.format(len(value.split('\n')))
 
     # test we get the reference numbering right
     samples_bibtex = [_generate_sample_bibtex() for x in range(6)]
@@ -407,7 +406,7 @@ def test_bibtex_output() -> None:
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert value == '', 'Value was {0}'.format(value)
+    assert value == '', f'Value was {value}'
 
     # impose citing
     collector = DueCreditCollector()
@@ -416,7 +415,7 @@ def test_bibtex_output() -> None:
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert value.strip() == _sample_bibtex.strip(), 'Value was {0}'.format(value)
+    assert value.strip() == _sample_bibtex.strip(), f'Value was {value}'
 
     # impose filtering
     collector = DueCreditCollector()
@@ -426,13 +425,13 @@ def test_bibtex_output() -> None:
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['edu'])
     value = strio.getvalue()
-    assert value.strip() == _sample_bibtex.strip(), 'Value was {0}'.format(value)
+    assert value.strip() == _sample_bibtex.strip(), f'Value was {value}'
 
     # no filtering
     strio = StringIO()
     BibTeXOutput(strio, collector).dump(tags=['*'])
     value = strio.getvalue()
-    assert value.strip() == _sample_bibtex.strip() + _sample_bibtex2.rstrip(), 'Value was {0}'.format(value)
+    assert value.strip() == _sample_bibtex.strip() + _sample_bibtex2.rstrip(), f'Value was {value}'
 
     # check the we output only unique bibtex entries
     collector.cite(entry2, path='package')
@@ -441,7 +440,7 @@ def test_bibtex_output() -> None:
     value = strio.getvalue()
     value_ = sorted(value.strip().split('\n'))
     bibtex = sorted((_sample_bibtex.strip() + _sample_bibtex2.rstrip()).split('\n'))
-    assert value_ == bibtex, 'Value was {0} instead of {1}'.format(value_, bibtex)
+    assert value_ == bibtex, f'Value was {value_} instead of {bibtex}'
 
     # assert_equal(value_, bibtex,
     #              msg='Value was {0}'.format(value_, bibtex))
@@ -470,7 +469,7 @@ def _generate_sample_bibtex() -> str:
 
     sample_bibtex = "@ARTICLE{%s,\n" % key
     for string, value in elements:
-        sample_bibtex += "%s={%s},\n" % (string, value)
+        sample_bibtex += "{}={{{}}},\n".format(string, value)
     sample_bibtex += "}"
     return sample_bibtex
 
@@ -552,16 +551,16 @@ def test_format_bibtex_with_utf_characters() -> None:
     """
     # this was fetched on 2017-08-16
     # replaced Brett with Brótt to have utf-8 characters in first author's name as well
-    bibtex_utf8 = u"@misc{https://doi.org/10.5281/zenodo.60847,\n  doi = {10.5281/zenodo.60847},\n  url = {" \
-                  u"http://zenodo.org/record/60847},\n  author = {Brótt, Matthew and Hanke, Michael and Cipollini, " \
-                  u"Ben and {Marc-Alexandre Côté} and Markiewicz, Chris and Gerhard, Stephan and Larson, " \
-                  u"Eric and Lee, Gregory R. and Halchenko, Yaroslav and Kastman, Erik and {Cindeem} and Morency, " \
-                  u"Félix C. and {Moloney} and Millman, Jarrod and Rokem, Ariel and {Jaeilepp} and Gramfort, " \
-                  u"Alexandre and Bosch, Jasper J.F. Van Den and {Krish Subramaniam} and Nichols, Nolan and {Embaker} " \
-                  u"and {Bpinsard} and {Chaselgrove} and Oosterhof, Nikolaas N. and St-Jean, Samuel and {Bago " \
-                  u"Amirbekian} and Nimmo-Smith, Ian and {Satrajit Ghosh}},\n  keywords = {},\n  title = {nibabel " \
-                  u"2.0.1},\n  publisher = {Zenodo},\n  year = {2015}\n} "
-    assert (format_bibtex(BibTeX(bibtex_utf8)) == u'Brótt, M. et al., 2015. nibabel 2.0.1.')
+    bibtex_utf8 = "@misc{https://doi.org/10.5281/zenodo.60847,\n  doi = {10.5281/zenodo.60847},\n  url = {" \
+                  "http://zenodo.org/record/60847},\n  author = {Brótt, Matthew and Hanke, Michael and Cipollini, " \
+                  "Ben and {Marc-Alexandre Côté} and Markiewicz, Chris and Gerhard, Stephan and Larson, " \
+                  "Eric and Lee, Gregory R. and Halchenko, Yaroslav and Kastman, Erik and {Cindeem} and Morency, " \
+                  "Félix C. and {Moloney} and Millman, Jarrod and Rokem, Ariel and {Jaeilepp} and Gramfort, " \
+                  "Alexandre and Bosch, Jasper J.F. Van Den and {Krish Subramaniam} and Nichols, Nolan and {Embaker} " \
+                  "and {Bpinsard} and {Chaselgrove} and Oosterhof, Nikolaas N. and St-Jean, Samuel and {Bago " \
+                  "Amirbekian} and Nimmo-Smith, Ian and {Satrajit Ghosh}},\n  keywords = {},\n  title = {nibabel " \
+                  "2.0.1},\n  publisher = {Zenodo},\n  year = {2015}\n} "
+    assert (format_bibtex(BibTeX(bibtex_utf8)) == 'Brótt, M. et al., 2015. nibabel 2.0.1.')
 
 
 def test_is_contained() -> None:

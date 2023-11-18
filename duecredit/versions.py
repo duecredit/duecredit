@@ -132,7 +132,7 @@ class ExternalVersions:
         preamble: str, optional
           What preamble to the listing to use
         """
-        items = ["%s=%s" % (k, self._versions[k]) for k in sorted(self._versions)]
+        items = ["{}={}".format(k, self._versions[k]) for k in sorted(self._versions)]
         out = "%s" % preamble
         if indent:
             indent_ = ' ' if indent is True else indent

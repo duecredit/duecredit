@@ -33,7 +33,7 @@ def mbasename(s: str) -> str:
     base = basename(s)
     if base.endswith('.py'):
         base = base[:-3]
-    if base in set(['base', '__init__']):
+    if base in {'base', '__init__'}:
         base = basename(dirname(s)) + '.' + base
     return base
 
@@ -65,7 +65,7 @@ class TraceBack:
                 entries_out[-1][1] += ',%s' % entry[1]
             else:
                 entries_out.append(entry)
-        sftb = '>'.join(['%s:%s' % (mbasename(x[0]),
+        sftb = '>'.join(['{}:{}'.format(mbasename(x[0]),
                                     x[1]) for x in entries_out])
         if self.__collide:
             # lets remove part which is common with previous invocation

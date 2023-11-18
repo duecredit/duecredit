@@ -75,7 +75,7 @@ def _test_external(ev, modname: str) -> None:
     except ImportError:
         modname = pytest.importorskip(modname)
     except Exception as e:
-        pytest.skip("External %s fails to import: %s" % (modname, e))
+        pytest.skip("External {} fails to import: {}".format(modname, e))
     assert ev[modname] is not ev.UNKNOWN
     assert ev[modname] > '0.0.1'
     assert '1000000.0' > ev[modname]  # unlikely in our lifetimes
