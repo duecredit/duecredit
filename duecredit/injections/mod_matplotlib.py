@@ -52,4 +52,3 @@ def inject(injector: DueCreditInjector) -> None:
         "matplotlib", None, Doi(doi_prefix + "2893252"),
         description="Plotting with Python", tags=["implementation"]
     )
-

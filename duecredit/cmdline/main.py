@@ -67,23 +67,24 @@ def setup_parser() -> argparse.ArgumentParser:
     # setup cmdline args parser
     # main parser
     parser = argparse.ArgumentParser(
-                    fromfile_prefix_chars='@',
-                    # usage="%(prog)s ...",
-                    description="""\
+        fromfile_prefix_chars='@',
+        # usage="%(prog)s ...",
+        description="""\
     DueCredit simplifies citation of papers describing methods, software and data used by any given analysis script/pipeline.
 
     """,
-                    epilog='"Your Credit is Due"',
-                    formatter_class=argparse.RawDescriptionHelpFormatter,
-                    add_help=False
-                )
+        epilog='"Your Credit is Due"',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        add_help=False
+    )
     # common options
     helpers.parser_add_common_opt(parser, 'help')
     helpers.parser_add_common_opt(parser, 'log_level')
-    helpers.parser_add_common_opt(parser,
-                                  'version',
-                                  version='duecredit {}\n\n{}'.format(__version__,
-                                                              _license_info()))
+    helpers.parser_add_common_opt(
+        parser,
+        'version',
+        version=f'duecredit {__version__}\n\n{_license_info()}',
+    )
     if __debug__:
         parser.add_argument(
             '--dbg', action='store_true', dest='common_debug',
@@ -120,15 +121,16 @@ def setup_parser() -> argparse.ArgumentParser:
         else:
             parser_args = dict()
         # use module description, if no explicit description is available
-        if not 'description' in parser_args:
+        if 'description' not in parser_args:
             parser_args['description'] = subcmdmod.__doc__
         # create subparser, use module suffix as cmd name
         subparser = subparsers.add_parser(cmd_name, add_help=False, **parser_args)
         # all subparser can report the version
         helpers.parser_add_common_opt(
-                subparser, 'version',
-                version='duecredit {} {}\n\n{}'.format(cmd_name, __version__,
-                                                 _license_info()))
+            subparser,
+            'version',
+            version=f'duecredit {cmd_name} {__version__}\n\n{_license_info()}',
+        )
         # our own custom help for all commands
         helpers.parser_add_common_opt(subparser, 'help')
         helpers.parser_add_common_opt(subparser, 'log_level')
@@ -147,20 +149,28 @@ def setup_parser() -> argparse.ArgumentParser:
     # create command summary
     cmd_summary = []
     for cd in cmd_short_description:
-        cmd_summary.append('%s\n%s\n\n' \
-                           % (cd[0],
-                              textwrap.fill(cd[1], 75,
-                              initial_indent=' ' * 4,
-                              subsequent_indent=' ' * 4)))
-    parser.description = '%s\n%s\n\n%s' \
-            % (parser.description,
-               '\n'.join(cmd_summary),
-               textwrap.fill("""\
+        cmd_summary.append('%s\n%s\n\n' % (
+            cd[0],
+            textwrap.fill(
+                cd[1],
+                75,
+                initial_indent=' ' * 4,
+                subsequent_indent=' ' * 4,
+            )
+        ))
+    parser.description = '%s\n%s\n\n%s' % (
+        parser.description,
+        '\n'.join(cmd_summary),
+        textwrap.fill(
+            """\
     Detailed usage information for individual commands is
     available via command-specific help options, i.e.:
     %s <command> --help""" % sys.argv[0],
-                                75, initial_indent='',
-                                subsequent_indent=''))
+            75,
+            initial_indent='',
+            subsequent_indent='',
+        )
+    )
     return parser
 
 def main(args: Any = None) -> None:

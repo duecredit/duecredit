@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..entries import Doi, BibTeX, Url
+from ..entries import Doi
 
 # If defined, would determine from which to which version of the corresponding
 # module to care about

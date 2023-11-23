@@ -27,7 +27,14 @@ def inject(injector: DueCreditInjector) -> None:
                  description="Library fMRI data analysis",
                  tags=['implementation'])
 
-    for f, d in [('spectral_decomposition', 'PCA decomposition of symbolic HRF shifted over time'),
-                 ('taylor_approx', 'A Taylor series approximation of an HRF shifted over time')]:
-        injector.add('nipy.modalities.fmri.fmristat.hrf', f, Doi('10.1006/nimg.2002.1096'),
-            description=d, tags=['implementation'])
+    for f, d in [
+        ('spectral_decomposition', 'PCA decomposition of symbolic HRF shifted over time'),
+        ('taylor_approx', 'A Taylor series approximation of an HRF shifted over time')
+    ]:
+        injector.add(
+            'nipy.modalities.fmri.fmristat.hrf',
+            f,
+            Doi('10.1006/nimg.2002.1096'),
+            description=d,
+            tags=['implementation'],
+        )

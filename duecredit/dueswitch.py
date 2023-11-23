@@ -37,8 +37,8 @@ def _get_inactive_due() -> InactiveDueCreditCollector:
 
 @never_fail
 def _get_active_due() -> DueCreditCollector | InactiveDueCreditCollector:
-    from .config import CACHE_DIR, DUECREDIT_FILE
-    from duecredit.collector import CollectorSummary, DueCreditCollector
+    from .config import DUECREDIT_FILE
+    from duecredit.collector import DueCreditCollector
     from .io import load_due
 
     # TODO:  this needs to move to atexit handling, that we load previous
@@ -111,9 +111,8 @@ class DueSwitch:
             # InactiveDueCollector also has those special methods defined
             # in DueSwitch so that client code could query/call (for no effect).
             # So we shouldn't delete or bind them either
-            is_public_or_special = \
-                lambda x: not (x.startswith('_')
-                               or x in ('activate', 'active', 'dump'))
+            def is_public_or_special(x):
+                return not (x.startswith('_') or x in ('activate', 'active', 'dump'))
             # Clean up current bindings first
             for k in filter(is_public_or_special, dir(self)):
                 delattr(self, k)

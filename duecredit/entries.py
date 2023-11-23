@@ -92,4 +92,3 @@ class Url(DueCreditEntry):
     @property
     def url(self) -> str:
         return self._rawentry
-

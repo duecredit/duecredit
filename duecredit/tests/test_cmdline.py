@@ -18,8 +18,8 @@ from .. import __version__
 from ..cmdline import main
 
 def test_import() -> None:
-    import duecredit.cmdline
-    import duecredit.cmdline.main
+    import duecredit.cmdline  # noqa: F401
+    import duecredit.cmdline.main  # noqa: F401
 
 
 def test_main_help(monkeypatch: MonkeyPatch) -> None:

@@ -65,8 +65,7 @@ class TraceBack:
                 entries_out[-1][1] += ',%s' % entry[1]
             else:
                 entries_out.append(entry)
-        sftb = '>'.join(['{}:{}'.format(mbasename(x[0]),
-                                    x[1]) for x in entries_out])
+        sftb = '>'.join(['{}:{}'.format(mbasename(x[0]), x[1]) for x in entries_out])
         if self.__collide:
             # lets remove part which is common with previous invocation
             prev_next = sftb
@@ -93,11 +92,11 @@ class ColorFormatter(logging.Formatter):
     BOLD_SEQ = "\033[1m"
 
     COLORS = {
-      'WARNING': YELLOW,
-      'INFO': WHITE,
-      'DEBUG': BLUE,
-      'CRITICAL': YELLOW,
-      'ERROR': RED
+        'WARNING': YELLOW,
+        'INFO': WHITE,
+        'DEBUG': BLUE,
+        'CRITICAL': YELLOW,
+        'ERROR': RED
     }
 
     def __init__(self, use_color: bool | None = None, log_name: bool = False) -> None:
@@ -168,9 +167,9 @@ class LoggerHelper:
         """
         if level is None:
             # see if nothing in the environment
-            l = self._get_environ('LOGLEVEL')
-            assert type(l) is not bool
-            level = l
+            lv = self._get_environ('LOGLEVEL')
+            assert type(lv) is not bool
+            level = lv
         if level is None:
             level = default
 
@@ -236,4 +235,3 @@ class LoggerHelper:
         return self.lgr
 
 lgr = LoggerHelper().get_initialized_logger()
-

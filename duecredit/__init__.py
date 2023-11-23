@@ -16,4 +16,4 @@ from .entries import Doi, BibTeX, Url, Text
 from .version import __version__, __release_date__
 from .dueswitch import due
 
-__all__ = ['Doi', 'BibTeX', 'Url', 'Text', 'due', '__version__']
+__all__ = ['Doi', 'BibTeX', 'Url', 'Text', 'due', "__version__", "__release_date__"]

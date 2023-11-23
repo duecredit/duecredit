@@ -6,12 +6,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-import pytest
-
-import duecredit.io
-from ..collector import DueCreditCollector, Citation
-from .test_collector import _sample_bibtex, _sample_doi, _sample_bibtex2
-from ..entries import BibTeX, Doi, Text, Url
+from ..entries import Doi, Text, Url
 
 
 def test_comparison() -> None:

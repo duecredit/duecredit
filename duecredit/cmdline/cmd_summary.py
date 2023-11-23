@@ -17,7 +17,6 @@ import sys
 
 from ..log import lgr
 from ..config import DUECREDIT_FILE
-from ..collector import CollectorSummary
 from ..io import TextOutput, BibTeXOutput
 
 __docformat__ = 'restructuredtext'
@@ -58,5 +57,3 @@ def run(args: argparse.Namespace) -> int:
         raise ValueError("unknown to treat %s" % args.format)
     out.dump()
     return 0
-
-

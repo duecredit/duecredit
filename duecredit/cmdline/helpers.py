@@ -24,27 +24,29 @@ class HelpAction(argparse.Action):
     def __call__(
         self,
         parser: argparse.ArgumentParser,
-        namespace: argparse.Namespace,
-        values,
+        namespace: argparse.Namespace,  # noqa: U100
+        values,  # noqa: U100
         option_string: str | None = None
     ) -> None:
-#        import pydb; pydb.debugger()
+        #import pydb; pydb.debugger()
 
         if is_interactive() and option_string == '--help':
             # lets use the manpage on mature systems ...
             try:
                 import subprocess
                 subprocess.check_call(
-                        'man %s 2> /dev/null' % parser.prog.replace(' ', '-'),
-                        shell=True)
+                    'man %s 2> /dev/null' % parser.prog.replace(' ', '-'),
+                    shell=True,
+                )
                 sys.exit(0)
             except (subprocess.CalledProcessError, OSError):
                 # ...but silently fall back if it doesn't work
                 pass
         if option_string == '-h':
-            helpstr = "%s\n%s" \
-                    % (parser.format_usage(),
-                       "Use '--help' to get more comprehensive information.")
+            helpstr = "%s\n%s" % (
+                parser.format_usage(),
+                "Use '--help' to get more comprehensive information.",
+            )
         else:
             helpstr = parser.format_help()
         # better for help2man
@@ -53,10 +55,11 @@ class HelpAction(argparse.Action):
         #helpstr = re.sub(r'positional arguments:\n.*\n', '', helpstr)
         # convert all heading to have the first character uppercase
         headpat = re.compile(r'^([a-z])(.*):$',  re.MULTILINE)
-        helpstr = re.subn(headpat,
-               lambda match: r'{}{}:'.format(match.group(1).upper(),
-                                             match.group(2)),
-               helpstr)[0]
+        helpstr = re.sub(
+            headpat,
+            lambda match: rf'{match[1].upper()}{match[2]}:',
+            helpstr
+        )
         # usage is on the same line
         helpstr = re.sub(r'^usage:', 'Usage:', helpstr)
         if option_string == '--help-np':
@@ -70,10 +73,10 @@ class HelpAction(argparse.Action):
 class LogLevelAction(argparse.Action):
     def __call__(
         self,
-        parser: argparse.ArgumentParser,
-        namespace: argparse.Namespace,
+        parser: argparse.ArgumentParser,  # noqa: U100
+        namespace: argparse.Namespace,  # noqa: U100
         values,
-        option_string: str | None = None
+        option_string: str | None = None  # noqa: U100
     ) -> None:
         from ..log import LoggerHelper
         LoggerHelper().set_level(level=values)
@@ -124,4 +127,3 @@ class RegexpType:
             return re.compile(string)
         else:
             return None
-

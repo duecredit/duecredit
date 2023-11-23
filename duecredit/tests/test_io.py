@@ -1,4 +1,4 @@
-# ex: set sts=4 ts=4 sw=4 noet:
+# ex: set sts=4 sw=4 et:
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 #
 #   See COPYING file distributed along with the duecredit package for the
@@ -25,9 +25,9 @@ from ..io import TextOutput, PickleOutput, import_doi, \
     get_text_rendering, format_bibtex, _is_contained, Output, BibTeXOutput
 
 try:
-	# TODO: for some reason test below started to complain that we are trying
-	# to overwrite the cassette.
-	# 
+    # TODO: for some reason test below started to complain that we are trying
+    # to overwrite the cassette.
+    #
     # import vcr
 
     # @vcr.use_cassette()
@@ -478,7 +478,7 @@ def test_get_text_rendering(monkeypatch: MonkeyPatch) -> None:
     # Patch bibtex_rendering
     sample_bibtex = BibTeX(_sample_bibtex)
 
-    def get_bibtex_rendering(*args: Any, **kwargs: Any) -> BibTeX:
+    def get_bibtex_rendering(*_args: Any, **_kwargs: Any) -> BibTeX:
         return sample_bibtex
 
     monkeypatch.setattr(duecredit.io, 'get_bibtex_rendering', get_bibtex_rendering)

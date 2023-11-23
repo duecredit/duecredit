@@ -13,7 +13,7 @@ from io import StringIO
 from typing import TYPE_CHECKING
 
 import pytest
-from pytest import MonkeyPatch, TempPathFactory
+from pytest import MonkeyPatch
 
 from .. import __main__, __version__
 from .. import due
@@ -29,7 +29,9 @@ def test_main_help(monkeypatch: MonkeyPatch) -> None:
     pytest.raises(SystemExit, __main__.main, ['__main__.py', '--help'])
     assert(
         fakestdout.getvalue().startswith(
-        "Usage: %s -m duecredit [OPTIONS] <file> [ARGS]\n" % sys.executable))
+            "Usage: %s -m duecredit [OPTIONS] <file> [ARGS]\n" % sys.executable
+        )
+    )
 
 
 def test_main_version(monkeypatch: MonkeyPatch) -> None:
@@ -57,7 +59,7 @@ def test_main_run_a_script(
     # Patch due.activate
     count = [0]
 
-    def count_calls(*args, **kwargs):
+    def count_calls(*_args, **_kwargs):
         count[0] += 1
 
     monkeypatch.setattr(due, "activate", count_calls)

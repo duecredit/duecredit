@@ -51,5 +51,5 @@ def test_extract_references_from_rst() -> None:
         line11
         line12
         """
-        ]
+    ]
     extract_references_from_rst(samples[0])

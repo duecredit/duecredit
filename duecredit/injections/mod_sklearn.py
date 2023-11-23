@@ -98,4 +98,3 @@ def inject(injector: DueCreditInjector) -> None:
     injector.add('sklearn.tree.tree', 'DecisionTreeClassifier.predict_proba', Breiman_1984,
                  description="Classification and regression trees",
                  tags=['implementation', 'edu'])
-
