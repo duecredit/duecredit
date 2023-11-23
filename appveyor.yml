@@ -29,7 +29,7 @@ install:
 
 test_script:
   - coverage run --source duecredit -m py.test -v
-  - python setup.py install
+  - pip install .
 
 # for interactive debugging upon completion (have 30 min to react)
 #on_finish:
