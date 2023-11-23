@@ -1,6 +1,8 @@
 # emacs: at the end of the file
 # ex: set sts=4 ts=4 sw=4 et:
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### #
+from __future__ import annotations
+
 """
 
 Stub file for a guaranteed safe import of duecredit constructs:  if duecredit

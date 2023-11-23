@@ -8,17 +8,26 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """
 """
+from __future__ import annotations
 
 __docformat__ = 'restructuredtext'
 
 import argparse
 import re
 import sys
+from typing import Any, Pattern
 
 from ..utils import is_interactive
 
+
 class HelpAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values,
+        option_string: str | None = None
+    ) -> None:
 #        import pydb; pydb.debugger()
 
         if is_interactive() and option_string == '--help':
@@ -59,12 +68,23 @@ class HelpAction(argparse.Action):
         sys.exit(0)
 
 class LogLevelAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values,
+        option_string: str | None = None
+    ) -> None:
         from ..log import LoggerHelper
         LoggerHelper().set_level(level=values)
 
 
-def parser_add_common_args(parser, pos=None, opt=None, **kwargs):
+def parser_add_common_args(
+    parser: argparse.ArgumentParser,
+    pos=None,
+    opt=None,
+    **kwargs: Any
+) -> None:
     from . import common_args
     for i, args in enumerate((pos, opt)):
         if args is None:
@@ -78,7 +98,12 @@ def parser_add_common_args(parser, pos=None, opt=None, **kwargs):
             else:
                 parser.add_argument(arg_tmpl[i], **arg_kwargs)
 
-def parser_add_common_opt(parser, opt, names=None, **kwargs):
+def parser_add_common_opt(
+    parser: argparse.ArgumentParser,
+    opt,
+    names=None,
+    **kwargs
+) -> None:
     from . import common_args
     opt_tmpl = getattr(common_args, opt)
     opt_kwargs = opt_tmpl[2].copy()
@@ -94,7 +119,7 @@ class RegexpType:
     DEPRECATED AFAIK -- now things are in the config file...
     but we might provide a mode where we operate solely from cmdline
     """
-    def __call__(self, string):
+    def __call__(self, string: str | None) -> Pattern[str] | None:
         if string:
             return re.compile(string)
         else:

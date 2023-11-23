@@ -7,6 +7,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Helper to use duecredit as a "runnable" module with  -m duecredit"""
+from __future__ import annotations
 
 import sys
 from . import due, __version__

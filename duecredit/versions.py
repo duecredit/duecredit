@@ -6,11 +6,13 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
+
 """Module to help maintain a registry of versions for external modules etc
 """
 import sys
 from os import linesep
-from typing import Any, Dict, List, Union
+from typing import Any
 
 from distutils.version import StrictVersion, LooseVersion
 
@@ -46,10 +48,10 @@ class ExternalVersions:
     UNKNOWN = UnknownVersion()
 
     def __init__(self) -> None:
-        self._versions: Dict[str, Union[StrictVersion, LooseVersion, UnknownVersion]] = {}
+        self._versions: dict[str, StrictVersion | LooseVersion | UnknownVersion] = {}
 
     @classmethod
-    def _deduce_version(klass, module) -> Union[StrictVersion, LooseVersion, UnknownVersion]:
+    def _deduce_version(klass, module) -> StrictVersion | LooseVersion | UnknownVersion:
         version = None
         for attr in ('__version__', 'version'):
             if hasattr(module, attr):
@@ -82,7 +84,7 @@ class ExternalVersions:
         else:
             return klass.UNKNOWN
 
-    def __getitem__(self, module: Any) -> Union[StrictVersion, LooseVersion, UnknownVersion, None]:
+    def __getitem__(self, module: Any) -> StrictVersion | LooseVersion | UnknownVersion | None:
         # when ran straight in its source code -- fails to discover nipy's version.. TODO
         #if module == 'nipy':
         if not isinstance(module, str):
@@ -113,13 +115,13 @@ class ExternalVersions:
         return item in self._versions
 
     @property
-    def versions(self) -> Dict[str, Union[StrictVersion, LooseVersion, UnknownVersion]]:
+    def versions(self) -> dict[str, StrictVersion | LooseVersion | UnknownVersion]:
         """Return dictionary (copy) of versions"""
         return self._versions.copy()
 
     def dumps(
         self,
-        indent: Union[bool, str] = False,
+        indent: bool | str = False,
         preamble: str = "Versions:"
     ) -> str:
         """Return listing of versions as a string

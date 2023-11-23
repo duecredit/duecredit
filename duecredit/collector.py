@@ -7,11 +7,14 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Citation and citations Collector classes"""
+from __future__ import annotations
 
+import logging
 import os
 import sys
+from collections import namedtuple
 from functools import wraps
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, TYPE_CHECKING
 
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
@@ -19,10 +22,11 @@ from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
 from .utils import never_fail, borrowdoc
 from .versions import external_versions
-from collections import namedtuple
 
-import logging
 lgr = logging.getLogger('duecredit.collector')
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 CitationKey = namedtuple('CitationKey', ['path', 'entry_key'])
 
@@ -32,11 +36,11 @@ class Citation:
     def __init__(
         self,
         entry: DueCreditEntry,
-        description: Optional[str] = None,
-        path: Optional[str] = None,
-        version: Union[None, str, Tuple[str, str]] = None,
+        description: str | None = None,
+        path: str | None = None,
+        version: None | str | tuple[str, str] = None,
         cite_module: bool = False,
-        tags: List[str] = ['implementation']
+        tags: list[str] = ['implementation']
     ):
         """Cite a reference
 
@@ -113,7 +117,7 @@ class Citation:
         return self._entry
 
     @property
-    def description(self) -> Optional[str]:
+    def description(self) -> str | None:
         return self._description
 
     @property
@@ -121,26 +125,26 @@ class Citation:
         return self._cite_module
 
     @property
-    def cites_module(self) -> Optional[bool]:
+    def cites_module(self) -> bool | None:
         if not self.path:
             return None
         return not (':' in self.path)
 
     @property
-    def module(self) -> Optional[str]:
+    def module(self) -> str | None:
         if not self.path:
             return None
         return self.path.split(':', 1)[0]
 
     @property
-    def package(self) -> Optional[str]:
+    def package(self) -> str | None:
         module = self.module
         if not module:
             return None
         return module.split('.', 1)[0]
 
     @property
-    def objname(self) -> Optional[str]:
+    def objname(self) -> str | None:
         if not self.path:
             return None
         spl = self.path.split(':', 1)
@@ -149,7 +153,7 @@ class Citation:
         else:
             return None
 
-    def __contains__(self, entry: 'Citation') -> bool:  # Self PEP673
+    def __contains__(self, entry: Self) -> bool:
         """Checks if provided entry 'contained' in this one given its path
 
         If current entry is associated with a module, contained will be an entry
@@ -198,8 +202,8 @@ class DueCreditCollector:
     # TODO?  rename "entries" to "references"?  or "references" is closer to "citations"
     def __init__(
         self,
-        entries: Optional[Dict[str, DueCreditEntry]] = None,
-        citations: Optional[Dict[CitationKey, Citation]] = None
+        entries: dict[str, DueCreditEntry] | None = None,
+        citations: dict[CitationKey, Citation] | None = None
     ) -> None:
         self._entries = entries or {}
         self.citations = citations or {}
@@ -207,7 +211,7 @@ class DueCreditCollector:
     @never_fail
     def add(
         self,
-        entry: Union[DueCreditEntry, List[DueCreditEntry]]
+        entry: DueCreditEntry | list[DueCreditEntry]
     ) -> None:
         """entry should be a DueCreditEntry object"""
         if isinstance(entry, list):
@@ -247,7 +251,7 @@ class DueCreditCollector:
 
     @never_fail
     @borrowdoc(Citation, "__init__")
-    def cite(self, entry: Union[DueCreditEntry, str], **kwargs: Any) -> Citation:
+    def cite(self, entry: DueCreditEntry | str, **kwargs: Any) -> Citation:
         # TODO: if cite is invoked but no path is provided -- we must figure it out
         # I guess from traceback, otherwise how would we know later to associate it
         # with modules???
@@ -268,7 +272,7 @@ class DueCreditCollector:
             citation = self.citations[citation_key]
         except KeyError:
             self.citations[citation_key] = citation = Citation(entry_, **kwargs)
-        assert type(citation) is Citation
+        assert isinstance(citation, Citation)
         assert citation.key == citation_key
         # update citation count
         citation.count += 1
@@ -296,7 +300,7 @@ class DueCreditCollector:
 
         return citation
 
-    def _citations_fromentrykey(self) -> Dict[str, Citation]:
+    def _citations_fromentrykey(self) -> dict[str, Citation]:
         """Return a dictionary with the current citations indexed by the entry key"""
         citations_key = dict()
         for (path, entry_key), citation in self.citations.items():
@@ -308,7 +312,7 @@ class DueCreditCollector:
 
     @staticmethod
     def _args_match_conditions(
-        conditions: Dict[Any, Any],
+        conditions: dict[Any, Any],
         *fargs: Any,
         **fkwargs: Any
     ) -> bool:
@@ -482,8 +486,8 @@ class CollectorSummary:
     def _get_output_handler(
         type_: str,
         collector: DueCreditCollector,
-        fn: Optional[str] = None
-    ) -> Union[TextOutput, PickleOutput]:
+        fn: str | None = None
+    ) -> TextOutput | PickleOutput:
         # just a little factory
         if type_ in ("stdout", "stderr"):
             return TextOutput(getattr(sys, type_), collector)

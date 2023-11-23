@@ -7,23 +7,24 @@
 #   under MIT license
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-import re
-from typing import Optional
+from __future__ import annotations
 
 import logging
+import re
+
 lgr = logging.getLogger('duecredit.entries')
 
 
 class DueCreditEntry:
     _key : str
 
-    def __init__(self, rawentry:str, key: Optional[str] = None) -> None:
+    def __init__(self, rawentry:str, key: str | None = None) -> None:
         self._rawentry = rawentry
         self._key = key or rawentry.lower()
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, DueCreditEntry):
-            raise NotImplemented
+            return NotImplemented
         return (
             (self._rawentry == other._rawentry) and
             (self._key == other._key)
@@ -55,7 +56,7 @@ class DueCreditEntry:
 
 
 class BibTeX(DueCreditEntry):
-    def __init__(self, bibtex: str, key: Optional[str] = None) -> None:
+    def __init__(self, bibtex: str, key: str | None = None) -> None:
         super().__init__(bibtex.strip())
         self._reference = None
         self._process_rawentry()

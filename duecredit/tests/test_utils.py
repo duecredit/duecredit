@@ -7,16 +7,17 @@
 #   under MIT license
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 import sys
-from typing import Any, TYPE_CHECKING
+from typing import Any
+
+from pytest import MonkeyPatch
 
 from ..utils import is_interactive
 
-if TYPE_CHECKING:
-    from pytest import MonkeyPatch
 
-def test_is_interactive_crippled_stdout(monkeypatch: 'MonkeyPatch') -> None:
+def test_is_interactive_crippled_stdout(monkeypatch: MonkeyPatch) -> None:
     class MockedOut:
         """the one which has no isatty
         """

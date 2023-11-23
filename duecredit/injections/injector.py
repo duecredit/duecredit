@@ -8,6 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Importer which would also call decoration on a module upon import
 """
+from __future__ import annotations
 
 __docformat__ = 'restructuredtext'
 
@@ -16,7 +17,7 @@ from os.path import basename, join as pathjoin, dirname
 from glob import glob
 import sys
 from functools import wraps
-from typing import Any, Dict, List, Optional, Set, Tuple, Union, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 import logging
 from ..log import lgr
@@ -37,14 +38,14 @@ def _short_str(obj: Any, l: int = 30) -> str:
     else:
         return s
 
-def get_modules_for_injection() -> List[str]:
+def get_modules_for_injection() -> list[str]:
     """Get local modules which provide "inject" method to provide delayed population of injector
     """
-    return sorted([basename(x)[:-3]
+    return sorted(basename(x)[:-3]
                    for x in glob(pathjoin(dirname(__file__), "mod_*.py"))
-                   ])
+                   )
 
-def find_object(mod: Any, path: str) -> Tuple[Any, str, Any]:
+def find_object(mod: Any, path: str) -> tuple[Any, str, Any]:
     """Finds object among present within module "mod" given path specification within
 
     Returns
@@ -94,15 +95,15 @@ class DueCreditInjector:
             from duecredit import due
             collector = due
         self._collector = collector
-        self._delayed_injections: Dict[str, str] = {}
-        self._entry_records: Dict[str, Dict[Union[str, None], Any]] = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
-        self._processed_modules: Set[str] = set()
+        self._delayed_injections: dict[str, str] = {}
+        self._entry_records: dict[str, dict[str | None, Any]] = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
+        self._processed_modules: set[str] = set()
         # We need to process modules only after we are done with all nested imports, otherwise we
         # might be trying to process them too early -- whenever they are not yet linked to their
         # parent's namespace. So we will keep track of import level and set of modules which
         # would need to be processed whenever we are back at __import_level == 1
         self.__import_level = 0
-        self.__queue_to_process: Set[str] = set()
+        self.__queue_to_process: set[str] = set()
         self.__processing_queue = False
         self._active = False
         lgr.debug("Created injector %r", self)
@@ -118,8 +119,8 @@ class DueCreditInjector:
     def add(
         self,
         modulename: str,
-        obj: Optional[str],
-        entry: 'Union[Doi, BibTeX, Url]',
+        obj: str | None,
+        entry: Doi | BibTeX | Url,
         min_version=None,
         max_version=None,
         **kwargs: Any
@@ -352,7 +353,7 @@ class DueCreditInjector:
         lgr.debug("Processing queue of imported %d modules", len(self.__queue_to_process))
         # We need first to process top-level modules etc, so delayed injections get picked up,
         # let's sort by the level
-        queue_with_levels = sorted([(m.count('.'), m) for m in self.__queue_to_process])
+        queue_with_levels = sorted((m.count('.'), m) for m in self.__queue_to_process)
         self.__processing_queue = True
         try:
             sorted_queue = [x[1] for x in queue_with_levels]

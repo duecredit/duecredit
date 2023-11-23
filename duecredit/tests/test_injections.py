@@ -6,8 +6,9 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 import gc
 import sys
@@ -64,8 +65,8 @@ class TestActiveInjector:
         assert len(self.due._entries) == 0
         assert len(self.due.citations) == 0
 
-        globals_: Dict[str, Any] = {}
-        locals_: Dict[str, Any] = {}
+        globals_: dict[str, Any] = {}
+        locals_: dict[str, Any] = {}
         exec(import_stmt, globals_, locals_)
 
         assert len(self.due._entries) == 1   # we should get an entry now
@@ -112,8 +113,8 @@ class TestActiveInjector:
         assert len(self.due._entries) == 0
         assert len(self.due.citations) == 0
 
-        globals_: Dict[str, Any] = {}
-        locals_: Dict[str, Any] = {}
+        globals_: dict[str, Any] = {}
+        locals_: dict[str, Any] = {}
         exec(import_stmt, globals_, locals_)
 
         assert len(self.due._entries) == 2  # we should get two entries now

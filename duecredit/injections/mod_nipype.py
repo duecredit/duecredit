@@ -9,6 +9,8 @@
 """
 Automatic injection of bibliography entries for nipype module
 """
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX
@@ -21,7 +23,7 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
-def inject(injector: 'DueCreditInjector') -> None:
+def inject(injector: DueCreditInjector) -> None:
     #http://nipy.org/nipype/about.html
     injector.add('nipype', None, Doi('10.3389/fninf.2011.00013'),
                     description='Nipype: a flexible, lightweight and extensible neuroimaging data processing framework in Python',
