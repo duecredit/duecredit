@@ -8,7 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Importer which would also call decoration on a module upon import
 """
-from __typing__ import annotations
+from __future__ import annotations
 
 __docformat__ = 'restructuredtext'
 
