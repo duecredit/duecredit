@@ -45,7 +45,7 @@ class HelpAction(argparse.Action):
         # convert all heading to have the first character uppercase
         headpat = re.compile(r'^([a-z])(.*):$',  re.MULTILINE)
         helpstr = re.subn(headpat,
-               lambda match: r'{0}{1}:'.format(match.group(1).upper(),
+               lambda match: r'{}{}:'.format(match.group(1).upper(),
                                              match.group(2)),
                helpstr)[0]
         # usage is on the same line
@@ -54,7 +54,7 @@ class HelpAction(argparse.Action):
             usagestr = re.split(r'\n\n[A-Z]+', helpstr, maxsplit=1)[0]
             usage_length = len(usagestr)
             usagestr = re.subn(r'\s+', ' ', usagestr.replace('\n', ' '))[0]
-            helpstr = '%s\n%s' % (usagestr, helpstr[usage_length:])
+            helpstr = '{}\n{}'.format(usagestr, helpstr[usage_length:])
         print(helpstr)
         sys.exit(0)
 

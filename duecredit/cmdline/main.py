@@ -79,7 +79,7 @@ def setup_parser():
     helpers.parser_add_common_opt(parser, 'log_level')
     helpers.parser_add_common_opt(parser,
                                   'version',
-                                  version='duecredit %s\n\n%s' % (__version__,
+                                  version='duecredit {}\n\n{}'.format(__version__,
                                                               _license_info()))
     if __debug__:
         parser.add_argument(
@@ -124,7 +124,7 @@ def setup_parser():
         # all subparser can report the version
         helpers.parser_add_common_opt(
                 subparser, 'version',
-                version='duecredit %s %s\n\n%s' % (cmd_name, __version__,
+                version='duecredit {} {}\n\n{}'.format(cmd_name, __version__,
                                                  _license_info()))
         # our own custom help for all commands
         helpers.parser_add_common_opt(subparser, 'help')
@@ -176,5 +176,5 @@ def main(args=None):
         try:
             args.func(args)
         except Exception as exc:
-            lgr.error('%s (%s)' % (str(exc), exc.__class__.__name__))
+            lgr.error('{} ({})'.format(str(exc), exc.__class__.__name__))
             sys.exit(1)

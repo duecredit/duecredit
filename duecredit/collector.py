@@ -87,17 +87,17 @@ class Citation:
     def __repr__(self) -> str:
         argl = [repr(self._entry)]
         if self._description:
-            argl.append("description={0}".format(repr(self._description)))
+            argl.append(f"description={repr(self._description)}")
         if self._path:
-            argl.append("path={0}".format(repr(self._path)))
+            argl.append(f"path={repr(self._path)}")
         if self._cite_module:
-            argl.append("cite_module={0}".format(repr(self._cite_module)))
+            argl.append(f"cite_module={repr(self._cite_module)}")
 
         if argl:
             args = ", ".join(argl)
         else:
             args = ""
-        return self.__class__.__name__ + '({0})'.format(args)
+        return self.__class__.__name__ + f'({args})'
 
     @property
     def path(self) -> str:
@@ -404,7 +404,7 @@ class DueCreditCollector:
                 # deduce path from the actual function which was decorated
                 # TODO: must include class name  but can't !!!???
                 modname = func.__module__
-                path = kwargs['path'] = '%s:%s' % (modname, func.__name__)
+                path = kwargs['path'] = '{}:{}'.format(modname, func.__name__)
             else:
                 # TODO: we indeed need to separate path logic outside
                 modname = path.split(':', 1)[0]
@@ -418,7 +418,7 @@ class DueCreditCollector:
             # TODO: might make use of inspect.getmro
             # see e.g.
             # http://stackoverflow.com/questions/961048/get-class-that-defined-method
-            lgr.debug("Decorating func %s within module %s" % (func.__name__, modname))
+            lgr.debug("Decorating func {} within module {}".format(func.__name__, modname))
             # TODO: unittest for all the __version__ madness
 
             # TODO: check if we better use wrapt module which provides superior "correctness"
@@ -430,7 +430,7 @@ class DueCreditCollector:
                             or self._args_match_conditions(conditions, *fargs, **fkwargs):
                         citation = self.cite(*args, **kwargs)
                 except Exception as e:
-                    lgr.warning("Failed to cite due to %s" % (e,))
+                    lgr.warning("Failed to cite due to {}".format(e))
                 return func(*fargs, **fkwargs)
 
             cite_wrapper.__duecredited__ = func
@@ -441,20 +441,20 @@ class DueCreditCollector:
     def __repr__(self) -> str:
         argl = []
         if self.citations:
-            argl.append("citations={0}".format(repr(self.citations)))
+            argl.append(f"citations={repr(self.citations)}")
         if self._entries:
-            argl.append("entries={0}".format(repr(self._entries)))
+            argl.append(f"entries={repr(self._entries)}")
 
         if argl:
             args = ", ".join(argl)
         else:
             args = ""
-        return self.__class__.__name__ + '({0})'.format(args)
+        return self.__class__.__name__ + f'({args})'
 
     @never_fail
     def __str__(self) -> str:
         return self.__class__.__name__ + \
-            ' {0:d} entries, {1:d} citations'.format(
+            ' {:d} entries, {:d} citations'.format(
                 len(self._entries), len(self.citations))
 
 

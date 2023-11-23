@@ -125,9 +125,9 @@ class Output:
         citations = self.collector.citations
         if tagset != {'*'}:
             # Filter out citations based on tags
-            citations = dict((k, c)
+            citations = {k: c
                              for k, c in citations.items()
-                             if tagset.intersection(c.tags))
+                             if tagset.intersection(c.tags)}
 
         packages = defaultdict(list)
         modules = defaultdict(list)
@@ -166,7 +166,7 @@ class Output:
 
 class TextOutput(Output):
     def __init__(self, fd, collector, style=None) -> None:
-        super(TextOutput, self).__init__(fd, collector)
+        super().__init__(fd, collector)
         self.style = style
         if 'DUECREDIT_STYLE' in os.environ.keys():
             self.style = os.environ['DUECREDIT_STYLE']
@@ -176,12 +176,12 @@ class TextOutput(Output):
 
     @staticmethod
     def _format_citations(citations, citation_nr) -> str:
-        descriptions = map(str, set(str(r.description) for r in citations))
-        versions = map(str, set(str(r.version) for r in citations))
+        descriptions = map(str, {str(r.description) for r in citations})
+        versions = map(str, {str(r.version) for r in citations})
         refnrs = map(str, [citation_nr[c.entry.key] for c in citations])
         path = citations[0].path
 
-        return '- {0} / {1} (v {2}) [{3}]\n'.format(
+        return '- {} / {} (v {}) [{}]\n'.format(
             ", ".join(descriptions), path, ', '.join(versions), ', '.join(refnrs))
 
     def dump(self, tags=None) -> None:
@@ -221,7 +221,7 @@ class TextOutput(Output):
                  (len(modules), 'module'),
                  (len(objects), 'function')]
         for n, cit_type in stats:
-            self.fd.write('\n{0} {1} cited'.format(n, cit_type if n == 1
+            self.fd.write('\n{} {} cited'.format(n, cit_type if n == 1
                                                       else cit_type + 's'))
         # now print out references
         printed_keys = []
@@ -232,7 +232,7 @@ class TextOutput(Output):
                     # 'import Citation / assert type(cit) is Citation' would pollute environment
                     ek = cit.entry.key  # type: ignore
                     if ek not in printed_keys:
-                        self.fd.write('\n[{0}] '.format(citation_nr[ek]))
+                        self.fd.write(f'\n[{citation_nr[ek]}] ')
                         self.fd.write(get_text_rendering(cit,
                                                         style=self.style))
                         printed_keys.append(ek)
@@ -252,7 +252,7 @@ def get_text_rendering(citation, style: str = 'harvard1') -> str:
     elif isinstance(entry, Text):
         return entry.format()
     elif isinstance(entry, Url):
-        return "URL: {}".format(entry.format())
+        return f"URL: {entry.format()}"
     else:
         return str(entry)
 
@@ -277,7 +277,7 @@ def condition_bibtex(bibtex: str) -> bytes:
     if bibtex.startswith('@data'):
         bibtex = bibtex.replace('@data', '@misc', 1)
         bibtex = bibtex.replace(';', ' and')
-    bibtex = bibtex.replace(u'\u2013', '--') + "\n"
+    bibtex = bibtex.replace('\u2013', '--') + "\n"
     # workaround for citeproc 0.3.0 failing to parse a single page pages field
     # as for BIDS paper.  Workaround to add trailing + after pages number
     # related issue asking for a new release: https://github.com/brechtm/citeproc-py/issues/72
@@ -323,7 +323,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = 'harvard1') -> str:
                 # we should be able to provide encoding argument
                 bib_source = cpBibTeX(fname, encoding='utf-8')
         except Exception as e:
-            msg = "Failed to process BibTeX file %s: %s." % (fname, e)
+            msg = "Failed to process BibTeX file {}: {}.".format(fname, e)
             if 'unexpected keyword argument' in str(e):
                 citeproc_version = external_versions['citeproc']
                 if type(citeproc_version) is StrictVersion:
@@ -378,7 +378,7 @@ class PickleOutput:
 
 class BibTeXOutput(Output):
     def __init__(self, fd, collector) -> None:
-        super(BibTeXOutput, self).__init__(fd, collector)
+        super().__init__(fd, collector)
 
     def dump(self, tags=None) -> None:
         packages, modules, objects = self._get_collated_citations(tags)

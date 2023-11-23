@@ -170,7 +170,7 @@ class DueCreditInjector:
         except Exception as e:
             if os.environ.get('DUECREDIT_ALLOW_FAIL', False):
                 raise
-            raise RuntimeError("Failed to import %s: %r" % (inj_mod_name, e))
+            raise RuntimeError("Failed to import {}: {!r}".format(inj_mod_name, e))
         # TODO: process min/max_versions etc
         assert(hasattr(inj_mod, 'inject'))
         lgr.log(3, "Calling injector of %s", inj_mod_name_full)
@@ -212,7 +212,7 @@ class DueCreditInjector:
                 try:
                     parent, obj_name, obj = find_object(mod, obj_path)
                 except (KeyError, AttributeError) as e:
-                    lgr.warning("Could not find %s in module %s: %s" % (obj_path, mod, e))
+                    lgr.warning("Could not find {} in module {}: {}".format(obj_path, mod, e))
                     continue
             assert obj_name
 

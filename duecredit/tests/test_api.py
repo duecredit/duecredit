@@ -34,7 +34,7 @@ def stubbed_env():
     """Create stubbed module with a sample script"""
     os.makedirs(stubbed_dir)
     with open(stubbed_script, 'wb') as f:
-        f.write("""
+        f.write(b"""
 from due import due, Doi
 
 kwargs = dict(
@@ -52,7 +52,7 @@ def method(arg):
 
 assert method(1) == 2
 print("done123")
-""".encode())
+""")
     # copy stub.py under stubbed
     shutil.copy(
         pathjoin(dirname(__file__), os.pardir, 'stub.py'),
@@ -125,7 +125,7 @@ def test_noincorrect_import_if_no_lxml(monkeypatch: 'MonkeyPatch') -> None:
     if on_windows:
         pytest.xfail("Fails for some reason on Windows")
 
-    monkeypatch.setitem(os.environ, 'PYTHONPATH', "%s:%s" % (badlxml_path, os.environ.get('PYTHONPATH', '')))
+    monkeypatch.setitem(os.environ, 'PYTHONPATH', "{}:{}".format(badlxml_path, os.environ.get('PYTHONPATH', '')))
     ret, out, err = run_python_command('import lxml')
     assert ret == 1
     assert 'ImportError' in err
@@ -166,7 +166,7 @@ def test_noincorrect_import_if_no_lxml_numpy(
     except ImportError:
         pytest.skip("We need to have numpy to test correct operation")
 
-    fake_env_nolxml_ = {'PYTHONPATH': "%s:%s" % (badlxml_path, os.environ.get('PYTHONPATH', ''))}.copy()
+    fake_env_nolxml_ = {'PYTHONPATH': "{}:{}".format(badlxml_path, os.environ.get('PYTHONPATH', ''))}.copy()
     fake_env_nolxml_.update(env)
 
     for key in fake_env_nolxml_:
