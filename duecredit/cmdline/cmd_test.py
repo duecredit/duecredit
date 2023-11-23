@@ -11,18 +11,24 @@
 
 __docformat__ = 'restructuredtext'
 
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    import argparse
+
 # magic line for manpage summary
 # man: -*- % run unit-tests
 
 from .helpers import parser_add_common_args
 
 
-def setup_parser(parser):
+def setup_parser(parser: argparse.ArgumentParser) -> None:
     # TODO -- pass options such as verbosity etc
     pass
 
 
-def run(args):
+def run(args: argparse.Namespace) -> None:
     import duecredit
     raise NotImplementedError("Just use pytest duecredit for now")
     #duecredit.test()

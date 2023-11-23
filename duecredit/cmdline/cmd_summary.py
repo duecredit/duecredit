@@ -9,9 +9,11 @@
 """Spit out the summary of the citations which were collected.
 
 """
+from __future__ import annotations
 
 import sys
 import os
+from typing import TYPE_CHECKING
 
 from ..log import lgr
 from ..config import DUECREDIT_FILE
@@ -20,10 +22,13 @@ from ..io import TextOutput, BibTeXOutput
 
 __docformat__ = 'restructuredtext'
 
+if TYPE_CHECKING:
+    import argparse
+
 # magic line for manpage summary
 # man: -*- % summary of collected citations
 
-def setup_parser(parser):
+def setup_parser(parser: argparse.ArgumentParser) -> None:
 
     parser.add_argument(
         "-f", "--filename", default=DUECREDIT_FILE,
@@ -37,7 +42,7 @@ def setup_parser(parser):
         "--format", choices=("text", "bibtex"), default="text",
         help="Way to present the summary")
 
-def run(args):
+def run(args: argparse.Namespace) -> int:
     from ..io import PickleOutput
     if not os.path.exists(args.filename):
         lgr.debug("File {} doesn't exist.  No summary available".format(
@@ -47,6 +52,7 @@ def run(args):
     due = PickleOutput.load(args.filename)
     #CollectorSummary(due).dump()
 
+    out: TextOutput | BibTeXOutput
     if args.format == "text":
         out = TextOutput(sys.stdout, due, args.style)
     elif args.format == "bibtex":
@@ -54,5 +60,6 @@ def run(args):
     else:
         raise ValueError("unknown to treat %s" % args.format)
     out.dump()
+    return 0
 
 
