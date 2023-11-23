@@ -7,6 +7,7 @@
 #   under MIT license
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 import glob
 import os
@@ -20,7 +21,7 @@ import time
 from os.path import exists, join as opj, isabs, expandvars, expanduser, abspath
 from os.path import realpath
 from functools import wraps
-from typing import Any, Union
+from typing import Any
 
 #
 # Some useful variables
@@ -97,7 +98,7 @@ def rotree(path: str, ro: bool = True, chmod_files: bool = True) -> None:
         chmod(root)
 
 
-def rmtree(path: str, chmod_files: Union[str, bool] = 'auto', *args: Any, **kwargs: Any) -> None:
+def rmtree(path: str, chmod_files: str | bool = 'auto', *args: Any, **kwargs: Any) -> None:
     """To remove git-annex .git it is needed to make all files and directories writable again first
 
     Parameters
@@ -143,7 +144,7 @@ def rmtemp(f: str, *args: Any, **kwargs: Any) -> None:
             for i in range(10):
                 try:
                     os.unlink(f)
-                except OSError as e:
+                except OSError:
                     if i < 9:
                         time.sleep(0.1)
                         continue

@@ -13,7 +13,7 @@ import pickle
 import os
 import pytest
 from io import StringIO
-from typing import Any, List
+from typing import Any
 
 from pytest import MonkeyPatch
 
@@ -374,7 +374,7 @@ def test_text_output_dump_formatting() -> None:
     value = strio.getvalue()
     lines = value.split('\n')
 
-    citation_numbers: List[str] = []
+    citation_numbers: list[str] = []
     reference_numbers = []
     references = []
     for line in lines:

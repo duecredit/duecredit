@@ -9,6 +9,8 @@
 """
 Automatic injection of bibliography entries for psychopy module
 """
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX, Url
@@ -21,7 +23,7 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
-def inject(injector: 'DueCreditInjector') -> None:
+def inject(injector: DueCreditInjector) -> None:
     injector.add('psychopy', None, Doi('doi:10.1016/j.jneumeth.2006.11.017'),
                  description="PsychoPy -- Psychophysics software in Python.",
                  tags=['implementation'])

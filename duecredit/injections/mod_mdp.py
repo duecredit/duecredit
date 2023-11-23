@@ -10,6 +10,8 @@
 """
 Automatic injection of bibliography entries for mdp module
 """
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX, Url
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
 
-def inject(injector: 'DueCreditInjector') -> None:
+def inject(injector: DueCreditInjector) -> None:
     injector.add('mdp', None, Doi('10.3389/neuro.11.008.2008'),
                  description="Modular toolkit for Data Processing (MDP): a Python data processing framework",
                  tags=['implementation'])

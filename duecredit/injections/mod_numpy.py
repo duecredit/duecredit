@@ -8,6 +8,8 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for numpy module
 """
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX
@@ -20,7 +22,7 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
-def inject(injector: 'DueCreditInjector') -> None:
+def inject(injector: DueCreditInjector) -> None:
     injector.add('numpy', None, BibTeX(r"""
     @article{van2011numpy,
         title={The NumPy array: a structure for efficient numerical computation},

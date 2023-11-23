@@ -9,6 +9,8 @@
 """
 Automatic injection of bibliography entries for mne module
 """
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ..entries import Doi, BibTeX
@@ -21,7 +23,7 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
-def inject(injector: 'DueCreditInjector') -> None:
+def inject(injector: DueCreditInjector) -> None:
     #http://martinos.org/mne/stable/cite.html
     injector.add('mne', None, Doi('10.1016/j.neuroimage.2013.10.027'),
                     description='MNE software for processing MEG and EEG data.',

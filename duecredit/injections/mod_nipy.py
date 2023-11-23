@@ -8,6 +8,8 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for nipy module
 """
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ..entries import Doi
@@ -20,7 +22,7 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
-def inject(injector: 'DueCreditInjector') -> None:
+def inject(injector: DueCreditInjector) -> None:
     injector.add('nipy', None, Doi('10.1016/S1053-8119(09)72223-2'),
                  description="Library fMRI data analysis",
                  tags=['implementation'])

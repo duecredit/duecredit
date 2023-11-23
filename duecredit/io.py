@@ -23,7 +23,7 @@ import warnings
 from collections import defaultdict
 from distutils.version import StrictVersion
 from os.path import dirname, exists
-from typing import Any, Dict, List, Tuple, Type, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, Text, Url
@@ -99,9 +99,9 @@ class Output:
 
     def _get_collated_citations(
         self,
-        tags: List[str] | None = None,
+        tags: list[str] | None = None,
         all_: bool | None = None
-    ) -> 'Tuple[Dict[str, List[Citation]], Dict[str, List[Citation]], Dict[str, List[Citation]]]':
+    ) -> tuple[dict[str, list[Citation]], dict[str, list[Citation]], dict[str, list[Citation]]]:
         """Given all the citations, filter only those that the user wants and
         those that were actually used"""
         if not tags:
@@ -291,7 +291,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = 'harvard1') -> str:
             "For formatted output we need citeproc and all of its dependencies "
             "(such as lxml) but there is a problem while importing citeproc: %s"
             % str(e))
-    decode_exceptions: Tuple[Type[Exception], ...]
+    decode_exceptions: tuple[type[Exception], ...]
     try:
         from citeproc.source.bibtex.bibparse import BibTeXDecodeError
         decode_exceptions = (UnicodeDecodeError, BibTeXDecodeError)
@@ -310,7 +310,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = 'harvard1') -> str:
         try:
             try:
                 bib_source = cpBibTeX(fname)
-            except decode_exceptions as e:
+            except decode_exceptions:
                 # So .bib must be having UTF-8 characters.  With
                 # a recent (not yet released past v0.3.0-68-g9800dad
                 # we should be able to provide encoding argument
