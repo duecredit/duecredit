@@ -11,11 +11,7 @@ from __future__ import annotations
 
 __docformat__ = 'restructuredtext'
 
-from typing import TYPE_CHECKING
-
-
-if TYPE_CHECKING:
-    import argparse
+import argparse
 
 # magic line for manpage summary
 # man: -*- % run unit-tests

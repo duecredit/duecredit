@@ -11,9 +11,9 @@
 """
 from __future__ import annotations
 
-import sys
+import argparse
 import os
-from typing import TYPE_CHECKING
+import sys
 
 from ..log import lgr
 from ..config import DUECREDIT_FILE
@@ -21,9 +21,6 @@ from ..collector import CollectorSummary
 from ..io import TextOutput, BibTeXOutput
 
 __docformat__ = 'restructuredtext'
-
-if TYPE_CHECKING:
-    import argparse
 
 # magic line for manpage summary
 # man: -*- % summary of collected citations
