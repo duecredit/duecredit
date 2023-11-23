@@ -6,6 +6,7 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 # Just for testing of robust operation
 import os
@@ -16,14 +17,13 @@ import copy
 import locale
 import pickle
 import re
-import sys
 import tempfile
 import time
 import warnings
 from collections import defaultdict
 from distutils.version import StrictVersion
 from os.path import dirname, exists
-from typing import Any, Dict, List, Optional, Tuple, Type, Union, TYPE_CHECKING
+from typing import Any, Dict, List, Tuple, Type, TYPE_CHECKING
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, Text, Url
@@ -34,13 +34,6 @@ if TYPE_CHECKING:
     from collector import Citation
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
-
-# https://github.com/python/mypy/issues/9242#issuecomment-667586397
-# https://github.com/spack/spack/pull/35640
-if sys.platform == "win32":
-    OSExceptions = (OSError, WindowsError)
-else:
-    OSExceptions = (OSError,)
 
 
 def get_doi_cache_file(doi: str) -> str:
@@ -106,8 +99,8 @@ class Output:
 
     def _get_collated_citations(
         self,
-        tags: Optional[List[str]] = None,
-        all_: Optional[bool] = None
+        tags: List[str] | None = None,
+        all_: bool | None = None
     ) -> 'Tuple[Dict[str, List[Citation]], Dict[str, List[Citation]], Dict[str, List[Citation]]]':
         """Given all the citations, filter only those that the user wants and
         those that were actually used"""
@@ -257,7 +250,7 @@ def get_text_rendering(citation, style: str = 'harvard1') -> str:
         return str(entry)
 
 
-def get_bibtex_rendering(entry: Union[Doi, BibTeX]) -> BibTeX:
+def get_bibtex_rendering(entry: Doi | BibTeX) -> BibTeX:
     if isinstance(entry, Doi):
         return BibTeX(import_doi(entry.doi))
     elif isinstance(entry, BibTeX):
@@ -348,7 +341,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = 'harvard1') -> str:
             for i in range(50):
                 try:
                     os.unlink(fname)
-                except OSExceptions:
+                except OSError:
                     if i < 49:
                         time.sleep(0.1)
                         continue

@@ -6,13 +6,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-import random
-import re
-import pickle
-import os
 import pytest
-
-from io import StringIO
 
 import duecredit.io
 from ..collector import DueCreditCollector, Citation

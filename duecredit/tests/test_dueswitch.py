@@ -6,20 +6,19 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
-from typing import Any, Callable, TYPE_CHECKING
+from typing import Any, Callable
 
 import atexit
 import pytest
+from pytest import MonkeyPatch
 
 from ..injections.injector import DueCreditInjector
 from ..dueswitch import DueSwitch, due
 
-if  TYPE_CHECKING:
-    from pytest import MonkeyPatch
 
-
-def test_dueswitch_activate(monkeypatch: 'MonkeyPatch') -> None:
+def test_dueswitch_activate(monkeypatch: MonkeyPatch) -> None:
     if due.active:
        pytest.skip("due is already active, can't test more at this point")
 

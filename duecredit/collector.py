@@ -7,11 +7,14 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Citation and citations Collector classes"""
+from __future__ import annotations
 
+import logging
 import os
 import sys
+from collections import namedtuple
 from functools import wraps
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
@@ -19,10 +22,11 @@ from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
 from .utils import never_fail, borrowdoc
 from .versions import external_versions
-from collections import namedtuple
 
-import logging
 lgr = logging.getLogger('duecredit.collector')
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 CitationKey = namedtuple('CitationKey', ['path', 'entry_key'])
 
@@ -149,7 +153,7 @@ class Citation:
         else:
             return None
 
-    def __contains__(self, entry: 'Citation') -> bool:  # Self PEP673
+    def __contains__(self, entry: Self) -> bool:
         """Checks if provided entry 'contained' in this one given its path
 
         If current entry is associated with a module, contained will be an entry
@@ -268,7 +272,7 @@ class DueCreditCollector:
             citation = self.citations[citation_key]
         except KeyError:
             self.citations[citation_key] = citation = Citation(entry_, **kwargs)
-        assert type(citation) is Citation
+        assert isinstance(citation, Citation)
         assert citation.key == citation_key
         # update citation count
         citation.count += 1

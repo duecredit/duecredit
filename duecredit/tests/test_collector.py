@@ -6,15 +6,19 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+import os
 
-from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
-    CollectorSummary, Citation
+import pytest
+
+from ..collector import (
+    DueCreditCollector,
+    InactiveDueCreditCollector,
+    CollectorSummary,
+    Citation,
+)
 from ..dueswitch import DueSwitch
 from ..entries import BibTeX, Doi
 from ..io import PickleOutput
-
-import os
-import pytest
 
 
 def _test_entry(due, entry):
