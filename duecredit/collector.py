@@ -40,7 +40,7 @@ class Citation:
         path: str | None = None,
         version: None | str | tuple[str, str] = None,
         cite_module: bool = False,
-        tags: list[str] = ['implementation']
+        tags: list[str] | None = None,
     ):
         """Cite a reference
 
@@ -84,6 +84,8 @@ class Citation:
         # We might want extract all the relevant functionality into a separate class
         self._path = path
         self._cite_module = cite_module
+        if tags is None:
+            tags = ["implementation"]
         self.tags = tags or []
         self.version = version
         self.count = 0
