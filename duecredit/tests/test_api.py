@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import os
 import sys
+import warnings
+
 import pytest
 import shutil
 import tempfile
@@ -63,6 +65,71 @@ print("done123")
     shutil.rmtree(stubbed_dir)
 
 
+@pytest.fixture
+def duplicate_script(tmp_path):
+    package_dir = tmp_path / "mypackage"
+    package_dir.mkdir()
+    with open(str(package_dir / "__init__.py"), "w") as f:
+        f.write("""
+from .due import BibTeX, due
+
+bib_str = '''
+@misc{ Nobody06,
+       author = "Nobody Jr",
+       title = "My Article",
+       year = "2006" }
+'''.strip()
+
+due.cite(BibTeX(bib_str), path="mypackage")
+
+
+@due.dcite(BibTeX(bib_str))
+def hello():
+    print("hello there!")
+""".lstrip())
+
+    shutil.copy(
+        pathjoin(dirname(__file__), os.pardir, 'stub.py'),
+        pathjoin(str(package_dir), 'due.py')
+    )
+
+    script_path = tmp_path / "myscript.py"
+    with open(str(script_path), "w") as f:
+        f.write("""
+from mypackage import hello
+
+hello()
+""".lstrip())
+
+    yield script_path
+
+
+def test_no_duplicate(duplicate_script, monkeypatch):
+    monkeypatch.setenv("DUECREDIT_ENABLE", "yes")
+    cwd = str(duplicate_script.parent)
+    ret, out, err = run_python_command(
+        script=str(duplicate_script), cwd=cwd
+    )
+    if ret:
+        warnings.warn(err)
+    assert ret == 0
+    assert "[2]" not in out
+    assert "1 package" in out and "1 function" in out
+
+    ret2, out2, err2 = run_command(
+        ["duecredit", "summary", "--format", "bibtex"], cwd=cwd
+    )
+
+    if ret:
+        warnings.warn(err2)
+    warnings.warn(out2)
+    assert ret2 == 0
+    assert out2.count("@") == 1
+    stripped = out2.strip()
+    assert stripped.startswith('@')
+    assert stripped.endswith('}')
+
+
 @pytest.mark.parametrize(
     'collector_class', [DueCreditCollector, InactiveDueCreditCollector]
 )
@@ -102,21 +169,31 @@ def test_api(collector_class):
     kid.birth("female")
 
 
-def run_python_command(cmd=None, script=None):
-    """Just a tiny helper which runs command and returns exit code, stdout, stderr"""
-    assert bool(cmd) != bool(script)  # one or another, not both
-    args = ['-c', cmd] if cmd else [script]
+def run_command(args, cwd=None):
     try:
         # run script from some temporary directory so we do not breed .duecredit.p
         # in current directory
-        tmpdir = tempfile.mkdtemp()
-        python = Popen([sys.executable] + args, stdout=PIPE, stderr=PIPE, cwd=tmpdir)
+        if cwd is None:
+            rm = True
+            cwd = tempfile.mkdtemp()
+        else:
+            rm = False
+        python = Popen(args, stdout=PIPE, stderr=PIPE, cwd=cwd)
         stdout, stderr = python.communicate()  # wait()
         ret = python.poll()
     finally:
-        shutil.rmtree(tmpdir)
+        if rm:
+            shutil.rmtree(cwd)
     # TODO stdout cannot decode on Windows special character /x introduced
     return ret, stdout.decode(errors='ignore'), stderr.decode()
+
+
+def run_python_command(cmd=None, script=None, cwd=None):
+    """Just a tiny helper which runs command and returns exit code, stdout, stderr"""
+    assert bool(cmd) != bool(script)  # one or another, not both
+    args = ['-c', cmd] if cmd else [script]
+
+    return run_command([sys.executable] + args, cwd)
 
 
 # Since duecredit and possibly lxml already loaded, let's just test
