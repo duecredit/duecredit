@@ -395,7 +395,7 @@ class BibTeXOutput(Output):
             try:
                 bibtex = get_bibtex_rendering(entry)
             except Exception:
-                lgr.warning("Failed to generate bibtex for %s" % entry)
+                lgr.warning("Failed to generate BibTeX for %s", entry)
                 continue
             self.fd.write(bibtex.rawentry + "\n")
 
