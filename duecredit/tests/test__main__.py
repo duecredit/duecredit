@@ -6,20 +6,22 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 import sys
 from io import StringIO
 from typing import TYPE_CHECKING
 
 import pytest
+from pytest import MonkeyPatch, TempPathFactory
 
 from .. import __main__, __version__
 from .. import due
 
 if TYPE_CHECKING:
-    from pytest import MonkeyPatch, TempdirFactory
+    import py
 
-def test_main_help(monkeypatch: 'MonkeyPatch') -> None:
+def test_main_help(monkeypatch: MonkeyPatch) -> None:
     # Patch stdout
     fakestdout = StringIO()
     monkeypatch.setattr(sys, "stdout", fakestdout)
@@ -30,7 +32,7 @@ def test_main_help(monkeypatch: 'MonkeyPatch') -> None:
         "Usage: %s -m duecredit [OPTIONS] <file> [ARGS]\n" % sys.executable))
 
 
-def test_main_version(monkeypatch: 'MonkeyPatch') -> None:
+def test_main_version(monkeypatch: MonkeyPatch) -> None:
     # Patch stdout
     fakestdout = StringIO()
     monkeypatch.setattr(sys, "stdout", fakestdout)
@@ -40,8 +42,8 @@ def test_main_version(monkeypatch: 'MonkeyPatch') -> None:
 
 
 def test_main_run_a_script(
-    tmpdir: 'TempdirFactory',
-    monkeypatch: 'MonkeyPatch'
+    tmpdir: py.path.local,
+    monkeypatch: MonkeyPatch
 ) -> None:
     tempfile = str(tmpdir.mkdir("sub").join("tempfile.txt"))
     content = b'print("Running the script")\n'

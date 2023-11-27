@@ -5,6 +5,7 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 import random
 import re
@@ -12,7 +13,9 @@ import pickle
 import os
 import pytest
 from io import StringIO
-from typing import Any, List, TYPE_CHECKING
+from typing import Any
+
+from pytest import MonkeyPatch
 
 import duecredit.io
 from ..collector import DueCreditCollector, Citation, CitationKey
@@ -20,9 +23,6 @@ from .test_collector import _sample_bibtex, _sample_doi, _sample_bibtex2
 from ..entries import BibTeX, Doi, Text, Url
 from ..io import TextOutput, PickleOutput, import_doi, \
     get_text_rendering, format_bibtex, _is_contained, Output, BibTeXOutput
-
-if TYPE_CHECKING:
-    from pytest import MonkeyPatch
 
 try:
 	# TODO: for some reason test below started to complain that we are trying
@@ -178,7 +178,7 @@ def test_output() -> None:
     assert modules['package.module'][0] == collector.citations[CitationKey('package.module', entry.get_key())]
 
 
-def test_output_return_all(monkeypatch: 'MonkeyPatch') -> None:
+def test_output_return_all(monkeypatch: MonkeyPatch) -> None:
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -208,7 +208,7 @@ def test_output_return_all(monkeypatch: 'MonkeyPatch') -> None:
         assert not objects
 
 
-def test_output_tags(monkeypatch: 'MonkeyPatch') -> None:
+def test_output_tags(monkeypatch: MonkeyPatch) -> None:
     entry = BibTeX(_sample_bibtex)
     entry2 = BibTeX(_sample_bibtex2)
 
@@ -374,7 +374,7 @@ def test_text_output_dump_formatting() -> None:
     value = strio.getvalue()
     lines = value.split('\n')
 
-    citation_numbers: List[str] = []
+    citation_numbers: list[str] = []
     reference_numbers = []
     references = []
     for line in lines:
@@ -474,7 +474,7 @@ def _generate_sample_bibtex() -> str:
     return sample_bibtex
 
 
-def test_get_text_rendering(monkeypatch: 'MonkeyPatch') -> None:
+def test_get_text_rendering(monkeypatch: MonkeyPatch) -> None:
     # Patch bibtex_rendering
     sample_bibtex = BibTeX(_sample_bibtex)
 

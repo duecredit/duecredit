@@ -8,9 +8,11 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Provides an adapter to switch between two (active, inactive) collectors
 """
+from __future__ import annotations
+
 import os
 import atexit
-from typing import Any, Optional, Union, TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from .log import lgr
 from .utils import never_fail
@@ -28,13 +30,13 @@ def _get_duecredit_enable() -> bool:
 
 
 @never_fail
-def _get_inactive_due() -> 'InactiveDueCreditCollector':
+def _get_inactive_due() -> InactiveDueCreditCollector:
     from .stub import InactiveDueCreditCollector
     return InactiveDueCreditCollector()
 
 
 @never_fail
-def _get_active_due() -> 'Union[DueCreditCollector, InactiveDueCreditCollector]':
+def _get_active_due() -> DueCreditCollector | InactiveDueCreditCollector:
     from .config import CACHE_DIR, DUECREDIT_FILE
     from duecredit.collector import CollectorSummary, DueCreditCollector
     from .io import load_due
@@ -45,7 +47,7 @@ def _get_active_due() -> 'Union[DueCreditCollector, InactiveDueCreditCollector]'
     if os.path.exists(DUECREDIT_FILE):
         try:
             due_ = load_due(DUECREDIT_FILE)
-        except Exception as e:
+        except Exception:
             lgr.warning("Failed to load previously collected %s. "
                         "DueCredit will not be active for this session."
                         % DUECREDIT_FILE)
@@ -63,7 +65,7 @@ class DueSwitch:
     duecredit decorators and register an event atexit.
     """
     def __init__(self, inactive, active, activate: bool = False) -> None:
-        self.__active: Optional[bool] = None
+        self.__active: bool | None = None
         self.__collectors = {False: inactive, True: active}
         self.__activations_done = False
         if not (inactive and active):

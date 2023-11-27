@@ -6,25 +6,23 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 import sys
 from io import StringIO
-from typing import TYPE_CHECKING
 
 import pytest
+from pytest import MonkeyPatch
 
 from .. import __version__
 from ..cmdline import main
-
-if TYPE_CHECKING:
-    from pytest import MonkeyPatch
 
 def test_import() -> None:
     import duecredit.cmdline
     import duecredit.cmdline.main
 
 
-def test_main_help(monkeypatch: 'MonkeyPatch') -> None:
+def test_main_help(monkeypatch: MonkeyPatch) -> None:
     # Patch stdout
     fakestdout = StringIO()
     monkeypatch.setattr(sys, "stdout", fakestdout)
@@ -33,7 +31,7 @@ def test_main_help(monkeypatch: 'MonkeyPatch') -> None:
     assert fakestdout.getvalue().lstrip().startswith("Usage: ")
 
 
-def test_main_version(monkeypatch: 'MonkeyPatch') -> None:
+def test_main_version(monkeypatch: MonkeyPatch) -> None:
     # Patch stdout or stderr for different Python versions -- catching both
     fakestdout = StringIO()
     fakeout = 'stdout'

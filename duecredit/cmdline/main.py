@@ -7,7 +7,9 @@
 #   under MIT license
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-""""""
+"""
+"""
+from __future__ import annotations
 
 __docformat__ = 'restructuredtext'
 
@@ -17,6 +19,7 @@ import logging
 import os
 import sys
 import textwrap
+from typing import Any
 
 from .. import __version__
 from ..log import lgr
@@ -26,7 +29,7 @@ from . import helpers
 
 from ..utils import setup_exceptionhook
 
-def _license_info():
+def _license_info() -> str:
     return """\
 Copyright 2015-2016 Yaroslav Halchenko, Matteo Visconti di Oleggio Castello.
 All rights reserved.
@@ -57,10 +60,10 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder.
 """
 
-def get_commands():
+def get_commands() -> list[str]:
     return sorted([c for c in dir(duecmd) if c.startswith('cmd_')])
 
-def setup_parser():
+def setup_parser() -> argparse.ArgumentParser:
     # setup cmdline args parser
     # main parser
     parser = argparse.ArgumentParser(
@@ -160,7 +163,7 @@ def setup_parser():
                                 subsequent_indent=''))
     return parser
 
-def main(args=None):
+def main(args: Any = None) -> None:
     parser = setup_parser()
     # parse cmd args
     args = parser.parse_args(args)

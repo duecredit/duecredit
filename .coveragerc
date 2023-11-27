@@ -1,7 +1,0 @@
-[run]
-branch = True
-source = duecredit
-include = 
-  duecredit/*
-  examples/*
-

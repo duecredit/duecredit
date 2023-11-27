@@ -7,6 +7,7 @@
 #   under MIT license.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 import logging
 import logging.handlers
@@ -16,11 +17,10 @@ import re
 import sys
 import traceback
 from os.path import basename, dirname
-from typing import Optional, Union
 
 from .utils import is_interactive
 
-__all__ = ['ColorFormatter', 'log']
+__all__ = ['ColorFormatter', 'lgr']
 
 # Snippets from traceback borrowed from PyMVPA upstream/2.4.0-39-g69ad545  MIT license
 
@@ -100,7 +100,7 @@ class ColorFormatter(logging.Formatter):
       'ERROR': RED
     }
 
-    def __init__(self, use_color: Optional[bool] = None, log_name: bool = False) -> None:
+    def __init__(self, use_color: bool | None = None, log_name: bool = False) -> None:
         if use_color is None:
             # if 'auto' - use color only if all streams are tty
             use_color = is_interactive()
@@ -152,13 +152,13 @@ class LoggerHelper:
     def _get_environ(
         self,
         var: str,
-        default: Union[str, None, bool] = None
-    ) -> Union[str, None, bool]:
+        default: str | None | bool = None
+    ) -> str | None | bool:
         return os.environ.get(self.name.upper() + '_%s' % var.upper(), default)
 
     def set_level(
         self,
-        level: Optional[str] = None,
+        level: str | None = None,
         default: str = 'WARNING'
     ) -> None:
         """Helper to set loglevel for an arbitrary logger
@@ -186,7 +186,7 @@ class LoggerHelper:
 
     def get_initialized_logger(
         self,
-        logtarget: Optional[str] = None
+        logtarget: str | None = None
     ) -> logging.Logger:
         """Initialize and return the logger
 

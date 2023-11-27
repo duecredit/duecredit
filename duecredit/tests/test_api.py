@@ -6,6 +6,7 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 import os
 import sys
@@ -14,7 +15,8 @@ import shutil
 import tempfile
 from os.path import dirname, join as pathjoin, pardir, normpath
 from subprocess import Popen, PIPE
-from typing import TYPE_CHECKING
+
+from pytest import MonkeyPatch
 
 from duecredit.collector import DueCreditCollector
 from duecredit.stub import InactiveDueCreditCollector
@@ -26,8 +28,6 @@ badlxml_path = pathjoin(dirname(__file__), 'envs', 'nolxml')
 stubbed_dir = tempfile.mktemp()
 stubbed_script = pathjoin(pathjoin(stubbed_dir, 'script.py'))
 
-if TYPE_CHECKING:
-    from pytest import MonkeyPatch
 
 @pytest.fixture(scope="module")
 def stubbed_env():
@@ -121,7 +121,7 @@ def run_python_command(cmd=None, script=None):
 
 # Since duecredit and possibly lxml already loaded, let's just test
 # ability to import in absence of lxml via external call to python
-def test_noincorrect_import_if_no_lxml(monkeypatch: 'MonkeyPatch') -> None:
+def test_noincorrect_import_if_no_lxml(monkeypatch: MonkeyPatch) -> None:
     if on_windows:
         pytest.xfail("Fails for some reason on Windows")
 
@@ -153,7 +153,7 @@ def test_noincorrect_import_if_no_lxml(monkeypatch: 'MonkeyPatch') -> None:
         {'script': stubbed_script}
     ])
 def test_noincorrect_import_if_no_lxml_numpy(
-    monkeypatch: 'MonkeyPatch',
+    monkeypatch: MonkeyPatch,
     kwargs,
     env,
     stubbed_env
