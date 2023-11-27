@@ -13,7 +13,6 @@ import os
 if 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in os.environ.keys():
     raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
 
-import copy
 import locale
 import pickle
 import re
@@ -26,7 +25,7 @@ from os.path import dirname, exists
 from typing import Any, TYPE_CHECKING
 
 from .config import CACHE_DIR, DUECREDIT_FILE
-from .entries import BibTeX, Doi, Text, Url
+from .entries import BibTeX, Doi, DueCreditEntry, Text, Url
 from .log import lgr
 from .versions import external_versions
 
@@ -229,18 +228,14 @@ class TextOutput(Output):
                     ek = cit.entry.key  # type: ignore
                     if ek not in printed_keys:
                         self.fd.write(f'\n[{citation_nr[ek]}] ')
-                        self.fd.write(get_text_rendering(cit, style=self.style))
+                        self.fd.write(get_text_rendering(cit.entry, style=self.style))
                         printed_keys.append(ek)
             self.fd.write('\n')
 
 
-def get_text_rendering(citation, style: str = 'harvard1') -> str:
-    entry = citation.entry
+def get_text_rendering(entry: DueCreditEntry, style: str = 'harvard1') -> str:
     if isinstance(entry, Doi):
-        bibtex_rendering = get_bibtex_rendering(entry)
-        bibtex_citation = copy.copy(citation)
-        bibtex_citation.set_entry(bibtex_rendering)
-        return get_text_rendering(bibtex_citation, style=style)
+        return format_bibtex(get_bibtex_rendering(entry), style=style)
     elif isinstance(entry, BibTeX):
         return format_bibtex(entry, style=style)
     elif isinstance(entry, Text):
