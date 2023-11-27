@@ -240,7 +240,7 @@ def get_text_rendering(citation, style: str = 'harvard1') -> str:
         bibtex_rendering = get_bibtex_rendering(entry)
         bibtex_citation = copy.copy(citation)
         bibtex_citation.set_entry(bibtex_rendering)
-        return get_text_rendering(bibtex_citation)
+        return get_text_rendering(bibtex_citation, style=style)
     elif isinstance(entry, BibTeX):
         return format_bibtex(entry, style=style)
     elif isinstance(entry, Text):
