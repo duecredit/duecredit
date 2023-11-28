@@ -18,7 +18,6 @@ from typing import Any, TYPE_CHECKING
 
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
-from .stub import InactiveDueCreditCollector
 from .io import TextOutput, PickleOutput
 from .utils import never_fail, borrowdoc
 from .versions import external_versions
@@ -305,7 +304,7 @@ class DueCreditCollector:
     def _citations_fromentrykey(self) -> dict[str, Citation]:
         """Return a dictionary with the current citations indexed by the entry key"""
         citations_key = dict()
-        for (path, entry_key), citation in self.citations.items():
+        for (_path, entry_key), citation in self.citations.items():
             if entry_key not in citations_key:
                 citations_key[entry_key] = citation
 
@@ -434,7 +433,7 @@ class DueCreditCollector:
                 try:
                     if not conditions \
                             or self._args_match_conditions(conditions, *fargs, **fkwargs):
-                        citation = self.cite(*args, **kwargs)
+                        self.cite(*args, **kwargs)
                 except Exception as e:
                     lgr.warning("Failed to cite due to {}".format(e))
                 return func(*fargs, **fkwargs)
@@ -504,4 +503,3 @@ class CollectorSummary:
 
 
 # TODO:  provide HTML, MD, RST etc output formats
-

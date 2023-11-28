@@ -30,20 +30,18 @@ if TYPE_CHECKING:
 __all__ = ['DueCreditInjector', 'find_object']
 
 # TODO: move elsewhere
-def _short_str(obj: Any, l: int = 30) -> str:
+def _short_str(obj: Any, lng: int = 30) -> str:
     """Return a shortened str of an object -- for logging"""
     s = str(obj)
-    if len(s) > l:
-        return s[:l-3] + "..."
+    if len(s) > lng:
+        return s[:lng-3] + "..."
     else:
         return s
 
 def get_modules_for_injection() -> list[str]:
     """Get local modules which provide "inject" method to provide delayed population of injector
     """
-    return sorted(basename(x)[:-3]
-                   for x in glob(pathjoin(dirname(__file__), "mod_*.py"))
-                   )
+    return sorted(basename(x)[:-3] for x in glob(pathjoin(dirname(__file__), "mod_*.py")))
 
 def find_object(mod: Any, path: str) -> tuple[Any, str, Any]:
     """Finds object among present within module "mod" given path specification within
@@ -383,10 +381,9 @@ class DueCreditInjector:
         try:
             if self._active:
                 self.deactivate()
-        except:  # noqa: E722
+        except:  # noqa: E722, B001
             pass
         try:
             super(self.__class__, self).__del__()  # type: ignore
-        except:  # noqa: E722
+        except:  # noqa: E722, B001
             pass
-

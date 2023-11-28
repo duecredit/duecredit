@@ -13,3 +13,5 @@ __docformat__ = 'restructuredtext'
 
 from . import cmd_summary
 from . import cmd_test
+
+__all__ = ["cmd_summary", "cmd_test"]

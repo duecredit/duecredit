@@ -12,15 +12,11 @@ import os
 
 import pytest
 
-from ..collector import (
-    DueCreditCollector,
-    InactiveDueCreditCollector,
-    CollectorSummary,
-    Citation,
-)
+from ..collector import DueCreditCollector, CollectorSummary, Citation
 from ..dueswitch import DueSwitch
 from ..entries import BibTeX, Doi
 from ..io import PickleOutput
+from ..stub import InactiveDueCreditCollector
 
 
 def _test_entry(due, entry):
@@ -98,11 +94,11 @@ def test_entry():
     _test_entry(DueCreditCollector(), entries)
 
 
-def _test_dcite_basic(due, callable):
-    assert callable("magical", 1) == "load"
+def _test_dcite_basic(_due, func):
+    assert func("magical", 1) == "load"
     # verify that @wraps correctly passes all the docstrings etc
-    assert callable.__name__ == "method"
-    assert callable.__doc__ == "docstring"
+    assert func.__name__ == "method"
+    assert func.__doc__ == "docstring"
 
 
 def test_dcite_method():
@@ -158,7 +154,7 @@ def test_dcite_method():
         class SomeClass2:
             # Used to test for classes that are not instantiated
             @due.dcite("XXX0", path="some.module.without.method")
-            def method2(self, arg1, kwarg2="blah"):
+            def method2(self, arg1, kwarg2="blah"):  # noqa: U100
                 assert arg1 == "magical"
                 return "load"
 
@@ -204,30 +200,30 @@ def test_args_match_conditions():
                                  (2, 'scope'): {'life', 'DC_DEFAULT'}})
 
 
-def _test_dcite_match_conditions(due, callable, path):
+def _test_dcite_match_conditions(due, func, path):
     assert due.citations == {}
     assert len(due._entries) == 1
 
-    assert callable("magical", "unknown") == "load unknown"
+    assert func("magical", "unknown") == "load unknown"
     assert due.citations == {}
     assert len(due._entries) == 1
 
-    assert callable("magical") == "load blah"
+    assert func("magical") == "load blah"
 
     assert len(due.citations) == 1
     assert len(due._entries) == 1
-    entry = due._entries['XXX0']
+    entry = due._entries['XXX0']  # noqa: F841
     assert due.citations[(path, 'XXX0')].count == 1
 
     # Cause the same citation
-    assert callable("magical", "blah") == "load blah"
+    assert func("magical", "blah") == "load blah"
     # Nothing should change
     assert len(due.citations) == 1
     assert len(due._entries) == 1
     assert due.citations[(path, 'XXX0')].count == 2  # Besides the count
 
     # Now cause new citation given another value
-    assert callable("magical", "boo") == "load boo"
+    assert func("magical", "boo") == "load boo"
     assert len(due.citations) == 2
     assert len(due._entries) == 2
     assert due.citations[(path, 'XXX0')].count == 2  # Count should stay the same for XXX0
@@ -295,8 +291,12 @@ def test_get_output_handler_method(tmpdir, monkeypatch):
 
 
 def test_collectors_uniform_api():
-    get_api = lambda objs: [x for x in sorted(sum((dir(obj) for obj in objs), []))
-                           if not x.startswith('_') or x in '__call__']
+    def get_api(objs):
+        return [
+            x for x in sorted(sum((dir(obj) for obj in objs), []))
+            if not x.startswith('_') or x in '__call__'
+        ]
+
     assert get_api([DueCreditCollector, DueSwitch]) == get_api([InactiveDueCreditCollector])
 
 

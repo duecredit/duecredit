@@ -13,7 +13,7 @@ import sys
 import pytest
 import shutil
 import tempfile
-from os.path import dirname, join as pathjoin, pardir, normpath
+from os.path import dirname, join as pathjoin
 from subprocess import Popen, PIPE
 
 from pytest import MonkeyPatch
@@ -95,7 +95,7 @@ def test_api(collector_class):
 
         # including functionality within/by the methods
         @due.dcite('XXX00')
-        def birth(self, gender):
+        def birth(self, _gender):
             return "Rachel was born"
 
     kid = Child()
@@ -132,7 +132,7 @@ def test_noincorrect_import_if_no_lxml(monkeypatch: MonkeyPatch) -> None:
 
     ret, out, err = run_python_command('import duecredit')
     if "CoverageWarning" not in err:
-        # TODO: deal with that warning 
+        # TODO: deal with that warning
         # "--include is ignored because --source is set"
         assert err == ''
     assert out == ''
@@ -156,13 +156,13 @@ def test_noincorrect_import_if_no_lxml_numpy(
     monkeypatch: MonkeyPatch,
     kwargs,
     env,
-    stubbed_env
+    stubbed_env  # noqa: U100
 ) -> None:
     # Now make sure that we would not crash entire process at the end when unable to
     # produce sensible output when we have something to cite
     # we do inject for numpy
     try:
-        import numpy
+        import numpy  # noqa: F401
     except ImportError:
         pytest.skip("We need to have numpy to test correct operation")
 
@@ -186,8 +186,10 @@ def test_noincorrect_import_if_no_lxml_numpy(
     if os.environ.get('DUECREDIT_ENABLE', False) and on_windows:  # TODO this test fails on windows
         pytest.xfail("Fails for some reason on Windows")
     elif os.environ.get('DUECREDIT_ENABLE', False):  # we enabled duecredit
-        if (os.environ.get('DUECREDIT_REPORT_TAGS', None) == '*' and kwargs.get('script')) \
-            or 'numpy' in kwargs.get('cmd', ''):
+        if (
+            (os.environ.get('DUECREDIT_REPORT_TAGS', None) == '*' and kwargs.get('script'))
+            or 'numpy' in kwargs.get('cmd', '')
+        ):
             # we requested to have all tags output, and used bibtex in our entry
             assert 'For formatted output we need citeproc' in out
         else:

@@ -16,15 +16,12 @@ import argparse
 # magic line for manpage summary
 # man: -*- % run unit-tests
 
-from .helpers import parser_add_common_args
-
-
 def setup_parser(parser: argparse.ArgumentParser) -> None:
     # TODO -- pass options such as verbosity etc
     pass
 
 
-def run(args: argparse.Namespace) -> None:
-    import duecredit
+def run(_args: argparse.Namespace) -> None:
+    import duecredit  # noqa: F401
     raise NotImplementedError("Just use pytest duecredit for now")
     #duecredit.test()

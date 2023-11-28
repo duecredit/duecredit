@@ -13,9 +13,9 @@ from typing import Any
 import gc
 import sys
 import pytest
+from logging import getLogger
 
 import builtins as __builtin__
-_orig__import__ = __builtin__.__import__
 
 from duecredit.collector import DueCreditCollector
 from duecredit.entries import Doi
@@ -25,12 +25,12 @@ from ..injections.injector import DueCreditInjector, find_object, get_modules_fo
 from .. import __version__
 
 try:
-    import mvpa2
+    import mvpa2  # noqa: F401
     _have_mvpa2 = True
 except ImportError:
     _have_mvpa2 = False
 
-from logging import getLogger
+_orig__import__ = __builtin__.__import__
 lgr = getLogger('duecredit.tests.injector')
 
 
@@ -165,7 +165,7 @@ class TestActiveInjector:
 
         try:
             # We do have injections for scipy
-            import scipy
+            import scipy  # noqa: F401
         except ImportError as e:
             pytest.skip("scipy was not found: {}".format(e))
 
@@ -173,7 +173,7 @@ class TestActiveInjector:
         if not _have_mvpa2:
             pytest.skip("no mvpa2 found")
         # just a smoke test for now
-        import mvpa2.suite as mv
+        import mvpa2.suite as mv  # noqa: F401
 
     def _test_incorrect_path(self, mod, obj) -> None:
         ref = Doi('1.2.3.4')
@@ -261,12 +261,12 @@ def test_injector_del() -> None:
         assert __builtin__.__import__ is not orig__import__
         assert inj._orig_import is not None
         del inj   # delete active but not used
-        inj = None  # type: ignore
+        inj = None  # type: ignore  # noqa: F841
         __builtin__.__import__ = None # type: ignore
         # /\ We need to do that since otherwise gc will not pick up inj
         gc.collect()  # To cause __del__
         assert __builtin__.__import__ is orig__import__
-        import abc   # and new imports work just fine
+        import abc  # noqa: F401   # and new imports work just fine
     finally:
         __builtin__.__import__ = orig__import__
 
@@ -294,12 +294,12 @@ def test_injector_delayed_del() -> None:
         assert __builtin__.__import__ is not orig__import__
         assert inj2._orig_import is not None
         del inj  # type: ignore
-        inj = None  # type: ignore
+        inj = None  # type: ignore  # noqa: F841
         gc.collect()  # To cause __del__
         assert __builtin__.__import__ is not orig__import__  # would fail if del had side-effect
         assert inj2._orig_import is not None
         inj2.deactivate()
         assert __builtin__.__import__ is orig__import__
-        import abc   # and new imports work just fine
+        import abc  # noqa: F401   # and new imports work just fine
     finally:
         __builtin__.__import__ = orig__import__

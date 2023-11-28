@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..entries import Doi, BibTeX
+from ..entries import Doi
 
 # If defined, would determine from which to which version of the corresponding
 # module to care about
@@ -25,6 +25,10 @@ if TYPE_CHECKING:
 
 def inject(injector: DueCreditInjector) -> None:
     #http://scikit-image.org
-    injector.add('skimage', None, Doi('10.7717/peerj.453'),
-                    description='scikit-image: Image processing in Python.',
-                    tags=['implementation'])
+    injector.add(
+        'skimage',
+        None,
+        Doi('10.7717/peerj.453'),
+        description='scikit-image: Image processing in Python.',
+        tags=['implementation']
+    )

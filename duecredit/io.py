@@ -13,7 +13,6 @@ import os
 if 'DUECREDIT_TEST_EARLY_IMPORT_ERROR' in os.environ.keys():
     raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
 
-import copy
 import locale
 import pickle
 import re
@@ -26,12 +25,12 @@ from os.path import dirname, exists
 from typing import Any, TYPE_CHECKING
 
 from .config import CACHE_DIR, DUECREDIT_FILE
-from .entries import BibTeX, Doi, Text, Url
+from .entries import BibTeX, Doi, DueCreditEntry, Text, Url
 from .log import lgr
 from .versions import external_versions
 
 if TYPE_CHECKING:
-    from collector import Citation
+    from .collector import Citation
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
 
@@ -118,9 +117,11 @@ class Output:
         citations = self.collector.citations
         if tagset != {'*'}:
             # Filter out citations based on tags
-            citations = {k: c
-                             for k, c in citations.items()
-                             if tagset.intersection(c.tags)}
+            citations = {
+                k: c
+                for k, c in citations.items()
+                if tagset.intersection(c.tags)
+            }
 
         packages = defaultdict(list)
         modules = defaultdict(list)
@@ -128,7 +129,7 @@ class Output:
 
         # store the citations according to their path and divide them into
         # the right level
-        for (path, entry_key), citation in citations.items():
+        for (path, _entry_key), citation in citations.items():
             if ':' in path:
                 objects[path].append(citation)
             elif '.' in path:
@@ -142,9 +143,11 @@ class Output:
         cited_modobj = list(modules) + list(objects)
         for package in cited_packages:
             package_citations = packages[package]
-            if all_ or \
-                any(filter(lambda x: x.cite_module, package_citations)) or any(filter(lambda x: _is_contained(package, x), cited_modobj)):  # type: ignore
-                # WIP, mypy doesn(t understand the 'ignore' on a continuated line
+            if (
+                all_ or
+                any(filter(lambda x: x.cite_module, package_citations))  # type: ignore
+                or any(filter(lambda x: _is_contained(package, x), cited_modobj))  # type: ignore
+            ):
                 continue
             else:
                 # we don't need it
@@ -203,19 +206,18 @@ class TextOutput(Output):
         for path in paths:
             # since they're lexicographically sorted by path, dependencies
             # should be maintained
-            cit = pmo[path]
+            cites = pmo[path]
             if ':' in path or '.' in path:
                 self.fd.write('  ')
-            self.fd.write(self._format_citations(cit, citation_nr))
-            start_refnr += len(cit)
+            self.fd.write(self._format_citations(cites, citation_nr))
+            start_refnr += len(cites)
 
         # Print out some stats
         stats = [(len(packages), 'package'),
                  (len(modules), 'module'),
                  (len(objects), 'function')]
         for n, cit_type in stats:
-            self.fd.write('\n{} {} cited'.format(n, cit_type if n == 1
-                                                      else cit_type + 's'))
+            self.fd.write('\n{} {} cited'.format(n, cit_type if n == 1 else cit_type + 's'))
         # now print out references
         printed_keys = []
         if len(pmo) > 0:
@@ -226,20 +228,14 @@ class TextOutput(Output):
                     ek = cit.entry.key  # type: ignore
                     if ek not in printed_keys:
                         self.fd.write(f'\n[{citation_nr[ek]}] ')
-                        self.fd.write(get_text_rendering(cit,
-                                                        style=self.style))
+                        self.fd.write(get_text_rendering(cit.entry, style=self.style))
                         printed_keys.append(ek)
             self.fd.write('\n')
 
 
-def get_text_rendering(citation, style: str = 'harvard1') -> str:
-    from .collector import Citation
-    entry = citation.entry
+def get_text_rendering(entry: DueCreditEntry, style: str = 'harvard1') -> str:
     if isinstance(entry, Doi):
-        bibtex_rendering = get_bibtex_rendering(entry)
-        bibtex_citation = copy.copy(citation)
-        bibtex_citation.set_entry(bibtex_rendering)
-        return get_text_rendering(bibtex_citation)
+        return format_bibtex(get_bibtex_rendering(entry), style=style)
     elif isinstance(entry, BibTeX):
         return format_bibtex(entry, style=style)
     elif isinstance(entry, Text):
@@ -250,7 +246,7 @@ def get_text_rendering(citation, style: str = 'harvard1') -> str:
         return str(entry)
 
 
-def get_bibtex_rendering(entry: Doi | BibTeX) -> BibTeX:
+def get_bibtex_rendering(entry: DueCreditEntry) -> BibTeX:
     if isinstance(entry, Doi):
         return BibTeX(import_doi(entry.doi))
     elif isinstance(entry, BibTeX):
@@ -320,9 +316,9 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = 'harvard1') -> str:
             if 'unexpected keyword argument' in str(e):
                 citeproc_version = external_versions['citeproc']
                 if type(citeproc_version) is StrictVersion:
-                     if citeproc_version < StrictVersion('0.4'):
-                         err = "need a newer citeproc-py >= 0.4.0"
-                         msg += " You might just " + err
+                    if citeproc_version < StrictVersion('0.4'):
+                        err = "need a newer citeproc-py >= 0.4.0"
+                        msg += " You might just " + err
             else:
                 err = str(e)
             lgr.error(msg)
@@ -393,8 +389,8 @@ class BibTeXOutput(Output):
         for entry in entries:
             try:
                 bibtex = get_bibtex_rendering(entry)
-            except:
-                lgr.warning("Failed to generate bibtex for %s" % entry)
+            except Exception:
+                lgr.warning("Failed to generate BibTeX for %s", entry)
                 continue
             self.fd.write(bibtex.rawentry + "\n")
 

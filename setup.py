@@ -68,7 +68,7 @@ try:
     with open(VERSION_FILE, 'w') as version_file:
         version_file.write(f"__version__ = '{__version__}'\n")
         version_file.write(f"__release_date__ = '{__release_date__}'\n")
-except OSError as e:
+except OSError:
     print('Assume we are running from a source distribution.')
     # read version from VERSION_FILE
     if os.path.exists(VERSION_FILE):
@@ -102,7 +102,7 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-             'duecredit=duecredit.cmdline.main:main',
+            'duecredit=duecredit.cmdline.main:main',
         ],
     },
     author='Yaroslav Halchenko, Matteo Visconti di Oleggio Castello',

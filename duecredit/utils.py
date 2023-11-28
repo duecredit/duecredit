@@ -9,17 +9,14 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 from __future__ import annotations
 
-import glob
 import os
 import logging
 import sys
 import platform
 import shutil
 import stat
-import tempfile
 import time
 from os.path import exists, join as opj, isabs, expandvars, expanduser, abspath
-from os.path import realpath
 from functools import wraps
 from typing import Any
 
@@ -84,11 +81,13 @@ def rotree(path: str, ro: bool = True, chmod_files: bool = True) -> None:
       Either to operate also on files (not just directories)
     """
     if ro:
-        chmod = lambda f: os.chmod(f, os.stat(f).st_mode & ~stat.S_IWRITE)
+        def chmod(f):
+            os.chmod(f, os.stat(f).st_mode & ~stat.S_IWRITE)
     else:
-        chmod = lambda f: os.chmod(f, os.stat(f).st_mode | stat.S_IWRITE | stat.S_IREAD)
+        def chmod(f):
+            os.chmod(f, os.stat(f).st_mode | stat.S_IWRITE | stat.S_IREAD)
 
-    for root, dirs, files in os.walk(path, followlinks=False):
+    for root, _, files in os.walk(path, followlinks=False):
         if chmod_files:
             for f in files:
                 fullf = opj(root, f)
@@ -246,20 +245,21 @@ def borrowdoc(cls, methodname=None, replace=None):
     return _borrowdoc
 
 # TODO: just provide decorators for tempfile.mk* functions. This is ugly!
-def get_tempfile_kwargs(tkwargs={}, prefix="", wrapped=None):
+def get_tempfile_kwargs(tkwargs=None, prefix="", wrapped=None):
     """Updates kwargs to be passed to tempfile. calls depending on env vars
     """
     # operate on a copy of tkwargs to avoid any side-effects
+    if tkwargs is None:
+        tkwargs = {}
     tkwargs_ = tkwargs.copy()
 
     # TODO: don't remember why I had this one originally
     # if len(targs)<2 and \
-    if not 'prefix' in tkwargs_:
+    if 'prefix' not in tkwargs_:
         tkwargs_['prefix'] = '_'.join(
             ['duecredit_temp'] +
             ([prefix] if prefix else []) +
-            ([''] if (on_windows or not wrapped)
-                  else [wrapped.__name__]))
+            ([''] if (on_windows or not wrapped) else [wrapped.__name__]))
 
     directory = os.environ.get('DUECREDIT_TESTS_TEMPDIR')
     if directory and 'dir' not in tkwargs_:
@@ -284,19 +284,19 @@ def setup_exceptionhook() -> None:
        pdb.post_mortem; if not interactive, then invokes default handler.
     """
 
-    def _duecredit_pdb_excepthook(type, value, tb) -> None:
+    def _duecredit_pdb_excepthook(exc_type, exc_value, exc_tb) -> None:
 
         if is_interactive():
-            import traceback, pdb
-            traceback.print_exception(type, value, tb)
+            import pdb
+            import traceback
+            traceback.print_exception(exc_type, exc_value, exc_tb)
             print
-            pdb.post_mortem(tb)
+            pdb.post_mortem(exc_tb)
         else:
             lgr.warn("We cannot setup exception hook since not in interactive mode")
             # we are in interactive mode or we don't have a tty-like
             # device, so we call the default hook
-            #sys.__excepthook__(type, value, tb)
-            _sys_excepthook(type, value, tb)
+            #sys.__excepthook__(exc_type, exc_value, exc_tb)
+            _sys_excepthook(exc_type, exc_value, exc_tb)
 
     sys.excepthook = _duecredit_pdb_excepthook
-

@@ -19,7 +19,7 @@ __docformat__ = 'restructuredtext'
 
 from ..cmdline.helpers import HelpAction, LogLevelAction
 
-help = (
+help = (  # noqa: A001
     'help', ('-h', '--help', '--help-np'),
     dict(nargs=0, action=HelpAction,
          help="""show this help message and exit. --help-np forcefully disables
@@ -39,4 +39,3 @@ log_level = (
          default='warning',
          help="""level of verbosity. Integers provide even more debugging information""")
 )
-

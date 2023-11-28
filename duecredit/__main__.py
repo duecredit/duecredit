@@ -25,14 +25,14 @@ Meta-options:
 """ % executable)
 
 
-def runctx(cmd, globals=None, locals=None):
-    if globals is None:
-        globals = {}
-    if locals is None:
-        locals = {}
+def runctx(cmd, global_ctx=None, local_ctx=None):
+    if global_ctx is None:
+        global_ctx = {}
+    if local_ctx is None:
+        local_ctx = {}
 
     try:
-        exec(cmd, globals, locals)
+        exec(cmd, global_ctx, local_ctx)
     finally:
         # good opportunity to avoid atexit I guess. pass for now
         pass
@@ -58,7 +58,7 @@ def main(argv=None):
 
     # and now we need to execute target script "manually"
     # Borrowing up on from trace.py
-    for opt, val in opts:
+    for opt, _ in opts:
         if opt == "--help":
             usage(sys.stdout, executable=argv[0])
             sys.exit(0)

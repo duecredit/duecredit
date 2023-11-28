@@ -13,3 +13,4 @@ __docformat__ = 'restructuredtext'
 
 from .injector import DueCreditInjector
 
+__all__ = ["DueCreditInjector"]

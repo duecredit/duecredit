@@ -1,4 +1,4 @@
-# ex: set sts=4 ts=4 sw=4 noet:
+# ex: set sts=4 sw=4 et:
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 #
 #   See COPYING file distributed along with the duecredit package for the
@@ -18,16 +18,16 @@ from typing import Any
 from pytest import MonkeyPatch
 
 import duecredit.io
-from ..collector import DueCreditCollector, Citation, CitationKey
+from ..collector import DueCreditCollector, CitationKey
 from .test_collector import _sample_bibtex, _sample_doi, _sample_bibtex2
 from ..entries import BibTeX, Doi, Text, Url
 from ..io import TextOutput, PickleOutput, import_doi, \
     get_text_rendering, format_bibtex, _is_contained, Output, BibTeXOutput
 
 try:
-	# TODO: for some reason test below started to complain that we are trying
-	# to overwrite the cassette.
-	# 
+    # TODO: for some reason test below started to complain that we are trying
+    # to overwrite the cassette.
+    #
     # import vcr
 
     # @vcr.use_cassette()
@@ -478,7 +478,7 @@ def test_get_text_rendering(monkeypatch: MonkeyPatch) -> None:
     # Patch bibtex_rendering
     sample_bibtex = BibTeX(_sample_bibtex)
 
-    def get_bibtex_rendering(*args: Any, **kwargs: Any) -> BibTeX:
+    def get_bibtex_rendering(*_args: Any, **_kwargs: Any) -> BibTeX:
         return sample_bibtex
 
     monkeypatch.setattr(duecredit.io, 'get_bibtex_rendering', get_bibtex_rendering)
@@ -493,16 +493,14 @@ def test_get_text_rendering(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setattr(duecredit.io, 'format_bibtex', format_bibtex)
 
     # test if bibtex type is passed
-    citation_bibtex = Citation(sample_bibtex, path='mypath')
-    bibtex_output = get_text_rendering(citation_bibtex)
-    assert fmt_args["entry"] == citation_bibtex.entry
+    bibtex_output = get_text_rendering(sample_bibtex)
+    assert fmt_args["entry"] == sample_bibtex
     assert fmt_args["style"] == 'harvard1'
     fmt_args.clear()
 
     # test if doi type is passed
-    citation_doi = Citation(Doi(_sample_doi), path='mypath')
-    doi_output = get_text_rendering(citation_doi)
-    assert fmt_args["entry"] == citation_bibtex.entry
+    doi_output = get_text_rendering(Doi(_sample_doi))
+    assert fmt_args["entry"] == sample_bibtex
     assert fmt_args["style"] == 'harvard1'
 
     assert bibtex_output == doi_output
@@ -510,14 +508,12 @@ def test_get_text_rendering(monkeypatch: MonkeyPatch) -> None:
 
 def test_text_text_rendering() -> None:
     text = "I am so free"
-    citation = Citation(Text(text), path='mypath')
-    assert get_text_rendering(citation) == text
+    assert get_text_rendering(Text(text)) == text
 
 
 def test_url_text_rendering() -> None:
     url = "http://example.com"
-    citation = Citation(Url(url), path='mypath')
-    assert get_text_rendering(citation) == "URL: " + url
+    assert get_text_rendering(Url(url)) == "URL: " + url
 
 
 def test_format_bibtex_zenodo_doi() -> None:

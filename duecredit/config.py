@@ -12,4 +12,6 @@ import os
 # For now just hardcoded variables
 
 CACHE_DIR = os.path.expanduser(os.path.join('~', '.cache', 'duecredit', 'bibtex'))
-DUECREDIT_FILE = os.getenv('DUECREDIT_FILE') or '.duecredit.p'  # NB: `or` catches empty env var. TODO: Add file name/ext check for the env variable?
+DUECREDIT_FILE = os.getenv('DUECREDIT_FILE') or '.duecredit.p'
+# NB: `or` catches empty env var. TODO: Add file name/ext check for the env
+# variable?

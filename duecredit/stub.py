@@ -31,11 +31,11 @@ __version__ = '0.0.9'
 
 class InactiveDueCreditCollector:
     """Just a stub at the Collector which would not do anything"""
-    def _donothing(self, *args, **kwargs):
+    def _donothing(self, *_args, **_kwargs):
         """Perform no good and no bad"""
         pass
 
-    def dcite(self, *args, **kwargs):
+    def dcite(self, *_args, **_kwargs):
         """If I could cite I would"""
         def nondecorating_decorator(func):
             return func
