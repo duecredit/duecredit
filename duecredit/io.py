@@ -154,9 +154,11 @@ class Output:
             if (
                 all_
                 or any(
-                    filter(lambda x: x.cite_module, package_citations)
-                )  # type: ignore
-                or any(filter(lambda x: _is_contained(package, x), cited_modobj))  # type: ignore
+                    filter(lambda x: x.cite_module, package_citations)  # type: ignore
+                )
+                or any(
+                    filter(lambda x: _is_contained(package, x), cited_modobj)  # type: ignore
+                )
             ):
                 continue
             else:
