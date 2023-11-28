@@ -72,7 +72,7 @@ def import_doi(doi: str, sleep: float = 0.5, retries: int = 10) -> str:
         raise ValueError(
             "Query %(url)s for BibTeX for a DOI %(doi)s (wrong doi?) has failed. "
             "Response code %(status_code)d. "
-            #'BibTeX response was: %(bibtex)s'
+            # 'BibTeX response was: %(bibtex)s'
             % locals()
         )
     if not exists(cached):
