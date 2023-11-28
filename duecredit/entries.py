@@ -24,7 +24,7 @@ class DueCreditEntry:
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, DueCreditEntry):
-            raise NotImplementedError(f"Don't know how to compare {self} to {other}")
+            return NotImplemented
         return (
             (self._rawentry == other._rawentry) and
             (self._key == other._key)
