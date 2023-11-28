@@ -52,13 +52,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip wheel
-        python setup.py --help # just to trigger generation of .version
         pip install --upgrade flake8 pytest
         pip install ".[tests]"
 
     - name: Run all tests
       run: |
-        python setup.py install  # test installation
+        pip install .
         # for now flaking only the stub.py
         flake8 duecredit/stub.py
         python -m pytest -s -v --cov=duecredit --cov-report=xml duecredit
