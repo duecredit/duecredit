@@ -10,11 +10,13 @@ from __future__ import annotations
 
 """Module to help maintain a registry of versions for external modules etc
 """
-from distutils.version import LooseVersion, StrictVersion
 from importlib.metadata import version as metadata_version
 from os import linesep
 import sys
 from typing import Any
+
+from looseversion import LooseVersion
+from packaging.version import Version
 
 
 # To depict an unknown version, which can't be compared by mistake etc
@@ -33,19 +35,19 @@ class UnknownVersion:
 class ExternalVersions:
     """Helper to figure out/use versions of the external modules.
 
-    It maintains a dictionary of `distuil.version.StrictVersion`s to make
-    comparisons easy.  If version string doesn't conform the StrictVersion
-    LooseVersion will be used.  If version can't be deduced for the module,
+    It maintains a dictionary of `packaging.version.Version`s to make
+    comparisons easy.  If a version string doesn't conform to Version,
+    LooseVersion will be used.  If a version can't be deduced for a module,
     'None' is assigned
     """
 
     UNKNOWN = UnknownVersion()
 
     def __init__(self) -> None:
-        self._versions: dict[str, StrictVersion | LooseVersion | UnknownVersion] = {}
+        self._versions: dict[str, Version | LooseVersion | UnknownVersion] = {}
 
     @classmethod
-    def _deduce_version(klass, module) -> StrictVersion | LooseVersion | UnknownVersion:
+    def _deduce_version(klass, module) -> Version | LooseVersion | UnknownVersion:
         version = None
         for attr in ("__version__", "version"):
             if hasattr(module, attr):
@@ -71,7 +73,7 @@ class ExternalVersions:
 
         if version:
             try:
-                return StrictVersion(version)
+                return Version(version)
             except ValueError:
                 # let's then go with Loose one
                 return LooseVersion(version)
@@ -80,7 +82,7 @@ class ExternalVersions:
 
     def __getitem__(
         self, module: Any
-    ) -> StrictVersion | LooseVersion | UnknownVersion | None:
+    ) -> Version | LooseVersion | UnknownVersion | None:
         # when ran straight in its source code -- fails to discover nipy's version.. TODO
         # if module == 'nipy':
         if not isinstance(module, str):
@@ -111,7 +113,7 @@ class ExternalVersions:
         return item in self._versions
 
     @property
-    def versions(self) -> dict[str, StrictVersion | LooseVersion | UnknownVersion]:
+    def versions(self) -> dict[str, Version | LooseVersion | UnknownVersion]:
         """Return dictionary (copy) of versions"""
         return self._versions.copy()
 

@@ -13,7 +13,7 @@ from os import linesep
 import pytest
 
 from ..version import __version__
-from ..versions import ExternalVersions, StrictVersion
+from ..versions import ExternalVersions, Version
 
 
 # just to ease testing
@@ -24,19 +24,17 @@ def cmp(a, b):
 def test_external_versions_basic():
     ev = ExternalVersions()
     assert ev._versions == {}
-    assert ev["duecredit"] == __version__
+    assert ev["duecredit"] == Version(__version__)
     # and it could be compared
-    assert ev["duecredit"] >= __version__
-    assert ev["duecredit"] > "0.1"
+    assert ev["duecredit"] >= Version(__version__)
+    assert ev["duecredit"] > Version("0.1")
     assert list(ev.keys()) == ["duecredit"]
     assert "duecredit" in ev
     assert "unknown" not in ev
 
-    # StrictVersion might remove training .0
+    # Version might remove training .0
     version_str = (
-        str(ev["duecredit"])
-        if isinstance(ev["duecredit"], StrictVersion)
-        else __version__
+        str(ev["duecredit"]) if isinstance(ev["duecredit"], Version) else __version__
     )
     assert ev.dumps() == "Versions: duecredit=%s" % version_str
 
@@ -61,13 +59,13 @@ def test_external_versions_basic():
     # And we can get versions based on modules themselves
     from duecredit.tests import mod
 
-    assert ev[mod] == mod.__version__
+    assert ev[mod] == Version(mod.__version__)
 
     # Check that we can get a copy of the versions
     versions_dict = ev.versions
     versions_dict["duecredit"] = "0.0.1"
     assert versions_dict["duecredit"] == "0.0.1"
-    assert ev["duecredit"] == __version__
+    assert ev["duecredit"] == Version(__version__)
 
 
 def test_external_versions_unknown() -> None:

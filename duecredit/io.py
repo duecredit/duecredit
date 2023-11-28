@@ -15,7 +15,6 @@ if "DUECREDIT_TEST_EARLY_IMPORT_ERROR" in os.environ.keys():
     raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
 
 from collections import defaultdict
-from distutils.version import StrictVersion
 import locale
 from os.path import dirname, exists
 import pickle
@@ -24,6 +23,8 @@ import tempfile
 import time
 from typing import TYPE_CHECKING, Any
 import warnings
+
+from packaging.version import Version
 
 from .config import CACHE_DIR, DUECREDIT_FILE
 from .entries import BibTeX, Doi, DueCreditEntry, Text, Url
@@ -332,10 +333,11 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = "harvard1") -> str:
             msg = "Failed to process BibTeX file {}: {}.".format(fname, e)
             if "unexpected keyword argument" in str(e):
                 citeproc_version = external_versions["citeproc"]
-                if type(citeproc_version) is StrictVersion:
-                    if citeproc_version < StrictVersion("0.4"):
-                        err = "need a newer citeproc-py >= 0.4.0"
-                        msg += " You might just " + err
+                if isinstance(citeproc_version, Version) and citeproc_version < Version(
+                    "0.4"
+                ):
+                    err = "need a newer citeproc-py >= 0.4.0"
+                    msg += " You might just " + err
             else:
                 err = str(e)
             lgr.error(msg)
