@@ -20,12 +20,12 @@ citeable implementations.
 ## Installation
 
 Duecredit is easy to install via pip, simply type:
- 
+
  `pip install duecredit`
 
 ## Examples
 
-### To cite the modules and methods you are using 
+### To cite the modules and methods you are using
 
 You can already start "registering" citations using duecredit in your
 Python modules and even registering citations (we call this approach "injections")
@@ -72,9 +72,9 @@ For using duecredit in your software
     `User-view` section below). If your reference is to a core package and you find that it
     should be listed in the summary then set `cite_module=True` (see [here](https://github.com/duecredit/duecredit/blob/master/duecredit/collector.py#L35) for a complete
     description of the arguments)
-   
+
          due.cite(Doi("1.2.3/x.y.z"), description="The Answer to Everything", path="magicpy", cite_module=True)
-   
+
     Similarly, to provide a direct reference for a function or a method, use the `dcite` decorator (by default
     this decorator sets cite_module=True)
 
@@ -92,15 +92,15 @@ References can also be entered as BibTeX entries
                 author={Happy, Author and Lucky, Author},
                 journal={The Journal of Serendipitous Discoveries}
                 }
-                """), 
+                """),
                 description="Solves all your problems", path="magicpy")
-        
+
 ## Now what
-        
+
 ### Do the due
 
 Once you obtained the references in the duecredit output, include them in in the references section of your paper or software.
-        
+
 ### Add injections for other existing modules
 
 We hope that eventually this somewhat cruel approach will not be necessary. But
@@ -190,7 +190,7 @@ can enable listing of references for other tags as well (e.g. "edu"
 depicting instructional materials -- textbooks etc. on the topic):
 
     $> DUECREDIT_REPORT_TAGS=* duecredit summary
-    
+
     DueCredit Report:
     - Scientific tools library / numpy (v 1.10.4) [1]
     - Scientific tools library / scipy (v 0.14) [2]
@@ -215,11 +215,11 @@ depicting instructional materials -- textbooks etc. on the topic):
     [9] Fisher, R.A., 1936. The use of multiple measurements in taxonomic problems. Annals of eugenics, 7(2), pp.179–188.
     [10] Gower, J.C. & Ross, G., 1969. Minimum spanning trees and single linkage cluster analysis. Applied statistics, pp.54–64.
     [11] Sibson, R., 1973. SLINK: an optimally efficient algorithm for the single-link cluster method. The Computer Journal, 16(1), pp.30–34.
-    
+
 The `DUECREDIT_REPORT_ALL` flag allows one to output all the references
 for the modules that lack objects or functions with citations.
-Compared to the previous example, the following output additionally 
-shows a reference for scikit-learn since `example_scipy.py` uses 
+Compared to the previous example, the following output additionally
+shows a reference for scikit-learn since `example_scipy.py` uses
 an uncited function from that package.
 
     $> DUECREDIT_REPORT_TAGS=* DUECREDIT_REPORT_ALL=1 duecredit summary

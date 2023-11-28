@@ -22,8 +22,13 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
+
 def inject(injector: DueCreditInjector) -> None:
-    injector.add('pandas', None, BibTeX("""
+    injector.add(
+        "pandas",
+        None,
+        BibTeX(
+            """
         @InProceedings{ mckinney-proc-scipy-2010,
           author    = { McKinney, Wes },
           title     = { Data Structures for Statistical Computing in Python },
@@ -32,4 +37,7 @@ def inject(injector: DueCreditInjector) -> None:
           year      = { 2010 },
           editor    = { van der Walt, St\'efan and Millman, Jarrod }
         }
-    """), description="Data analysis library for tabular data")
+    """
+        ),
+        description="Data analysis library for tabular data",
+    )

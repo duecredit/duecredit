@@ -8,14 +8,14 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 from __future__ import annotations
 
+import atexit
 from typing import Any
 
-import atexit
 import pytest
 from pytest import MonkeyPatch
 
-from ..injections.injector import DueCreditInjector
 from ..dueswitch import DueSwitch, due
+from ..injections.injector import DueCreditInjector
 
 
 def test_dueswitch_activate(monkeypatch: MonkeyPatch) -> None:

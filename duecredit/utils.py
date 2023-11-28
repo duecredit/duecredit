@@ -9,24 +9,25 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 from __future__ import annotations
 
-import os
+from functools import wraps
 import logging
-import sys
+import os
+from os.path import abspath, exists, expanduser, expandvars, isabs
+from os.path import join as opj
 import platform
 import shutil
 import stat
+import sys
 import time
-from os.path import exists, join as opj, isabs, expandvars, expanduser, abspath
-from functools import wraps
 from typing import Any
 
 #
 # Some useful variables
 #
 platform_system = platform.system()
-on_windows = platform_system == 'Windows'
-on_osx = platform_system == 'Darwin'
-on_linux = platform_system == 'Linux'
+on_windows = platform_system == "Windows"
+on_osx = platform_system == "Darwin"
+on_linux = platform_system == "Linux"
 
 
 lgr = logging.getLogger("duecredit.utils")
@@ -38,7 +39,9 @@ lgr = logging.getLogger("duecredit.utils")
 
 def is_interactive() -> bool:
     """Return True if all in/outs are tty"""
-    if any(not hasattr(inout, 'isatty') for inout in (sys.stdin, sys.stdout, sys.stderr)):
+    if any(
+        not hasattr(inout, "isatty") for inout in (sys.stdin, sys.stdout, sys.stderr)
+    ):
         lgr.warning("Assuming non interactive session since isatty found missing")
         return False
     # TODO: check on windows if hasattr check would work correctly and add value:
@@ -64,9 +67,12 @@ def is_explicit_path(path: str) -> bool:
     './' is assumed to indicate a location on the filesystem. Any other
     path format is not considered explicit."""
     path = expandpath(path, force_absolute=False)
-    return isabs(path) \
-        or path.startswith(os.curdir + os.sep) \
+    return (
+        isabs(path)
+        or path.startswith(os.curdir + os.sep)
         or path.startswith(os.pardir + os.sep)
+    )
+
 
 def rotree(path: str, ro: bool = True, chmod_files: bool = True) -> None:
     """To make tree read-only or writable
@@ -81,9 +87,12 @@ def rotree(path: str, ro: bool = True, chmod_files: bool = True) -> None:
       Either to operate also on files (not just directories)
     """
     if ro:
+
         def chmod(f):
             os.chmod(f, os.stat(f).st_mode & ~stat.S_IWRITE)
+
     else:
+
         def chmod(f):
             os.chmod(f, os.stat(f).st_mode | stat.S_IWRITE | stat.S_IREAD)
 
@@ -97,7 +106,9 @@ def rotree(path: str, ro: bool = True, chmod_files: bool = True) -> None:
         chmod(root)
 
 
-def rmtree(path: str, chmod_files: str | bool = 'auto', *args: Any, **kwargs: Any) -> None:
+def rmtree(
+    path: str, chmod_files: str | bool = "auto", *args: Any, **kwargs: Any
+) -> None:
     """To remove git-annex .git it is needed to make all files and directories writable again first
 
     Parameters
@@ -111,7 +122,7 @@ def rmtree(path: str, chmod_files: str | bool = 'auto', *args: Any, **kwargs: An
        Passed into shutil.rmtree call
     """
     # Give W permissions back only to directories, no need to bother with files
-    if chmod_files == 'auto':
+    if chmod_files == "auto":
         chmod_files_ = on_windows
     else:
         assert type(chmod_files) is bool
@@ -131,7 +142,7 @@ def rmtemp(f: str, *args: Any, **kwargs: Any) -> None:
     It will not remove the temporary file/directory if DATALAD_TESTS_KEEPTEMP
     environment variable is defined
     """
-    if not os.environ.get('DATALAD_TESTS_KEEPTEMP'):
+    if not os.environ.get("DATALAD_TESTS_KEEPTEMP"):
         if not os.path.lexists(f):
             lgr.debug("Path %s does not exist, so can't be removed" % f)
             return
@@ -153,22 +164,24 @@ def rmtemp(f: str, *args: Any, **kwargs: Any) -> None:
     else:
         lgr.info("Keeping temp file: %s" % f)
 
+
 #
 # Decorators
 #
+
 
 # Borrowed from pandas
 # Copyright: 2011-2014, Lambda Foundry, Inc. and PyData Development Team
 # License: BSD-3
 def optional_args(decorator):
     """allows a decorator to take optional positional and keyword arguments.
-        Assumes that taking a single, callable, positional argument means that
-        it is decorating a function, i.e. something like this::
+    Assumes that taking a single, callable, positional argument means that
+    it is decorating a function, i.e. something like this::
 
-            @my_decorator
-            def function(): pass
+        @my_decorator
+        def function(): pass
 
-        Calls decorator with decorator(f, *args, **kwargs)"""
+    Calls decorator with decorator(f, *args, **kwargs)"""
 
     @wraps(decorator)
     def wrapper(*args, **kwargs):
@@ -188,16 +201,19 @@ def optional_args(decorator):
 
 def never_fail(f):
     """Assure that function never fails -- all exceptions are caught"""
+
     @wraps(f)
     def wrapped_func(*args, **kwargs):
         try:
             return f(*args, **kwargs)
         except Exception as e:
-            lgr.warning("DueCredit internal failure while running %s: %r. "
-                        "Please report to developers at https://github.com/duecredit/duecredit/issues"
-                        % (f, e))
+            lgr.warning(
+                "DueCredit internal failure while running %s: %r. "
+                "Please report to developers at https://github.com/duecredit/duecredit/issues"
+                % (f, e)
+            )
 
-    if os.environ.get('DUECREDIT_ALLOW_FAIL', False):
+    if os.environ.get("DUECREDIT_ALLOW_FAIL", False):
         return f
     else:
         return wrapped_func
@@ -230,24 +246,24 @@ def borrowdoc(cls, methodname=None, replace=None):
     """
 
     def _borrowdoc(method):
-        """Decorator which assigns to the `method` docstring from another
-        """
+        """Decorator which assigns to the `method` docstring from another"""
         if methodname is None:
             other_method = getattr(cls, method.__name__)
         else:
             other_method = getattr(cls, methodname)
-        if hasattr(other_method, '__doc__'):
+        if hasattr(other_method, "__doc__"):
             if not replace:
                 method.__doc__ = other_method.__doc__
             else:
                 method.__doc__ = method.__doc__.replace(replace, other_method.__doc__)
         return method
+
     return _borrowdoc
+
 
 # TODO: just provide decorators for tempfile.mk* functions. This is ugly!
 def get_tempfile_kwargs(tkwargs=None, prefix="", wrapped=None):
-    """Updates kwargs to be passed to tempfile. calls depending on env vars
-    """
+    """Updates kwargs to be passed to tempfile. calls depending on env vars"""
     # operate on a copy of tkwargs to avoid any side-effects
     if tkwargs is None:
         tkwargs = {}
@@ -255,17 +271,19 @@ def get_tempfile_kwargs(tkwargs=None, prefix="", wrapped=None):
 
     # TODO: don't remember why I had this one originally
     # if len(targs)<2 and \
-    if 'prefix' not in tkwargs_:
-        tkwargs_['prefix'] = '_'.join(
-            ['duecredit_temp'] +
-            ([prefix] if prefix else []) +
-            ([''] if (on_windows or not wrapped) else [wrapped.__name__]))
+    if "prefix" not in tkwargs_:
+        tkwargs_["prefix"] = "_".join(
+            ["duecredit_temp"]
+            + ([prefix] if prefix else [])
+            + ([""] if (on_windows or not wrapped) else [wrapped.__name__])
+        )
 
-    directory = os.environ.get('DUECREDIT_TESTS_TEMPDIR')
-    if directory and 'dir' not in tkwargs_:
-        tkwargs_['dir'] = directory
+    directory = os.environ.get("DUECREDIT_TESTS_TEMPDIR")
+    if directory and "dir" not in tkwargs_:
+        tkwargs_["dir"] = directory
 
     return tkwargs_
+
 
 #
 # Context Managers
@@ -280,15 +298,15 @@ _sys_excepthook = sys.excepthook  # Just in case we ever need original one
 def setup_exceptionhook() -> None:
     """Overloads default sys.excepthook with our exceptionhook handler.
 
-       If interactive, our exceptionhook handler will invoke
-       pdb.post_mortem; if not interactive, then invokes default handler.
+    If interactive, our exceptionhook handler will invoke
+    pdb.post_mortem; if not interactive, then invokes default handler.
     """
 
     def _duecredit_pdb_excepthook(exc_type, exc_value, exc_tb) -> None:
-
         if is_interactive():
             import pdb
             import traceback
+
             traceback.print_exception(exc_type, exc_value, exc_tb)
             print
             pdb.post_mortem(exc_tb)
@@ -296,7 +314,7 @@ def setup_exceptionhook() -> None:
             lgr.warn("We cannot setup exception hook since not in interactive mode")
             # we are in interactive mode or we don't have a tty-like
             # device, so we call the default hook
-            #sys.__excepthook__(exc_type, exc_value, exc_tb)
+            # sys.__excepthook__(exc_type, exc_value, exc_tb)
             _sys_excepthook(exc_type, exc_value, exc_tb)
 
     sys.excepthook = _duecredit_pdb_excepthook

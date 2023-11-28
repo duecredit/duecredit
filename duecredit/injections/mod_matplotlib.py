@@ -13,8 +13,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..entries import Doi, BibTeX
-
+from ..entries import BibTeX, Doi
 
 # If defined, would determine from which to which version of the corresponding
 # module to care about
@@ -43,12 +42,21 @@ bib_str = """
 
 
 def inject(injector: DueCreditInjector) -> None:
-    injector.add("matplotlib", None, BibTeX(bib_str), description="Plotting with Python", tags=["implementation"])
+    injector.add(
+        "matplotlib",
+        None,
+        BibTeX(bib_str),
+        description="Plotting with Python",
+        tags=["implementation"],
+    )
 
     doi_prefix = "10.5281/zenodo."
 
     # latest version
     injector.add(
-        "matplotlib", None, Doi(doi_prefix + "2893252"),
-        description="Plotting with Python", tags=["implementation"]
+        "matplotlib",
+        None,
+        Doi(doi_prefix + "2893252"),
+        description="Plotting with Python",
+        tags=["implementation"],
     )

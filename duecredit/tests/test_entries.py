@@ -12,12 +12,12 @@ from ..entries import Doi, Text, Url
 def test_comparison() -> None:
     assert Text("123") == Text("123")
     assert Text("123") != Text("124")
-    assert Text("123", 'key') == Text("123", 'key')
-    assert Text("123", 'key') != Text("123", 'key1')
-    assert Text("123", 'key') != Text("124", 'key')
+    assert Text("123", "key") == Text("123", "key")
+    assert Text("123", "key") != Text("123", "key1")
+    assert Text("123", "key") != Text("124", "key")
 
-    assert Doi("123/1", 'key') == Doi("123/1", 'key')
-    assert Url("http://123/1", 'key') == Url("http://123/1", 'key')
+    assert Doi("123/1", "key") == Doi("123/1", "key")
+    assert Url("http://123/1", "key") == Url("http://123/1", "key")
 
 
 def test_sugaring_api() -> None:

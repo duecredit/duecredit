@@ -75,7 +75,7 @@
 
 - Prevent warnings from the injector's `__del__`.
 - InactiveDueCollector in `stub.py` now provides also `active=False`
-  attribute (so external tools could directly query if duecredit is 
+  attribute (so external tools could directly query if duecredit is
   active) and no-op `activate` and `dump` for consistent API with a
   `due` object whenever `duecredit` is available.
 - Provide `Text` citation entry for free form text. It does not have any

@@ -10,19 +10,24 @@
 from __future__ import annotations
 
 import sys
-from . import due, __version__
+
+from . import __version__, due
 from .log import lgr
 
+
 def usage(outfile, executable=sys.argv[0]):
-    if '__main__.py' in executable:
+    if "__main__.py" in executable:
         # That was -m duecredit way to launch
         executable = "%s -m duecredit" % sys.executable
-    outfile.write("""Usage: %s [OPTIONS] <file> [ARGS]
+    outfile.write(
+        """Usage: %s [OPTIONS] <file> [ARGS]
 
 Meta-options:
 --help                Display this help then exit.
 --version             Output version information then exit.
-""" % executable)
+"""
+        % executable
+    )
 
 
 def runctx(cmd, global_ctx=None, local_ctx=None):
@@ -37,9 +42,10 @@ def runctx(cmd, global_ctx=None, local_ctx=None):
         # good opportunity to avoid atexit I guess. pass for now
         pass
 
+
 def main(argv=None):
-    import os
     import getopt
+    import os
 
     if argv is None:
         argv = sys.argv
@@ -51,10 +57,8 @@ def main(argv=None):
         # under cmdline/
     except getopt.error as msg:
         sys.stderr.write("{}: {}\n".format(sys.argv[0], msg))
-        sys.stderr.write("Try `%s --help' for more information\n"
-                         % sys.argv[0])
+        sys.stderr.write("Try `%s --help' for more information\n" % sys.argv[0])
         sys.exit(1)
-
 
     # and now we need to execute target script "manually"
     # Borrowing up on from trace.py
@@ -73,13 +77,13 @@ def main(argv=None):
 
     try:
         with open(progname) as fp:
-            code = compile(fp.read(), progname, 'exec')
+            code = compile(fp.read(), progname, "exec")
         # try to emulate __main__ namespace as much as possible
         globs = {
-            '__file__': progname,
-            '__name__': '__main__',
-            '__package__': None,
-            '__cached__': None,
+            "__file__": progname,
+            "__name__": "__main__",
+            "__package__": None,
+            "__cached__": None,
         }
         # Since used explicitly -- activate the beast
         due.activate(True)
@@ -91,5 +95,6 @@ def main(argv=None):
     except SystemExit:
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

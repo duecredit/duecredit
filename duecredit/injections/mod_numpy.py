@@ -22,11 +22,13 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
+
 def inject(injector: DueCreditInjector) -> None:
     injector.add(
-        'numpy',
+        "numpy",
         None,
-        BibTeX(r"""
+        BibTeX(
+            r"""
     @article{van2011numpy,
         title={The NumPy array: a structure for efficient numerical computation},
         author={Van Der Walt, Stefan and Colbert, S Chris and Varoquaux, Gael},
@@ -38,8 +40,9 @@ def inject(injector: DueCreditInjector) -> None:
         publisher={AIP Publishing},
         doi={10.1109/MCSE.2011.37}
         }
-    """),
-        tags=['implementation'],
+    """
+        ),
+        tags=["implementation"],
         cite_module=True,
-        description="Scientific tools library"
+        description="Scientific tools library",
     )

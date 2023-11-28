@@ -3,6 +3,7 @@ def extract_references_from_rst(rst: str) -> None:
     # then up until the end or another section starting
     pass
 
+
 def test_extract_references_from_rst() -> None:
     # some obscure examples of how people specify references
     samples = [
@@ -16,7 +17,6 @@ def test_extract_references_from_rst() -> None:
            line12
 
         """,
-
         """
     References
     ----------
@@ -25,7 +25,6 @@ def test_extract_references_from_rst() -> None:
       line2
 
         """,
-
         """
         References
         ----------
@@ -40,7 +39,6 @@ def test_extract_references_from_rst() -> None:
         Buga duga
         ---------
         """,
-
         """
         References
         ----------
@@ -50,6 +48,6 @@ def test_extract_references_from_rst() -> None:
 
         line11
         line12
-        """
+        """,
     ]
     extract_references_from_rst(samples[0])

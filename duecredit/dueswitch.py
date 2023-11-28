@@ -10,35 +10,41 @@
 """
 from __future__ import annotations
 
-import os
 import atexit
-from typing import Any, TYPE_CHECKING
+import os
+from typing import TYPE_CHECKING, Any
 
 from .log import lgr
 from .utils import never_fail
+
 if TYPE_CHECKING:
     from duecredit.collector import DueCreditCollector
+
     from .stub import InactiveDueCreditCollector
 
 
 def _get_duecredit_enable() -> bool:
-    env_enable = os.environ.get('DUECREDIT_ENABLE', 'no')
-    if not env_enable.lower() in ('0', '1', 'yes', 'no', 'true', 'false'):
-        lgr.warning("Misunderstood value %s for DUECREDIT_ENABLE. "
-                    "Use 'yes' or 'no', or '0' or '1'")
-    return env_enable.lower() in ('1', 'yes', 'true')
+    env_enable = os.environ.get("DUECREDIT_ENABLE", "no")
+    if not env_enable.lower() in ("0", "1", "yes", "no", "true", "false"):
+        lgr.warning(
+            "Misunderstood value %s for DUECREDIT_ENABLE. "
+            "Use 'yes' or 'no', or '0' or '1'"
+        )
+    return env_enable.lower() in ("1", "yes", "true")
 
 
 @never_fail
 def _get_inactive_due() -> InactiveDueCreditCollector:
     from .stub import InactiveDueCreditCollector
+
     return InactiveDueCreditCollector()
 
 
 @never_fail
 def _get_active_due() -> DueCreditCollector | InactiveDueCreditCollector:
-    from .config import DUECREDIT_FILE
     from duecredit.collector import DueCreditCollector
+
+    from .config import DUECREDIT_FILE
     from .io import load_due
 
     # TODO:  this needs to move to atexit handling, that we load previous
@@ -48,9 +54,10 @@ def _get_active_due() -> DueCreditCollector | InactiveDueCreditCollector:
         try:
             due_ = load_due(DUECREDIT_FILE)
         except Exception:
-            lgr.warning("Failed to load previously collected %s. "
-                        "DueCredit will not be active for this session."
-                        % DUECREDIT_FILE)
+            lgr.warning(
+                "Failed to load previously collected %s. "
+                "DueCredit will not be active for this session." % DUECREDIT_FILE
+            )
             return _get_inactive_due()
     else:
         due_ = DueCreditCollector()
@@ -64,6 +71,7 @@ class DueSwitch:
     Once activated though, cannot be fully deactivated since it would inject
     duecredit decorators and register an event atexit.
     """
+
     def __init__(self, inactive, active, activate: bool = False) -> None:
         self.__active: bool | None = None
         self.__collectors = {False: inactive, True: active}
@@ -89,6 +97,7 @@ class DueSwitch:
            Passed to `CollectorSummary` constructor.
         """
         from duecredit.collector import CollectorSummary
+
         due_summary = CollectorSummary(self.__collectors[True], **kwargs)
         due_summary.dump()
 
@@ -100,6 +109,7 @@ class DueSwitch:
 
         # Deal with injector
         from .injections import DueCreditInjector
+
         injector = DueCreditInjector(collector=self.__collectors[True])
         injector.activate()
 
@@ -112,7 +122,8 @@ class DueSwitch:
             # in DueSwitch so that client code could query/call (for no effect).
             # So we shouldn't delete or bind them either
             def is_public_or_special(x):
-                return not (x.startswith('_') or x in ('activate', 'active', 'dump'))
+                return not (x.startswith("_") or x in ("activate", "active", "dump"))
+
             # Clean up current bindings first
             for k in filter(is_public_or_special, dir(self)):
                 delattr(self, k)
