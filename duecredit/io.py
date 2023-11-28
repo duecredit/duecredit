@@ -246,7 +246,7 @@ def get_text_rendering(entry: DueCreditEntry, style: str = 'harvard1') -> str:
         return str(entry)
 
 
-def get_bibtex_rendering(entry: Doi | BibTeX) -> BibTeX:
+def get_bibtex_rendering(entry: DueCreditEntry) -> BibTeX:
     if isinstance(entry, Doi):
         return BibTeX(import_doi(entry.doi))
     elif isinstance(entry, BibTeX):
