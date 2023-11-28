@@ -9,25 +9,26 @@
 """Citation and citations Collector classes"""
 from __future__ import annotations
 
+from collections import namedtuple
+from functools import wraps
 import logging
 import os
 import sys
-from collections import namedtuple
-from functools import wraps
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
-from .io import TextOutput, PickleOutput
-from .utils import never_fail, borrowdoc
+from .io import PickleOutput, TextOutput
+from .utils import borrowdoc, never_fail
 from .versions import external_versions
 
-lgr = logging.getLogger('duecredit.collector')
+lgr = logging.getLogger("duecredit.collector")
 
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-CitationKey = namedtuple('CitationKey', ['path', 'entry_key'])
+CitationKey = namedtuple("CitationKey", ["path", "entry_key"])
+
 
 class Citation:
     """Encapsulates citations and information on their use"""
@@ -77,7 +78,7 @@ class Citation:
             describing how to contribute some funds to the referenced project
         """
         if path is None:
-            raise ValueError('Must specify path')
+            raise ValueError("Must specify path")
         self._entry = entry
         self._description = description
         # We might want extract all the relevant functionality into a separate class
@@ -102,7 +103,7 @@ class Citation:
             args = ", ".join(argl)
         else:
             args = ""
-        return self.__class__.__name__ + f'({args})'
+        return self.__class__.__name__ + f"({args})"
 
     @property
     def path(self) -> str:
@@ -129,26 +130,26 @@ class Citation:
     def cites_module(self) -> bool | None:
         if not self.path:
             return None
-        return not (':' in self.path)
+        return not (":" in self.path)
 
     @property
     def module(self) -> str | None:
         if not self.path:
             return None
-        return self.path.split(':', 1)[0]
+        return self.path.split(":", 1)[0]
 
     @property
     def package(self) -> str | None:
         module = self.module
         if not module:
             return None
-        return module.split('.', 1)[0]
+        return module.split(".", 1)[0]
 
     @property
     def objname(self) -> str | None:
         if not self.path:
             return None
-        spl = self.path.split(':', 1)
+        spl = self.path.split(":", 1)
         if len(spl) > 1:
             return spl[1]
         else:
@@ -166,12 +167,13 @@ class Citation:
         another entry if it really contains it as an attribute
         """
         if self.cites_module:
-            return ((self.path == entry.path) or
-                    (entry.path.startswith(self.path + '.')) or
-                    (entry.path.startswith(self.path + ':')))
+            return (
+                (self.path == entry.path)
+                or (entry.path.startswith(self.path + "."))
+                or (entry.path.startswith(self.path + ":"))
+            )
         else:
-            return entry.path.startswith(self.path + '.')
-
+            return entry.path.startswith(self.path + ".")
 
     @property
     def key(self) -> CitationKey:
@@ -204,16 +206,13 @@ class DueCreditCollector:
     def __init__(
         self,
         entries: dict[str, DueCreditEntry] | None = None,
-        citations: dict[CitationKey, Citation] | None = None
+        citations: dict[CitationKey, Citation] | None = None,
     ) -> None:
         self._entries = entries or {}
         self.citations = citations or {}
 
     @never_fail
-    def add(
-        self,
-        entry: DueCreditEntry | list[DueCreditEntry]
-    ) -> None:
+    def add(self, entry: DueCreditEntry | list[DueCreditEntry]) -> None:
         """entry should be a DueCreditEntry object"""
         if isinstance(entry, list):
             for e in entry:
@@ -232,12 +231,12 @@ class DueCreditCollector:
         """
         # raise NotImplementedError
         if isinstance(src, str):
-            if src.endswith('.bib'):
+            if src.endswith(".bib"):
                 self._load_bib(src)
             else:
-                raise NotImplementedError('Format not yet supported')
+                raise NotImplementedError("Format not yet supported")
         else:
-            raise ValueError('Must be a string')
+            raise ValueError("Must be a string")
 
     def _load_bib(self, src: str) -> None:
         lgr.debug("Loading %s" % src)
@@ -256,9 +255,9 @@ class DueCreditCollector:
         # TODO: if cite is invoked but no path is provided -- we must figure it out
         # I guess from traceback, otherwise how would we know later to associate it
         # with modules???
-        path = kwargs.get('path', None)
+        path = kwargs.get("path", None)
         if path is None:
-            raise ValueError('path must be provided')
+            raise ValueError("path must be provided")
 
         if isinstance(entry, DueCreditEntry):
             # new one -- add it
@@ -280,13 +279,13 @@ class DueCreditCollector:
 
         # TODO: theoretically version shouldn't differ if we don't preload previous results
         if not citation.version:
-            version = kwargs.get('version', None)
+            version = kwargs.get("version", None)
 
             if not version and citation.path:
-                modname = citation.path.split('.', 1)[0]
+                modname = citation.path.split(".", 1)[0]
 
-                if '.' in modname:
-                    package = modname.split('.', 1)[0]
+                if "." in modname:
+                    package = modname.split(".", 1)[0]
                 else:
                     package = modname
 
@@ -310,20 +309,16 @@ class DueCreditCollector:
 
         return citations_key
 
-
     @staticmethod
     def _args_match_conditions(
-        conditions: dict[Any, Any],
-        *fargs: Any,
-        **fkwargs: Any
+        conditions: dict[Any, Any], *fargs: Any, **fkwargs: Any
     ) -> bool:
-        """Helper to identify when to trigger citation given parameters to the function call
-        """
+        """Helper to identify when to trigger citation given parameters to the function call"""
         for (argpos, kwarg), values in conditions.items():
             # main logic -- assess default and if get to the next one if
             # given argument is not present
             if not ((len(fargs) > argpos) or (kwarg in fkwargs)):
-                if not ('DC_DEFAULT' in values):
+                if not ("DC_DEFAULT" in values):
                     # if value was specified but not provided and not default
                     # conditions are not satisfied
                     return False
@@ -337,10 +332,10 @@ class DueCreditCollector:
                 value = fkwargs[kwarg]
             assert value != "__duecredit_magical_undefined__"
 
-            if '.' in kwarg:
+            if "." in kwarg:
                 # we were requested to condition based on the value of the attribute
                 # of the value.  So get to the attribute(s) value
-                for attr in kwarg.split('.')[1:]:
+                for attr in kwarg.split(".")[1:]:
                     value = getattr(value, attr)
 
             # Value is present but not matching
@@ -402,28 +397,31 @@ class DueCreditCollector:
         >>> Citeable('magic')([1, 2])
         3
         """
+
         def func_wrapper(func):
-            conditions = kwargs.pop('conditions', {})
-            path = kwargs.get('path', None)
+            conditions = kwargs.pop("conditions", {})
+            path = kwargs.get("path", None)
             if not path:
                 # deduce path from the actual function which was decorated
                 # TODO: must include class name  but can't !!!???
                 modname = func.__module__
-                path = kwargs['path'] = '{}:{}'.format(modname, func.__name__)
+                path = kwargs["path"] = "{}:{}".format(modname, func.__name__)
             else:
                 # TODO: we indeed need to separate path logic outside
-                modname = path.split(':', 1)[0]
+                modname = path.split(":", 1)[0]
 
             # if decorated function was invoked, it means that we need
             # to cite that even if it is a module. But do not override
             # value if user explicitly stated
-            if 'cite_module' not in kwargs:
-                kwargs['cite_module'] = True
+            if "cite_module" not in kwargs:
+                kwargs["cite_module"] = True
 
             # TODO: might make use of inspect.getmro
             # see e.g.
             # http://stackoverflow.com/questions/961048/get-class-that-defined-method
-            lgr.debug("Decorating func {} within module {}".format(func.__name__, modname))
+            lgr.debug(
+                "Decorating func {} within module {}".format(func.__name__, modname)
+            )
             # TODO: unittest for all the __version__ madness
 
             # TODO: check if we better use wrapt module which provides superior "correctness"
@@ -431,8 +429,9 @@ class DueCreditCollector:
             @wraps(func)
             def cite_wrapper(*fargs, **fkwargs):
                 try:
-                    if not conditions \
-                            or self._args_match_conditions(conditions, *fargs, **fkwargs):
+                    if not conditions or self._args_match_conditions(
+                        conditions, *fargs, **fkwargs
+                    ):
                         self.cite(*args, **kwargs)
                 except Exception as e:
                     lgr.warning("Failed to cite due to {}".format(e))
@@ -440,6 +439,7 @@ class DueCreditCollector:
 
             cite_wrapper.__duecredited__ = func
             return cite_wrapper
+
         return func_wrapper
 
     @never_fail
@@ -454,40 +454,37 @@ class DueCreditCollector:
             args = ", ".join(argl)
         else:
             args = ""
-        return self.__class__.__name__ + f'({args})'
+        return self.__class__.__name__ + f"({args})"
 
     @never_fail
     def __str__(self) -> str:
-        return self.__class__.__name__ + \
-            ' {:d} entries, {:d} citations'.format(
-                len(self._entries), len(self.citations))
+        return self.__class__.__name__ + " {:d} entries, {:d} citations".format(
+            len(self._entries), len(self.citations)
+        )
 
 
 # TODO: redo heavily -- got very messy
 class CollectorSummary:
-    """A helper which would take care about exporting citations upon its Death
-    """
+    """A helper which would take care about exporting citations upon its Death"""
+
     def __init__(
         self,
         collector: DueCreditCollector,
         outputs: str = "stdout,pickle",
-        fn: str = DUECREDIT_FILE
+        fn: str = DUECREDIT_FILE,
     ) -> None:
         self._due = collector
         self.fn = fn
         # for now decide on output "format" right here
         self._outputs = [
-            self._get_output_handler(
-                type_.lower().strip(), collector, fn=fn)
-            for type_ in os.environ.get('DUECREDIT_OUTPUTS', outputs).split(',')
+            self._get_output_handler(type_.lower().strip(), collector, fn=fn)
+            for type_ in os.environ.get("DUECREDIT_OUTPUTS", outputs).split(",")
             if type_
         ]
 
     @staticmethod
     def _get_output_handler(
-        type_: str,
-        collector: DueCreditCollector,
-        fn: str | None = None
+        type_: str, collector: DueCreditCollector, fn: str | None = None
     ) -> TextOutput | PickleOutput:
         # just a little factory
         if type_ in ("stdout", "stderr"):

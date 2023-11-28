@@ -10,11 +10,10 @@ from __future__ import annotations
 
 """Module to help maintain a registry of versions for external modules etc
 """
-import sys
+from distutils.version import LooseVersion, StrictVersion
 from os import linesep
+import sys
 from typing import Any
-
-from distutils.version import StrictVersion, LooseVersion
 
 try:
     from importlib.metadata import version as metadata_version
@@ -24,8 +23,7 @@ except ImportError:
 
 # To depict an unknown version, which can't be compared by mistake etc
 class UnknownVersion:
-    """For internal use
-    """
+    """For internal use"""
 
     def __str__(self) -> str:
         return "UNKNOWN"
@@ -53,7 +51,7 @@ class ExternalVersions:
     @classmethod
     def _deduce_version(klass, module) -> StrictVersion | LooseVersion | UnknownVersion:
         version = None
-        for attr in ('__version__', 'version'):
+        for attr in ("__version__", "version"):
             if hasattr(module, attr):
                 version = getattr(module, attr)
                 break
@@ -70,7 +68,7 @@ class ExternalVersions:
             modname = module.__name__
             try:
                 version = metadata_version(
-                    {'citeproc': 'citeproc-py'}.get(modname, modname)
+                    {"citeproc": "citeproc-py"}.get(modname, modname)
                 )
             except Exception:
                 pass  # oh well - no luck either
@@ -84,9 +82,11 @@ class ExternalVersions:
         else:
             return klass.UNKNOWN
 
-    def __getitem__(self, module: Any) -> StrictVersion | LooseVersion | UnknownVersion | None:
+    def __getitem__(
+        self, module: Any
+    ) -> StrictVersion | LooseVersion | UnknownVersion | None:
         # when ran straight in its source code -- fails to discover nipy's version.. TODO
-        #if module == 'nipy':
+        # if module == 'nipy':
         if not isinstance(module, str):
             modname = module.__name__
         else:
@@ -119,11 +119,7 @@ class ExternalVersions:
         """Return dictionary (copy) of versions"""
         return self._versions.copy()
 
-    def dumps(
-        self,
-        indent: bool | str = False,
-        preamble: str = "Versions:"
-    ) -> str:
+    def dumps(self, indent: bool | str = False, preamble: str = "Versions:") -> str:
         """Return listing of versions as a string
 
         Parameters
@@ -137,10 +133,10 @@ class ExternalVersions:
         items = ["{}={}".format(k, self._versions[k]) for k in sorted(self._versions)]
         out = "%s" % preamble
         if indent:
-            indent_ = ' ' if indent is True else indent
-            out += (linesep + indent_).join([''] + items) + linesep
+            indent_ = " " if indent is True else indent
+            out += (linesep + indent_).join([""] + items) + linesep
         else:
-            out += " " + ' '.join(items)
+            out += " " + " ".join(items)
         return out
 
 

@@ -23,12 +23,13 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
+
 def inject(injector: DueCreditInjector) -> None:
-    #http://scikit-image.org
+    # http://scikit-image.org
     injector.add(
-        'skimage',
+        "skimage",
         None,
-        Doi('10.7717/peerj.453'),
-        description='scikit-image: Image processing in Python.',
-        tags=['implementation']
+        Doi("10.7717/peerj.453"),
+        description="scikit-image: Image processing in Python.",
+        tags=["implementation"],
     )

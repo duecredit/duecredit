@@ -19,8 +19,8 @@ from ..utils import is_interactive
 
 def test_is_interactive_crippled_stdout(monkeypatch: MonkeyPatch) -> None:
     class MockedOut:
-        """the one which has no isatty
-        """
+        """the one which has no isatty"""
+
         def write(self, *args: Any, **kwargs: Any) -> None:
             pass
 
@@ -28,11 +28,11 @@ def test_is_interactive_crippled_stdout(monkeypatch: MonkeyPatch) -> None:
         def isatty(self) -> bool:
             return True
 
-    for inout in ('in', 'out', 'err'):
-        monkeypatch.setattr(sys, 'std%s' % inout, MockedOut())
+    for inout in ("in", "out", "err"):
+        monkeypatch.setattr(sys, "std%s" % inout, MockedOut())
         assert not is_interactive()
 
     # just for paranoids
-    for inout in ('in', 'out', 'err'):
-        monkeypatch.setattr(sys, 'std%s' % inout, MockedIsaTTY())
+    for inout in ("in", "out", "err"):
+        monkeypatch.setattr(sys, "std%s" % inout, MockedIsaTTY())
     assert is_interactive()

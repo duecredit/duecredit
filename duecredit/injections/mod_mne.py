@@ -23,19 +23,20 @@ max_version = None
 if TYPE_CHECKING:
     from .injector import DueCreditInjector
 
+
 def inject(injector: DueCreditInjector) -> None:
-    #http://martinos.org/mne/stable/cite.html
+    # http://martinos.org/mne/stable/cite.html
     injector.add(
-        'mne',
+        "mne",
         None,
-        Doi('10.1016/j.neuroimage.2013.10.027'),
-        description='MNE software for processing MEG and EEG data.',
-        tags=['implementation'],
+        Doi("10.1016/j.neuroimage.2013.10.027"),
+        description="MNE software for processing MEG and EEG data.",
+        tags=["implementation"],
     )
     injector.add(
-        'mne',
+        "mne",
         None,
-        Doi('10.3389/fnins.2013.00267'),
-        description='MEG and EEG data analysis with MNE-Python.',
-        tags=['implementation'],
+        Doi("10.3389/fnins.2013.00267"),
+        description="MEG and EEG data analysis with MNE-Python.",
+        tags=["implementation"],
     )

@@ -9,7 +9,7 @@
 """Facility to automagically decorate with references other modules
 """
 
-__docformat__ = 'restructuredtext'
+__docformat__ = "restructuredtext"
 
 from .injector import DueCreditInjector
 

@@ -15,6 +15,7 @@ import pytest
 from ..version import __version__
 from ..versions import ExternalVersions, StrictVersion
 
+
 # just to ease testing
 def cmp(a, b):
     return (a > b) - (a < b)
@@ -23,51 +24,54 @@ def cmp(a, b):
 def test_external_versions_basic():
     ev = ExternalVersions()
     assert ev._versions == {}
-    assert ev['duecredit'] == __version__
+    assert ev["duecredit"] == __version__
     # and it could be compared
-    assert ev['duecredit'] >= __version__
-    assert ev['duecredit'] > '0.1'
-    assert list(ev.keys()) == ['duecredit']
-    assert 'duecredit' in ev
-    assert 'unknown' not in ev
+    assert ev["duecredit"] >= __version__
+    assert ev["duecredit"] > "0.1"
+    assert list(ev.keys()) == ["duecredit"]
+    assert "duecredit" in ev
+    assert "unknown" not in ev
 
     # StrictVersion might remove training .0
-    version_str = str(ev['duecredit']) \
-        if isinstance(ev['duecredit'], StrictVersion) \
+    version_str = (
+        str(ev["duecredit"])
+        if isinstance(ev["duecredit"], StrictVersion)
         else __version__
+    )
     assert ev.dumps() == "Versions: duecredit=%s" % version_str
 
     # For non-existing one we get None
-    assert ev['duecreditnonexisting'] is None
+    assert ev["duecreditnonexisting"] is None
 
     # and nothing gets added to _versions for nonexisting
-    assert set(ev._versions.keys()) == {'duecredit'}
+    assert set(ev._versions.keys()) == {"duecredit"}
 
     # but if it is a module without version, we get it set to UNKNOWN
-    assert ev['os'] == ev.UNKNOWN
+    assert ev["os"] == ev.UNKNOWN
     # And get a record on that inside
-    assert ev._versions.get('os') == ev.UNKNOWN
+    assert ev._versions.get("os") == ev.UNKNOWN
     # And that thing is "True", i.e. present
-    assert(ev['os'])
+    assert ev["os"]
     # but not comparable with anything besides itself (was above)
     with pytest.raises(TypeError):
-        cmp(ev['os'], '0')
+        cmp(ev["os"], "0")
 
     # assert_raises(TypeError, assert_greater, ev['os'], '0')
 
     # And we can get versions based on modules themselves
     from duecredit.tests import mod
+
     assert ev[mod] == mod.__version__
 
     # Check that we can get a copy of the versions
     versions_dict = ev.versions
-    versions_dict['duecredit'] = "0.0.1"
-    assert versions_dict['duecredit'] == "0.0.1"
-    assert ev['duecredit'] == __version__
+    versions_dict["duecredit"] = "0.0.1"
+    assert versions_dict["duecredit"] == "0.0.1"
+    assert ev["duecredit"] == __version__
 
 
 def test_external_versions_unknown() -> None:
-    assert str(ExternalVersions.UNKNOWN) == 'UNKNOWN'
+    assert str(ExternalVersions.UNKNOWN) == "UNKNOWN"
 
 
 def _test_external(ev, modname: str) -> None:
@@ -78,12 +82,23 @@ def _test_external(ev, modname: str) -> None:
     except Exception as e:
         pytest.skip("External {} fails to import: {}".format(modname, e))
     assert ev[modname] is not ev.UNKNOWN
-    assert ev[modname] > '0.0.1'
-    assert '1000000.0' > ev[modname]  # unlikely in our lifetimes
+    assert ev[modname] > "0.0.1"
+    assert "1000000.0" > ev[modname]  # unlikely in our lifetimes
 
 
-@pytest.mark.parametrize("modname", ['scipy', 'numpy', 'mvpa2', 'sklearn', 'statsmodels',
-                                     'pandas', 'matplotlib', 'psychopy'])
+@pytest.mark.parametrize(
+    "modname",
+    [
+        "scipy",
+        "numpy",
+        "mvpa2",
+        "sklearn",
+        "statsmodels",
+        "pandas",
+        "matplotlib",
+        "psychopy",
+    ],
+)
 def test_external_versions_popular_packages(modname: str) -> None:
     ev = ExternalVersions()
 

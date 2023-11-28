@@ -26,26 +26,29 @@ Copyright:  2015-2021  DueCredit developers
 License:    BSD-2
 """
 
-__version__ = '0.0.9'
+__version__ = "0.0.9"
 
 
 class InactiveDueCreditCollector:
     """Just a stub at the Collector which would not do anything"""
+
     def _donothing(self, *_args, **_kwargs):
         """Perform no good and no bad"""
         pass
 
     def dcite(self, *_args, **_kwargs):
         """If I could cite I would"""
+
         def nondecorating_decorator(func):
             return func
+
         return nondecorating_decorator
 
     active = False
     activate = add = cite = dump = load = _donothing
 
     def __repr__(self) -> str:
-        return self.__class__.__name__ + '()'
+        return self.__class__.__name__ + "()"
 
 
 def _donothing_func(*args, **kwargs):
@@ -54,15 +57,17 @@ def _donothing_func(*args, **kwargs):
 
 
 try:
-    from duecredit import due, BibTeX, Doi, Url, Text  # lgtm [py/unused-import]
-    if 'due' in locals() and not hasattr(due, 'cite'):
-        raise RuntimeError(
-            "Imported due lacks .cite. DueCredit is now disabled")
+    from duecredit import BibTeX, Doi, Text, Url, due  # lgtm [py/unused-import]
+
+    if "due" in locals() and not hasattr(due, "cite"):
+        raise RuntimeError("Imported due lacks .cite. DueCredit is now disabled")
 except Exception as e:
     if not isinstance(e, ImportError):
         import logging
+
         logging.getLogger("duecredit").error(
-            "Failed to import duecredit due to %s" % str(e))
+            "Failed to import duecredit due to %s" % str(e)
+        )
     # Initiate due stub
     due = InactiveDueCreditCollector()  # type: ignore
     BibTeX = Doi = Url = Text = _donothing_func  # type: ignore
