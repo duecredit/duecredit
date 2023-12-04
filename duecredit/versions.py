@@ -11,14 +11,10 @@ from __future__ import annotations
 """Module to help maintain a registry of versions for external modules etc
 """
 from distutils.version import LooseVersion, StrictVersion
+from importlib.metadata import version as metadata_version
 from os import linesep
 import sys
 from typing import Any
-
-try:
-    from importlib.metadata import version as metadata_version
-except ImportError:
-    from importlib_metadata import version as metadata_version  # type: ignore
 
 
 # To depict an unknown version, which can't be compared by mistake etc
