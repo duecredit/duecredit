@@ -26,6 +26,7 @@ from ..injections.injector import (
     find_object,
     get_modules_for_injection,
 )
+from ..versions import Version
 
 try:
     import mvpa2  # noqa: F401
@@ -100,7 +101,7 @@ class TestActiveInjector:
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version
-        assert citation.version == __version__
+        assert citation.version == Version(__version__)
 
         assert citation.tags == ["implementation", "very custom"]
 

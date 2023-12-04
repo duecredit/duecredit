@@ -91,8 +91,10 @@ setup(
     packages=find_packages(),
     python_requires=">=3.8",
     install_requires=[
-        "requests",
         "citeproc-py>=0.4",
+        "looseversion",
+        "packaging",
+        "requests",
     ],
     extras_require={"tests": ["pytest", "pytest-cov", "vcrpy", "contextlib2"]},
     include_package_data=True,
