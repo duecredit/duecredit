@@ -19,6 +19,7 @@ import shutil
 import stat
 import sys
 import time
+from types import TracebackType
 from typing import Any
 
 #
@@ -88,12 +89,12 @@ def rotree(path: str, ro: bool = True, chmod_files: bool = True) -> None:
     """
     if ro:
 
-        def chmod(f):
+        def chmod(f: str) -> None:
             os.chmod(f, os.stat(f).st_mode & ~stat.S_IWRITE)
 
     else:
 
-        def chmod(f):
+        def chmod(f: str) -> None:
             os.chmod(f, os.stat(f).st_mode | stat.S_IWRITE | stat.S_IREAD)
 
     for root, _, files in os.walk(path, followlinks=False):
@@ -219,7 +220,7 @@ def never_fail(f):
         return wrapped_func
 
 
-def borrowdoc(cls, methodname=None, replace=None):
+def borrowdoc(cls, methodname: str | None = None, replace: str | None = None):
     """Return a decorator to borrow docstring from another `cls`.`methodname`
 
     Common use is to borrow a docstring from the class's method for an
@@ -262,7 +263,9 @@ def borrowdoc(cls, methodname=None, replace=None):
 
 
 # TODO: just provide decorators for tempfile.mk* functions. This is ugly!
-def get_tempfile_kwargs(tkwargs=None, prefix="", wrapped=None):
+def get_tempfile_kwargs(
+    tkwargs: dict[str, str] | None = None, prefix: str = "", wrapped=None
+) -> dict[str, str]:
     """Updates kwargs to be passed to tempfile. calls depending on env vars"""
     # operate on a copy of tkwargs to avoid any side-effects
     if tkwargs is None:
@@ -302,7 +305,11 @@ def setup_exceptionhook() -> None:
     pdb.post_mortem; if not interactive, then invokes default handler.
     """
 
-    def _duecredit_pdb_excepthook(exc_type, exc_value, exc_tb) -> None:
+    def _duecredit_pdb_excepthook(
+        exc_type: type[BaseException],
+        exc_value: BaseException,
+        exc_tb: TracebackType | None = None,
+    ) -> None:
         if is_interactive():
             import pdb
             import traceback

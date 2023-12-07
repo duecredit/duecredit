@@ -3,6 +3,8 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### #
 from __future__ import annotations
 
+from typing import Any
+
 """
 
 Stub file for a guaranteed safe import of duecredit constructs:  if duecredit
@@ -32,11 +34,11 @@ __version__ = "0.0.9"
 class InactiveDueCreditCollector:
     """Just a stub at the Collector which would not do anything"""
 
-    def _donothing(self, *_args, **_kwargs):
+    def _donothing(self, *_args: Any, **_kwargs: Any) -> None:
         """Perform no good and no bad"""
         pass
 
-    def dcite(self, *_args, **_kwargs):
+    def dcite(self, *_args: Any, **_kwargs: Any):
         """If I could cite I would"""
 
         def nondecorating_decorator(func):
@@ -51,7 +53,7 @@ class InactiveDueCreditCollector:
         return self.__class__.__name__ + "()"
 
 
-def _donothing_func(*args, **kwargs):
+def _donothing_func(*args: Any, **kwargs: Any) -> None:
     """Perform no good and no bad"""
     pass
 

@@ -8,6 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 from __future__ import annotations
 
+from collections.abc import Iterator
 import os
 from os.path import dirname
 from os.path import join as pathjoin
@@ -15,6 +16,7 @@ import shutil
 from subprocess import PIPE, Popen
 import sys
 import tempfile
+from typing import overload
 
 import pytest
 from pytest import MonkeyPatch
@@ -32,7 +34,7 @@ stubbed_script = pathjoin(pathjoin(stubbed_dir, "script.py"))
 
 
 @pytest.fixture(scope="module")
-def stubbed_env():
+def stubbed_env() -> Iterator[str]:
     """Create stubbed module with a sample script"""
     os.makedirs(stubbed_dir)
     with open(stubbed_script, "wb") as f:
@@ -70,7 +72,7 @@ print("done123")
 @pytest.mark.parametrize(
     "collector_class", [DueCreditCollector, InactiveDueCreditCollector]
 )
-def test_api(collector_class):
+def test_api(collector_class) -> None:
     due = collector_class()
     # add references
     due.add(BibTeX("@article{XXX00, ...}"))
@@ -97,22 +99,36 @@ def test_api(collector_class):
 
     class Child:
         # Conception process is usually way too easy to be referenced
-        def __init__(self):
+        def __init__(self) -> None:
             pass
 
         # including functionality within/by the methods
         @due.dcite("XXX00")
-        def birth(self, _gender):
+        def birth(self, _gender) -> str:
             return "Rachel was born"
 
     kid = Child()
     kid.birth("female")
 
 
-def run_python_command(cmd=None, script=None):
+@overload
+def run_python_command(cmd: str):
+    ...
+
+
+@overload
+def run_python_command(cmd: None, script: str):
+    ...
+
+
+def run_python_command(cmd: str | None = None, script: str | None = None):
     """Just a tiny helper which runs command and returns exit code, stdout, stderr"""
-    assert bool(cmd) != bool(script)  # one or another, not both
-    args = ["-c", cmd] if cmd else [script]
+    if script is None:
+        assert cmd is not None
+        args = ["-c", cmd]
+    else:
+        assert cmd is None
+        args = [script]
     try:
         # run script from some temporary directory so we do not breed .duecredit.p
         # in current directory
