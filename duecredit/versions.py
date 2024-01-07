@@ -10,9 +10,11 @@ from __future__ import annotations
 
 """Module to help maintain a registry of versions for external modules etc
 """
+from collections.abc import KeysView
 from importlib.metadata import version as metadata_version
 from os import linesep
 import sys
+from types import ModuleType
 from typing import Any
 
 from looseversion import LooseVersion
@@ -47,7 +49,9 @@ class ExternalVersions:
         self._versions: dict[str, Version | LooseVersion | UnknownVersion] = {}
 
     @classmethod
-    def _deduce_version(klass, module) -> Version | LooseVersion | UnknownVersion:
+    def _deduce_version(
+        klass, module: ModuleType
+    ) -> Version | LooseVersion | UnknownVersion:
         version = None
         for attr in ("__version__", "version"):
             if hasattr(module, attr):
@@ -105,11 +109,11 @@ class ExternalVersions:
 
         return self._versions.get(modname, self.UNKNOWN)
 
-    def keys(self):
+    def keys(self) -> KeysView[str]:
         """Return names of the known modules"""
         return self._versions.keys()
 
-    def __contains__(self, item):
+    def __contains__(self, item: str) -> bool:
         return item in self._versions
 
     @property
