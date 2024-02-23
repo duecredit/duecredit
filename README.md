@@ -339,5 +339,6 @@ request and add your project to this list. Thanks to
 - [MDAnalysis](https://www.mdanalysis.org)
 - [bctpy](https://github.com/aestrivex/bctpy)
 - [TorchIO](https://github.com/fepegar/torchio)
+- [BIDScoin](https://github.com/Donders-Institute/bidscoin)
 
-Last updated 2020-04-07.
+Last updated 2024-02-23.
