@@ -195,7 +195,7 @@ class LoggerHelper:
         ----------
         target: string, optional
           Which log target to request logger for
-        logtarget: { 'stdout', 'stderr', str }, optional
+        logtarget: { 'stderr', 'stdout', str }, optional
           Where to direct the logs.  stdout and stderr stand for standard streams.
           Any other string is considered a filename.  Multiple entries could be
           specified comma-separated
@@ -205,7 +205,7 @@ class LoggerHelper:
         logging.Logger
         """
         # By default mimic previously talkative behavior
-        logtarget_ = self._get_environ("LOGTARGET", logtarget or "stdout")
+        logtarget_ = self._get_environ("LOGTARGET", logtarget or "stderr")
         assert type(logtarget_) is str
 
         # Allow for multiple handlers being specified, comma-separated
