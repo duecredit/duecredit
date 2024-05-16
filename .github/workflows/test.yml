@@ -55,6 +55,7 @@ jobs:
         python -m pip install --upgrade pip wheel
         pip install --upgrade pytest
         pip install ".[tests]"
+        pip install numpy
 
     - name: Run all tests
       run: |
