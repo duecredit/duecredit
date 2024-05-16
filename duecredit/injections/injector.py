@@ -244,7 +244,6 @@ class DueCreditInjector:
                         "Could not find {} in module {}: {}".format(obj_path, mod, e)
                     )
                     continue
-            assert obj_name
 
             # there could be multiple per func
             lgr.log(
@@ -259,6 +258,7 @@ class DueCreditInjector:
                 # Add entry explicitly
                 self._collector.add(entry)
                 if obj_path:  # if not entire module -- decorate!
+                    assert obj_name
                     decorator = self._collector.dcite(
                         entry.get_key(), **obj_entry_record["kwargs"]
                     )
