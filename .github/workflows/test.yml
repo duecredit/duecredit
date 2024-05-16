@@ -36,7 +36,8 @@ jobs:
           - '3.12'
         mode:
           - normal
-        extra-pip: ""
+        extra-pip:
+          - ""
         include:
           - os: ubuntu-latest
             python: 3.8
