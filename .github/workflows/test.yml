@@ -36,6 +36,15 @@ jobs:
           - '3.12'
         mode:
           - normal
+        extra-pip:
+          - ""
+        include:
+          - os: ubuntu-latest
+            python: 3.8
+            extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib psychopy
+          - os: ubuntu-latest
+            python: 3.12
+            extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib psychopy
     steps:
     - name: Set up environment
       uses: actions/checkout@v4
@@ -55,6 +64,12 @@ jobs:
         python -m pip install --upgrade pip wheel
         pip install --upgrade pytest
         pip install ".[tests]"
+    
+    - name: Install extra dependencies
+      run: |
+        if [ -n "${{ matrix.extra-pip }}" ]; then
+          python -m pip install ${{ matrix.extra-pip }}
+        fi
 
     - name: Run all tests
       run: |

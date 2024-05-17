@@ -80,8 +80,8 @@ def _test_external(ev, modname: str) -> None:
     except Exception as e:
         pytest.skip("External {} fails to import: {}".format(modname, e))
     assert ev[modname] is not ev.UNKNOWN
-    assert ev[modname] > "0.0.1"
-    assert "1000000.0" > ev[modname]  # unlikely in our lifetimes
+    assert ev[modname] > Version("0.0.1")
+    assert Version("1000000.0") > ev[modname]  # unlikely in our lifetimes
 
 
 @pytest.mark.parametrize(
