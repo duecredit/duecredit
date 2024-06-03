@@ -41,10 +41,10 @@ jobs:
         include:
           - os: ubuntu-latest
             python: 3.8
-            extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib psychopy
+            extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib
           - os: ubuntu-latest
             python: 3.12
-            extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib psychopy
+            extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib
     steps:
     - name: Set up environment
       uses: actions/checkout@v4
