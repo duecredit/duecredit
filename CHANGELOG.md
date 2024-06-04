@@ -1,3 +1,15 @@
+# 0.10.2 (Tue Jun 04 2024)
+
+#### 🐛 Bug Fix
+
+- Do not bother testing with psychopy installed [#216](https://github.com/duecredit/duecredit/pull/216) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 1
+
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
 # 0.10.1 (Fri May 17 2024)
 
 #### 🐛 Bug Fix
