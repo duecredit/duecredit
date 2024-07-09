@@ -4,6 +4,7 @@ duecredit (0.9.1-2) UNRELEASED; urgency=medium
     - add Drew Parsons as Uploader
     - git repo created using gbp import-dsc from .dsc files
       at http://snapshot.debian.org/package/duecredit/
+  * update debian/watch to version 4 @ANY_VERSION@@ARCHIVE_EXT@
 
  -- Drew Parsons <dparsons@debian.org>  Tue, 09 Jul 2024 12:14:52 +0200
 
