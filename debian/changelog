@@ -1,5 +1,6 @@
-duecredit (0.9.1-2) UNRELEASED; urgency=medium
+duecredit (0.10.2-1) UNRELEASED; urgency=medium
 
+  * New upstream release.
   * move duecredit to the Debian Python Team
     - add Drew Parsons as Uploader
     - git repo created using gbp import-dsc from .dsc files
