@@ -1,6 +1,28 @@
-# Change Log
+# 0.9.1 (Tue Apr 13 2021)
 
-## [0.8.0](https://github.com/duecredit/duecredit/tree/0.8.0) (2020-02-09)
+#### 🐛 Bug Fix
+
+- Set up intuit auto to automate releases [#178](https://github.com/duecredit/duecredit/pull/178) ([@jwodder](https://github.com/jwodder) [@yarikoptic](https://github.com/yarikoptic))
+- BF: make pypi upload happen in py 3.8 matrix (2.7 was removed) [#178](https://github.com/duecredit/duecredit/pull/178) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 2
+
+- John T. Wodder II ([@jwodder](https://github.com/jwodder))
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
+# [0.9.0](https://github.com/duecredit/duecredit/tree/0.9.0) (2021-04-13)
+
+- Drop support for Python < 3.6
+- Python packaging is reworked, importlib-metadata is added
+  as a dependency for python < 3.8
+
+# [0.8.1](https://github.com/duecredit/duecredit/tree/0.8.0) (2021-01-26)
+
+- Announce lines with unescaped \ as r(aw)
+
+# [0.8.0](https://github.com/duecredit/duecredit/tree/0.8.0) (2020-02-09)
 
 - Variety of small fixes
 - Added .zenodo.json for more proper citation of duecredit
@@ -9,7 +31,7 @@
 - Address a few deprecation warnings (#146)
 - Provide more informative message whenever using older citeproc without encoding arg
 
-## [0.7.0](https://github.com/duecredit/duecredit/tree/0.7.0) (2019-03-01)
+# [0.7.0](https://github.com/duecredit/duecredit/tree/0.7.0) (2019-03-01)
 
 - Prevent warnings from the injector's `__del__`.
 - InactiveDueCollector in `stub.py` now provides also `active=False`
@@ -20,7 +42,7 @@
   meaningful rendering in BibTex but is present in text rendering.
   `Url` entry also acquired text rendering with prefix `URL: `.
 
-## [0.6.5](https://github.com/duecredit/duecredit/tree/0.6.5) (2019-02-04)
+# [0.6.5](https://github.com/duecredit/duecredit/tree/0.6.5) (2019-02-04)
 
 - Delay import of imports (thanks [Chris Markiewicz (@effigies)](https://github.com/effigies)
   - serves also as a workaround due to inconsistent installation of
@@ -30,30 +52,30 @@
   Thanks [Katrin Leinweber (@katrinleinweber)](https://github.com/katrinleinweber)
   for the contribution
 
-## [0.6.4](https://github.com/duecredit/duecredit/tree/0.6.4) (2018-06-25)
+# [0.6.4](https://github.com/duecredit/duecredit/tree/0.6.4) (2018-06-25)
 
 - Added doi to numpy injection
 - Minor tune-ups to the docs
 
-## [0.6.3](https://github.com/duecredit/duecredit/tree/0.6.3) (2017-08-01)
+# [0.6.3](https://github.com/duecredit/duecredit/tree/0.6.3) (2017-08-01)
 
   Fixed a bug disallowing installation of duecredit in environments with
   crippled/too-basic locale setting.
 
-## [0.6.2](https://github.com/duecredit/duecredit/tree/0.6.2) (2017-06-23)
+# [0.6.2](https://github.com/duecredit/duecredit/tree/0.6.2) (2017-06-23)
 
 - Testing was converted to pytest
 - Various enhancements in supporting python3 and BiBTeX with utf-8
 - New tag 'dataset' to describe datasets
 
-## [0.6.1](https://github.com/duecredit/duecredit/tree/0.6.1) (2016-07-09)
+# [0.6.1](https://github.com/duecredit/duecredit/tree/0.6.1) (2016-07-09)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.6.0...0.6.1)
 
 **Merged pull requests:**
 
 - ENH: workaround for pages handling fixed in citeproc post 0.3.0 [\#98](https://github.com/duecredit/duecredit/pull/98) ([yarikoptic](https://github.com/yarikoptic))
 
-## [0.6.0](https://github.com/duecredit/duecredit/tree/0.6.0) (2016-06-17)
+# [0.6.0](https://github.com/duecredit/duecredit/tree/0.6.0) (2016-06-17)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.5.0...0.6.0)
 
 **Implemented enhancements:**
@@ -75,7 +97,7 @@
 - enable codecov coverage reports [\#87](https://github.com/duecredit/duecredit/pull/87) ([yarikoptic](https://github.com/yarikoptic))
 - REF,ENH: refactor {BibTeX,Text}Output into Output class with subclasses [\#86](https://github.com/duecredit/duecredit/pull/86) ([mvdoc](https://github.com/mvdoc))
 
-## [0.5.0](https://github.com/duecredit/duecredit/tree/0.5.0) (2016-05-11)
+# [0.5.0](https://github.com/duecredit/duecredit/tree/0.5.0) (2016-05-11)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.8...0.5.0)
 
 **Fixed bugs:**
@@ -93,7 +115,7 @@
 - enable testing under python 3.5 on travis [\#79](https://github.com/duecredit/duecredit/pull/79) ([yarikoptic](https://github.com/yarikoptic))
 - ENH: appveyor configuration \(based on shablona's\) based on mix of conda and pip [\#70](https://github.com/duecredit/duecredit/pull/70) ([yarikoptic](https://github.com/yarikoptic))
 
-## [0.4.8](https://github.com/duecredit/duecredit/tree/0.4.8) (2016-05-04)
+# [0.4.8](https://github.com/duecredit/duecredit/tree/0.4.8) (2016-05-04)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.7...0.4.8)
 
 **Closed issues:**
@@ -106,10 +128,10 @@
 - BF: change request command to make it work with zenodo too [\#76](https://github.com/duecredit/duecredit/pull/76) ([mvdoc](https://github.com/mvdoc))
 - DOC: Show that user can also enter BibTeX entries [\#75](https://github.com/duecredit/duecredit/pull/75) ([mvdoc](https://github.com/mvdoc))
 
-## [0.4.7](https://github.com/duecredit/duecredit/tree/0.4.7) (2016-04-21)
+# [0.4.7](https://github.com/duecredit/duecredit/tree/0.4.7) (2016-04-21)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.6...0.4.7)
 
-## [0.4.6](https://github.com/duecredit/duecredit/tree/0.4.6) (2016-04-19)
+# [0.4.6](https://github.com/duecredit/duecredit/tree/0.4.6) (2016-04-19)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.5...0.4.6)
 
 **Fixed bugs:**
@@ -122,17 +144,17 @@
 - Use HTTPS for GitHub URL [\#67](https://github.com/duecredit/duecredit/pull/67) ([jwilk](https://github.com/jwilk))
 - Fix typos [\#66](https://github.com/duecredit/duecredit/pull/66) ([jwilk](https://github.com/jwilk))
 
-## [0.4.5](https://github.com/duecredit/duecredit/tree/0.4.5) (2015-12-03)
+# [0.4.5](https://github.com/duecredit/duecredit/tree/0.4.5) (2015-12-03)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.4...0.4.5)
 
 **Merged pull requests:**
 
 - Make duecredit import and stub more robust to failures with e.g. import of lxml [\#65](https://github.com/duecredit/duecredit/pull/65) ([yarikoptic](https://github.com/yarikoptic))
 
-## [0.4.4](https://github.com/duecredit/duecredit/tree/0.4.4) (2015-11-08)
+# [0.4.4](https://github.com/duecredit/duecredit/tree/0.4.4) (2015-11-08)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.3...0.4.4)
 
-## [0.4.3](https://github.com/duecredit/duecredit/tree/0.4.3) (2015-09-28)
+# [0.4.3](https://github.com/duecredit/duecredit/tree/0.4.3) (2015-09-28)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.2...0.4.3)
 
 **Implemented enhancements:**
@@ -148,7 +170,7 @@
 - ENH: versions -- provide dumps, keys, \_\_contains\_\_ [\#57](https://github.com/duecredit/duecredit/pull/57) ([yarikoptic](https://github.com/yarikoptic))
 - ENH: Two more module level injections [\#56](https://github.com/duecredit/duecredit/pull/56) ([yarikoptic](https://github.com/yarikoptic))
 
-## [0.4.2](https://github.com/duecredit/duecredit/tree/0.4.2) (2015-09-03)
+# [0.4.2](https://github.com/duecredit/duecredit/tree/0.4.2) (2015-09-03)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.1...0.4.2)
 
 **Closed issues:**
@@ -161,10 +183,10 @@
 - Overhaul conditions -- "and" logic \(all must be met\) + allow to access attributes of the arguments [\#50](https://github.com/duecredit/duecredit/pull/50) ([yarikoptic](https://github.com/yarikoptic))
 - BF: Fix get\_text\_rendering when Citation is passed with Doi [\#46](https://github.com/duecredit/duecredit/pull/46) ([mvdoc](https://github.com/mvdoc))
 
-## [0.4.1](https://github.com/duecredit/duecredit/tree/0.4.1) (2015-08-27)
+# [0.4.1](https://github.com/duecredit/duecredit/tree/0.4.1) (2015-08-27)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.4.0...0.4.1)
 
-## [0.4.0](https://github.com/duecredit/duecredit/tree/0.4.0) (2015-08-21)
+# [0.4.0](https://github.com/duecredit/duecredit/tree/0.4.0) (2015-08-21)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.3.0...0.4.0)
 
 **Fixed bugs:**
@@ -184,7 +206,7 @@
 - REF: text output, divide "model" from "view" [\#41](https://github.com/duecredit/duecredit/pull/41) ([mvdoc](https://github.com/mvdoc))
 - RF to provide \_\_main\_\_ so we could do   python -m duecredit  existing script [\#39](https://github.com/duecredit/duecredit/pull/39) ([yarikoptic](https://github.com/yarikoptic))
 
-## [0.3.0](https://github.com/duecredit/duecredit/tree/0.3.0) (2015-08-05)
+# [0.3.0](https://github.com/duecredit/duecredit/tree/0.3.0) (2015-08-05)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.2.2...0.3.0)
 
 **Implemented enhancements:**
@@ -210,13 +232,13 @@
 - BF: give correct ref numbers for citations [\#24](https://github.com/duecredit/duecredit/pull/24) ([mvdoc](https://github.com/mvdoc))
 - Fix typo in README.md [\#21](https://github.com/duecredit/duecredit/pull/21) ([lesteve](https://github.com/lesteve))
 
-## [0.2.2](https://github.com/duecredit/duecredit/tree/0.2.2) (2015-07-27)
+# [0.2.2](https://github.com/duecredit/duecredit/tree/0.2.2) (2015-07-27)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.2.1...0.2.2)
 
-## [0.2.1](https://github.com/duecredit/duecredit/tree/0.2.1) (2015-07-27)
+# [0.2.1](https://github.com/duecredit/duecredit/tree/0.2.1) (2015-07-27)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.2.0...0.2.1)
 
-## [0.2.0](https://github.com/duecredit/duecredit/tree/0.2.0) (2015-07-27)
+# [0.2.0](https://github.com/duecredit/duecredit/tree/0.2.0) (2015-07-27)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.1.1...0.2.0)
 
 **Closed issues:**
@@ -236,10 +258,10 @@
 - WiP NF: core to implement "injection" of duecredit entries into other modules [\#10](https://github.com/duecredit/duecredit/pull/10) ([yarikoptic](https://github.com/yarikoptic))
 - coveralls call should be without any args, also test installation now [\#9](https://github.com/duecredit/duecredit/pull/9) ([yarikoptic](https://github.com/yarikoptic))
 
-## [0.1.1](https://github.com/duecredit/duecredit/tree/0.1.1) (2015-06-26)
+# [0.1.1](https://github.com/duecredit/duecredit/tree/0.1.1) (2015-06-26)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.1.0...0.1.1)
 
-## [0.1.0](https://github.com/duecredit/duecredit/tree/0.1.0) (2015-06-21)
+# [0.1.0](https://github.com/duecredit/duecredit/tree/0.1.0) (2015-06-21)
 [Full Changelog](https://github.com/duecredit/duecredit/compare/0.0.0...0.1.0)
 
 **Closed issues:**
@@ -250,7 +272,7 @@
 
 - Stub tests pass [\#1](https://github.com/duecredit/duecredit/pull/1) ([mvdoc](https://github.com/mvdoc))
 
-## [0.0.0](https://github.com/duecredit/duecredit/tree/0.0.0) (2013-12-06)
+# [0.0.0](https://github.com/duecredit/duecredit/tree/0.0.0) (2013-12-06)
 
 
 \* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*
