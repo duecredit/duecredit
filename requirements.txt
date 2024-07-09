@@ -1,4 +1,0 @@
-# install everything among install_requires specified in setup.py 
-# and needed for testing
--e .[tests]
-
