@@ -29,6 +29,7 @@ from .log import lgr
 
 _PREFERRED_ENCODING = locale.getpreferredencoding()
 
+
 def get_doi_cache_file(doi):
     return os.path.join(CACHE_DIR, doi)
 
@@ -44,7 +45,6 @@ def import_doi(doi, sleep=0.5, retries=10):
             return doi
 
     # else -- fetch it
-    #headers = {'Accept': 'text/bibliography; style=bibtex'}
     headers = {'Accept': 'application/x-bibtex; charset=utf-8'}
     url = 'http://dx.doi.org/' + doi
     while retries > 0:
@@ -75,151 +75,145 @@ def import_doi(doi, sleep=0.5, retries=10):
     return bibtex
 
 
-class EnumeratedEntries(Iterator):
-    """A container of entries enumerated referenced by their entry_key"""
-    def __init__(self):
-        self._keys2refnr = {}
-        self._refnr2keys = {}
-        self._refnr = 1
-
-    def add(self, entry_key):
-        """Add entry_key and update refnr"""
-        if entry_key not in self._keys2refnr:
-            self._keys2refnr[entry_key] = self._refnr
-            self._refnr2keys[self._refnr] = entry_key
-            self._refnr += 1
-
-    def __getitem__(self, item):
-        if item not in self._keys2refnr:
-            raise KeyError('{0} not present'.format(item))
-        return self._keys2refnr[item]
-
-    def fromrefnr(self, refnr):
-        if refnr not in self._refnr2keys:
-            raise KeyError('{0} not present'.format(refnr))
-        return self._refnr2keys[refnr]
-
-    def __iter__(self):
-        return iteritems(self._keys2refnr)
-
-    # Python 3
-    def __next__(self):
-        return self.next()
-
-    def next(self):
-        yield next(self.__iter__())
-
-    def __len__(self):
-        return len(self._keys2refnr)
+def _is_contained(toppath, subpath):
+    if ':' not in toppath:
+        return ((toppath == subpath) or
+                (subpath.startswith(toppath + '.')) or
+                (subpath.startswith(toppath + ':')))
+    else:
+        return subpath.startswith(toppath + '.')
 
 
-class TextOutput(object):  # TODO some parent class to do what...?
-    def __init__(self, fd, collector, style=None):
+class Output(object):
+    """A generic class for setting up citations that then will be outputted
+    differently (e.g., Bibtex, Text, etc.)"""
+    def __init__(self, fd, collector):
         self.fd = fd
         self.collector = collector
-        # TODO: check that CLS style actually exists
+
+    def _get_collated_citations(self, tags=None, all_=None):
+        """Given all the citations, filter only those that the user wants and
+        those that were actually used"""
+        if not tags:
+            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
+        if all_ is None:
+            # consult env var
+            all_ = os.environ.get('DUECREDIT_REPORT_ALL', '').lower() in {'1', 'true', 'yes', 'on'}
+        tags = set(tags)
+
+        citations = self.collector.citations
+        if tags != {'*'}:
+            # Filter out citations based on tags
+            citations = dict((k, c)
+                             for k, c in iteritems(citations)
+                             if tags.intersection(c.tags))
+
+        packages = defaultdict(list)
+        modules = defaultdict(list)
+        objects = defaultdict(list)
+
+        # store the citations according to their path and divide them into
+        # the right level
+        for (path, entry_key), citation in iteritems(citations):
+            if ':' in path:
+                objects[path].append(citation)
+            elif '.' in path:
+                modules[path].append(citation)
+            else:
+                packages[path].append(citation)
+
+        # now we need to filter out the packages that don't have modules
+        # or objects cited, or are specifically requested
+        cited_packages = list(packages)
+        cited_modobj = list(modules) + list(objects)
+        for package in cited_packages:
+            package_citations = packages[package]
+            if all_ or \
+                any(filter(lambda x: x.cite_module, package_citations)) or \
+                any(filter(lambda x: _is_contained(package, x), cited_modobj)):
+                continue
+            else:
+                # we don't need it
+                del packages[package]
+
+        return packages, modules, objects
+
+    def dump(self, tags=None):
+        raise NotImplementedError
+
+
+
+class TextOutput(Output):
+    def __init__(self, fd, collector, style=None):
+        super(TextOutput, self).__init__(fd, collector)
         self.style = style
         if 'DUECREDIT_STYLE' in os.environ.keys():
             self.style = os.environ['DUECREDIT_STYLE']
         else:
             self.style = 'harvard1'
 
-    # TODO: refactor name to sth more intuitive
-    def _model_citations(self, tags=None):
-        if not tags:
-            tags = os.environ.get('DUECREDIT_REPORT_TAGS', 'reference-implementation,implementation').split(',')
-        tags = set(tags)
 
-        citations = self.collector.citations
-        if tags != {'*'}:
-            # Filter out citations
-            citations = dict((k, c)
-                             for k, c in iteritems(citations)
-                             if tags.intersection(c.tags))
+    @staticmethod
+    def _format_citations(citations, citation_nr):
+        descriptions = map(str, set(str(r.description) for r in citations))
+        versions = map(str, set(str(r.version) for r in citations))
+        refnrs = map(str, [citation_nr[c.entry.key] for c in citations])
+        path = citations[0].path
 
-        packages = {}
-        modules = {}
-        objects = {}
-
-        for key in ('citations', 'entry_keys'):
-            packages[key] = defaultdict(list)
-            modules[key] = defaultdict(list)
-            objects[key] = defaultdict(list)
-
-        # for each path store both a list of entry keys and of citations
-        for (path, entry_key), citation in iteritems(citations):
-            if ':' in path:
-                target_dict = objects
-            elif '.' in path:
-                target_dict = modules
-            else:
-                target_dict = packages
-            target_dict['citations'][path].append(citation)
-            target_dict['entry_keys'][path].append(entry_key)
-        return packages, modules, objects
+        return '- {0} / {1} (v {2}) [{3}]\n'.format(
+            ", ".join(descriptions), path, ', '.join(versions), ', '.join(refnrs))
 
     def dump(self, tags=None):
         # get 'model' of citations
-        packages, modules, objects = self._model_citations(tags)
-        # mapping key -> refnr
-        enum_entries = EnumeratedEntries()
+        packages, modules, objects = self._get_collated_citations(tags)
+        # put everything into a single dict
+        pmo = {}
+        pmo.update(packages)
+        pmo.update(modules)
+        pmo.update(objects)
 
-        citations_ordered = []
-        # set up view
+        # get all the paths
+        paths = sorted(list(pmo))
+        # get all the entry_keys in order
+        entry_keys = [c.entry.key for p in paths for c in pmo[p]]
+        # make a dictionary entry_key -> citation_nr
+        citation_nr = defaultdict(int)
+        refnr = 1
+        for entry_key in entry_keys:
+            if entry_key not in citation_nr:
+                citation_nr[entry_key] = refnr
+                refnr += 1
 
-        # package level
-        sublevels = [modules, objects]
-        for package in sorted(packages['entry_keys']):
-            for entry_key in packages['entry_keys'][package]:
-                enum_entries.add(entry_key)
-            citations_ordered.append(package)
-            # sublevels
-            for sublevel in sublevels:
-                for obj in sorted(filter(lambda x: package in x, sublevel['entry_keys'])):
-                    for entry_key_obj in sublevel['entry_keys'][obj]:
-                        enum_entries.add(entry_key_obj)
-                    citations_ordered.append(obj)
-
-        # Now we can "render" different views of our "model"
-        # Here for now just text BUT that is where we can "split" the logic and provide
-        # different renderings given the model -- text, rest, md, tex+latex, whatever
         self.fd.write('\nDueCredit Report:\n')
-
-        for path in citations_ordered:
-            if ':' in path:
+        start_refnr = 1
+        for path in paths:
+            # since they're lexicographically sorted by path, dependencies
+            # should be maintained
+            cit = pmo[path]
+            if ':' in path or '.' in path:
                 self.fd.write('  ')
-                target_dict = objects
-            elif '.' in path:
-                self.fd.write('  ')
-                target_dict = modules
-            else:
-                target_dict = packages
-            # TODO: absorb common logic into a common function
-            citations = target_dict['citations'][path]
-            entry_keys = target_dict['entry_keys'][path]
-            descriptions = sorted(map(str, set(str(r.description) for r in citations)))
-            versions = sorted(map(str, set(str(r.version) for r in citations)))
-            refnrs = sorted([str(enum_entries[entry_key]) for entry_key in entry_keys])
-            self.fd.write('- {0} / {1} (v {2}) [{3}]\n'.format(
-                ", ".join(descriptions), path, ', '.join(versions), ', '.join(refnrs)))
+            self.fd.write(self._format_citations(cit, citation_nr))
+            start_refnr += len(cit)
 
         # Print out some stats
-        obj_names = ('packages', 'modules', 'functions')
-        n_citations = map(len, (packages['citations'], modules['citations'], objects['citations']))
-        for citation_type, n in zip(obj_names, n_citations):
-            self.fd.write('\n{0} {1} cited'.format(n, citation_type))
-
-        if enum_entries:
-            citations_fromentrykey = self.collector._citations_fromentrykey()
+        stats = [(len(packages), 'package'),
+                 (len(modules), 'module'),
+                 (len(objects), 'function')]
+        for n, cit_type in stats:
+            self.fd.write('\n{0} {1} cited'.format(n, cit_type if n == 1
+                                                      else cit_type + 's'))
+        # now print out references
+        printed_keys = []
+        if len(pmo) > 0:
             self.fd.write('\n\nReferences\n' + '-' * 10 + '\n')
-            # collect all the entries used
-            refnr_key = [(nr, enum_entries.fromrefnr(nr)) for nr in range(1, len(enum_entries)+1)]
-            for nr, key in refnr_key:
-                self.fd.write('\n[{0}] '.format(nr))
-                citation_text = get_text_rendering(citations_fromentrykey[key], style=self.style)
-                if PY2:
-                    citation_text = citation_text.encode(_PREFERRED_ENCODING)
-                self.fd.write(citation_text)
+            for path in paths:
+                for cit in pmo[path]:
+                    ek = cit.entry.key
+                    if ek not in printed_keys:
+                        self.fd.write('\n[{0}] '.format(citation_nr[ek]))
+                        self.fd.write(get_text_rendering(cit,
+                                                        style=self.style))
+                        printed_keys.append(ek)
             self.fd.write('\n')
 
 
@@ -312,17 +306,32 @@ class PickleOutput(object):
         with open(filename, 'rb') as f:
             return pickle.load(f)
 
-class BibTeXOutput(object):  # TODO some parent class to do what...?
+class BibTeXOutput(Output):
     def __init__(self, fd, collector):
-        self.fd = fd
-        self.collector = collector
+        super(BibTeXOutput, self).__init__(fd, collector)
 
-    def dump(self):
-        for citation in self.collector.citations.values():
+    def dump(self, tags=None):
+        packages, modules, objects = self._get_collated_citations(tags)
+        # get all the citations in order
+        pmo = {}
+        pmo.update(packages)
+        pmo.update(modules)
+        pmo.update(objects)
+
+        # get all the paths
+        paths = sorted(list(pmo))
+
+        entries = []
+        for path in paths:
+            for c in pmo[path]:
+                if c.entry not in entries:
+                    entries.append(c.entry)
+
+        for entry in entries:
             try:
-                bibtex = get_bibtex_rendering(citation.entry)
+                bibtex = get_bibtex_rendering(entry)
             except:
-                lgr.warning("Failed to generate bibtex for %s" % citation.entry)
+                lgr.warning("Failed to generate bibtex for %s" % entry)
                 continue
             self.fd.write(bibtex.rawentry + "\n")
 
