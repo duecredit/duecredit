@@ -10,7 +10,7 @@
 from os import linesep
 
 from ..version import __version__
-from ..versions import ExternalVersions
+from ..versions import ExternalVersions, StrictVersion
 
 from nose.tools import assert_true, assert_false
 from nose.tools import assert_equal, assert_greater_equal, assert_greater
@@ -34,7 +34,11 @@ def test_external_versions_basic():
     assert_true('duecredit' in ev)
     assert_false('unknown' in ev)
 
-    assert_equal(ev.dumps(), "Versions: duecredit=%s" % __version__)
+    # StrictVersion might remove training .0
+    version_str = str(ev['duecredit']) \
+        if isinstance(ev['duecredit'], StrictVersion) \
+        else __version__
+    assert_equal(ev.dumps(), "Versions: duecredit=%s" % version_str)
 
     # For non-existing one we get None
     assert_equal(ev['duecreditnonexisting'], None)
@@ -55,7 +59,7 @@ def test_external_versions_basic():
     from duecredit.tests import mod
     assert_equal(ev[mod], mod.__version__)
 
-    # Check that we can get a copy of the verions
+    # Check that we can get a copy of the versions
     versions_dict = ev.versions
     versions_dict['duecredit'] = "0.0.1"
     assert_equal(versions_dict['duecredit'], "0.0.1")
@@ -65,23 +69,25 @@ def test_external_versions_basic():
 def test_external_versions_unknown():
     assert_equal(str(ExternalVersions.UNKNOWN), 'UNKNOWN')
 
+
+def _test_external(ev, modname):
+    try:
+        exec ("import %s" % modname, globals(), locals())
+    except ImportError:
+        raise SkipTest("External %s not present" % modname)
+    except Exception as e:
+        raise SkipTest("External %s fails to import: %s" % (modname, e))
+    assert (ev[modname] is not ev.UNKNOWN)
+    assert_greater(ev[modname], '0.0.1')
+    assert_greater('1000000.0', ev[modname])  # unlikely in our lifetimes
+
+
 def test_external_versions_popular_packages():
     ev = ExternalVersions()
 
-    def _test_external(modname):
-        try:
-            exec("import %s" % modname, locals(), globals())
-        except ImportError:
-            raise SkipTest("External %s not present" % modname)
-        except Exception as e:
-            raise SkipTest("External %s fails to import: %s" % (modname, e))
-        assert(ev[modname] is not ev.UNKNOWN)
-        assert_greater(ev[modname], '0.0.1')
-        assert_greater('1000000.0', ev[modname])   # unlikely in our lifetimes
-
     for modname in ('scipy', 'numpy', 'mvpa2', 'sklearn', 'statsmodels', 'pandas',
                     'matplotlib', 'psychopy'):
-        yield _test_external, modname
+        yield _test_external, ev, modname
 
     # more of a smoke test
     assert_false(linesep in ev.dumps())

@@ -11,6 +11,7 @@ from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
     CollectorSummary, Citation
 from ..entries import BibTeX, Doi
 from ..io import PickleOutput
+from ..utils import with_tempfile
 
 from mock import patch
 from nose.tools import assert_equal, assert_is_instance, assert_raises, assert_true
@@ -188,10 +189,10 @@ def _test_args_match_conditions(conds):
     #  got compound case
     assert_true(args_match_conditions(conds, scope='life'))
     assert_false(args_match_conditions(conds, scope='someother'))
-    # should be "and", so if one not matching -- both not matchin
+    # should be "and", so if one not matching -- both not matching
     assert_false(args_match_conditions(conds, method="wrong", scope='life'))
     assert_false(args_match_conditions(conds, method="purge", scope='someother'))
-    #assert_true(args_match_conditions(conds, None, None, 'life'))  # ambigous/conflicting
+    #assert_true(args_match_conditions(conds, None, None, 'life'))  # ambiguous/conflicting
 
 def test_args_match_conditions():
     yield _test_args_match_conditions, {(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'}}
@@ -271,23 +272,22 @@ def test_dcite_match_conditions_method():
 
     # now test for self.param -
 
-
-def test_get_output_handler_method():
+@with_tempfile
+def test_get_output_handler_method(f):
     with patch.dict(os.environ, {'DUECREDIT_OUTPUTS': 'pickle'}):
         entry = BibTeX(_sample_bibtex)
         collector = DueCreditCollector()
         collector.cite(entry, path='module')
 
-        with tempfile.NamedTemporaryFile() as f:
-            summary = CollectorSummary(collector, fn=f.name)
-            handlers = [summary._get_output_handler(type_, collector)
-                        for type_ in ['pickle']]
+        summary = CollectorSummary(collector, fn=f)
+        handlers = [summary._get_output_handler(type_, collector)
+                    for type_ in ['pickle']]
 
-            #assert_is_instance(handlers[0], TextOutput)
-            assert_is_instance(handlers[0], PickleOutput)
+        #assert_is_instance(handlers[0], TextOutput)
+        assert_is_instance(handlers[0], PickleOutput)
 
-            assert_raises(NotImplementedError, summary._get_output_handler,
-                          'nothing', collector)
+        assert_raises(NotImplementedError, summary._get_output_handler,
+                      'nothing', collector)
 
 
 def test_collectors_uniform_API():
