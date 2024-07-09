@@ -8,6 +8,9 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for nipy module
 """
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from ..entries import Doi
 
@@ -16,13 +19,30 @@ from ..entries import Doi
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
-    injector.add('nipy', None, Doi('10.1016/S1053-8119(09)72223-2'),
-                 description="Library fMRI data analysis",
-                 tags=['implementation'])
 
-    for f, d in [('spectral_decomposition', 'PCA decomposition of symbolic HRF shifted over time'),
-                 ('taylor_approx', 'A Taylor series approximation of an HRF shifted over time')]:
-        injector.add('nipy.modalities.fmri.fmristat.hrf', f, Doi('10.1006/nimg.2002.1096'),
-            description=d, tags=['implementation'])
+def inject(injector: DueCreditInjector) -> None:
+    injector.add(
+        "nipy",
+        None,
+        Doi("10.1016/S1053-8119(09)72223-2"),
+        description="Library fMRI data analysis",
+        tags=["implementation"],
+    )
+
+    for f, d in [
+        (
+            "spectral_decomposition",
+            "PCA decomposition of symbolic HRF shifted over time",
+        ),
+        ("taylor_approx", "A Taylor series approximation of an HRF shifted over time"),
+    ]:
+        injector.add(
+            "nipy.modalities.fmri.fmristat.hrf",
+            f,
+            Doi("10.1006/nimg.2002.1096"),
+            description=d,
+            tags=["implementation"],
+        )

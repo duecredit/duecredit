@@ -7,9 +7,11 @@
 #   under MIT license
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-""""""
+"""
+"""
+from __future__ import annotations
 
-__docformat__ = 'restructuredtext'
+__docformat__ = "restructuredtext"
 
 
 import argparse
@@ -17,16 +19,17 @@ import logging
 import os
 import sys
 import textwrap
-
-from .. import __version__
-from ..log import lgr
+from typing import Any
 
 import duecredit.cmdline as duecmd
-from . import helpers
 
+from . import helpers
+from .. import __version__
+from ..log import lgr
 from ..utils import setup_exceptionhook
 
-def _license_info():
+
+def _license_info() -> str:
     return """\
 Copyright 2015-2016 Yaroslav Halchenko, Matteo Visconti di Oleggio Castello.
 All rights reserved.
@@ -57,34 +60,40 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the copyright holder.
 """
 
-def get_commands():
-    return sorted([c for c in dir(duecmd) if c.startswith('cmd_')])
 
-def setup_parser():
+def get_commands() -> list[str]:
+    return sorted([c for c in dir(duecmd) if c.startswith("cmd_")])
+
+
+def setup_parser() -> argparse.ArgumentParser:
     # setup cmdline args parser
     # main parser
     parser = argparse.ArgumentParser(
-                    fromfile_prefix_chars='@',
-                    # usage="%(prog)s ...",
-                    description="""\
+        fromfile_prefix_chars="@",
+        # usage="%(prog)s ...",
+        description="""\
     DueCredit simplifies citation of papers describing methods, software and data used by any given analysis script/pipeline.
 
     """,
-                    epilog='"Your Credit is Due"',
-                    formatter_class=argparse.RawDescriptionHelpFormatter,
-                    add_help=False
-                )
+        epilog='"Your Credit is Due"',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        add_help=False,
+    )
     # common options
-    helpers.parser_add_common_opt(parser, 'help')
-    helpers.parser_add_common_opt(parser, 'log_level')
-    helpers.parser_add_common_opt(parser,
-                                  'version',
-                                  version='duecredit %s\n\n%s' % (__version__,
-                                                              _license_info()))
+    helpers.parser_add_common_opt(parser, "help")
+    helpers.parser_add_common_opt(parser, "log_level")
+    helpers.parser_add_common_opt(
+        parser,
+        "version",
+        version=f"duecredit {__version__}\n\n{_license_info()}",
+    )
     if __debug__:
         parser.add_argument(
-            '--dbg', action='store_true', dest='common_debug',
-            help="do not catch exceptions and show exception traceback")
+            "--dbg",
+            action="store_true",
+            dest="common_debug",
+            help="do not catch exceptions and show exception traceback",
+        )
 
     # yoh: atm we only dump to console.  Might adopt the same separation later on
     #      and for consistency will call it --verbose-level as well for now
@@ -94,12 +103,11 @@ def setup_parser():
     #                     dest='common_log_level',
     #                     help="""level of verbosity in log files. By default
     #                          everything, including debug messages is logged.""")
-    #parser.add_argument('-l', '--verbose-level',
+    # parser.add_argument('-l', '--verbose-level',
     #                    choices=('critical', 'error', 'warning', 'info', 'debug'),
     #                    dest='common_verbose_level',
     #                    help="""level of verbosity of console output. By default
     #                         only warnings and errors are printed.""")
-
 
     # subparsers
     subparsers = parser.add_subparsers()
@@ -107,66 +115,81 @@ def setup_parser():
     cmd_short_description = []
     for cmd in get_commands():
         cmd_name = cmd[4:]
-        subcmdmod = getattr(__import__('duecredit.cmdline',
-                                       globals(), locals(),
-                                       [cmd], 0),
-                            cmd)
+        subcmdmod = getattr(
+            __import__("duecredit.cmdline", globals(), locals(), [cmd], 0), cmd
+        )
         # deal with optional parser args
-        if 'parser_args' in subcmdmod.__dict__:
+        if "parser_args" in subcmdmod.__dict__:
             parser_args = subcmdmod.parser_args
         else:
             parser_args = dict()
         # use module description, if no explicit description is available
-        if not 'description' in parser_args:
-            parser_args['description'] = subcmdmod.__doc__
+        if "description" not in parser_args:
+            parser_args["description"] = subcmdmod.__doc__
         # create subparser, use module suffix as cmd name
         subparser = subparsers.add_parser(cmd_name, add_help=False, **parser_args)
         # all subparser can report the version
         helpers.parser_add_common_opt(
-                subparser, 'version',
-                version='duecredit %s %s\n\n%s' % (cmd_name, __version__,
-                                                 _license_info()))
+            subparser,
+            "version",
+            version=f"duecredit {cmd_name} {__version__}\n\n{_license_info()}",
+        )
         # our own custom help for all commands
-        helpers.parser_add_common_opt(subparser, 'help')
-        helpers.parser_add_common_opt(subparser, 'log_level')
+        helpers.parser_add_common_opt(subparser, "help")
+        helpers.parser_add_common_opt(subparser, "log_level")
         # let module configure the parser
         subcmdmod.setup_parser(subparser)
         # logger for command
 
         # configure 'run' function for this command
-        subparser.set_defaults(func=subcmdmod.run,
-                               logger=logging.getLogger('duecredit.%s' % cmd))
+        subparser.set_defaults(
+            func=subcmdmod.run, logger=logging.getLogger("duecredit.%s" % cmd)
+        )
         # store short description for later
-        sdescr = getattr(subcmdmod, 'short_description',
-                         parser_args['description'].split('\n')[0])
+        sdescr = getattr(
+            subcmdmod, "short_description", parser_args["description"].split("\n")[0]
+        )
         cmd_short_description.append((cmd_name, sdescr))
 
     # create command summary
     cmd_summary = []
     for cd in cmd_short_description:
-        cmd_summary.append('%s\n%s\n\n' \
-                           % (cd[0],
-                              textwrap.fill(cd[1], 75,
-                              initial_indent=' ' * 4,
-                              subsequent_indent=' ' * 4)))
-    parser.description = '%s\n%s\n\n%s' \
-            % (parser.description,
-               '\n'.join(cmd_summary),
-               textwrap.fill("""\
+        cmd_summary.append(
+            "%s\n%s\n\n"
+            % (
+                cd[0],
+                textwrap.fill(
+                    cd[1],
+                    75,
+                    initial_indent=" " * 4,
+                    subsequent_indent=" " * 4,
+                ),
+            )
+        )
+    parser.description = "%s\n%s\n\n%s" % (
+        parser.description,
+        "\n".join(cmd_summary),
+        textwrap.fill(
+            """\
     Detailed usage information for individual commands is
     available via command-specific help options, i.e.:
-    %s <command> --help""" % sys.argv[0],
-                                75, initial_indent='',
-                                subsequent_indent=''))
+    %s <command> --help"""
+            % sys.argv[0],
+            75,
+            initial_indent="",
+            subsequent_indent="",
+        ),
+    )
     return parser
 
-def main(args=None):
+
+def main(args: Any = None) -> None:
     parser = setup_parser()
     # parse cmd args
     args = parser.parse_args(args)
 
     # run the function associated with the selected command
-    if args.common_debug or os.environ.get('DUECREDIT_DEBUG', None):
+    if args.common_debug or os.environ.get("DUECREDIT_DEBUG", None):
         # So we could see/stop clearly at the point of failure
         setup_exceptionhook()
         args.func(args)
@@ -176,5 +199,5 @@ def main(args=None):
         try:
             args.func(args)
         except Exception as exc:
-            lgr.error('%s (%s)' % (str(exc), exc.__class__.__name__))
+            lgr.error("{} ({})".format(str(exc), exc.__class__.__name__))
             sys.exit(1)

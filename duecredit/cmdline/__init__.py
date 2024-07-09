@@ -9,7 +9,8 @@
 """
 """
 
-__docformat__ = 'restructuredtext'
+__docformat__ = "restructuredtext"
 
-from . import cmd_summary
-from . import cmd_test
+from . import cmd_summary, cmd_test
+
+__all__ = ["cmd_summary", "cmd_test"]

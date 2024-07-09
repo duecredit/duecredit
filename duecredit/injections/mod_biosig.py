@@ -8,6 +8,9 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for biosig module
 """
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from ..entries import Doi
 
@@ -16,7 +19,14 @@ from ..entries import Doi
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
-    injector.add('biosig', None, Doi("10.1109/MC.2008.407"),
-                 description="I/O library for biosignal data formats")
+
+def inject(injector: DueCreditInjector) -> None:
+    injector.add(
+        "biosig",
+        None,
+        Doi("10.1109/MC.2008.407"),
+        description="I/O library for biosignal data formats",
+    )

@@ -6,30 +6,37 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
 import atexit
+from typing import Any
+
 import pytest
+from pytest import MonkeyPatch
 
-from ..injections.injector import DueCreditInjector
 from ..dueswitch import DueSwitch, due
+from ..injections.injector import DueCreditInjector
 
 
-def test_dueswitch_activate(monkeypatch):
+def test_dueswitch_activate(monkeypatch: MonkeyPatch) -> None:
     if due.active:
-       pytest.skip("due is already active, can't test more at this point")
+        pytest.skip("due is already active, can't test more at this point")
 
+    # TODO: use TypedDict PEP 692 or a small typed object
     state = dict(activate=0, register=0, register_func=None)
 
     # Patch DueCreditInjector.activate
-    def activate_calls(*args, **kwargs):
-       state["activate"] += 1
+    def activate_calls(*_args: Any, **_kwargs: Any) -> None:
+        assert type(state["activate"]) is int
+        state["activate"] += 1
 
     monkeypatch.setattr(DueCreditInjector, "activate", activate_calls)
 
     # Patch atexit.register
-    def register(func):
-       state["register"] += 1
-       state["register_func"] = func
+    def register(func) -> None:
+        assert type(state["register"]) is int
+        state["register"] += 1
+        state["register_func"] = func
 
     monkeypatch.setattr(atexit, "register", register)
 
@@ -41,7 +48,7 @@ def test_dueswitch_activate(monkeypatch):
     assert state["register_func"] == due.dump
 
 
-def test_a_bad_one():
+def test_a_bad_one() -> None:
     # We might get neither of those and should fail
     # see https://github.com/duecredit/duecredit/issues/142
     # So let's through ValueError right away

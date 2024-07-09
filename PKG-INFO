@@ -1,3 +1,42 @@
+Metadata-Version: 2.1
+Name: duecredit
+Version: 0.10.2
+Summary: Publications (and donations) tracer
+Home-page: https://github.com/duecredit/duecredit
+Author: Yaroslav Halchenko, Matteo Visconti di Oleggio Castello
+Author-email: yoh@onerussian.com
+License: 2-clause BSD License
+Keywords: citation tracing
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: Console
+Classifier: Environment :: Other Environment
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Legal Industry
+Classifier: Intended Audience :: Other Audience
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Documentation
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: citeproc-py>=0.4
+Requires-Dist: looseversion
+Requires-Dist: packaging
+Requires-Dist: requests
+Provides-Extra: tests
+Requires-Dist: pytest; extra == "tests"
+Requires-Dist: pytest-cov; extra == "tests"
+Requires-Dist: vcrpy; extra == "tests"
+Requires-Dist: contextlib2; extra == "tests"
+
 # duecredit
 
 
