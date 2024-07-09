@@ -16,6 +16,7 @@ duecredit (0.10.2-1) UNRELEASED; urgency=medium
     - skip test_import_doi at build-time (needs internet),
       run separately with Restrictions: needs-internet in debian/tests
   * add debian/tests for debci (autopkgtest)
+    - run from installed tests dir due to use of relative path ..
   * debian/control: remove unknown field XB-Python-Egg-Name
   * debhelper compatibility level 13 (remove debian/compat)
 

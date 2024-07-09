@@ -1,9 +1,9 @@
-Test-Command: for py in `py3versions -s`; do $py -m pytest -k "not test_import_doi"; done
+Test-Command: for py in `py3versions -s`; do $py -m pytest -k "not test_import_doi" /usr/lib/python3/dist-packages/duecredit/tests; done
 Depends: python3-duecredit,
  python3-pytest,
  python3-all
 
-Test-Command: for py in `py3versions -s`; do $py -m pytest -k test_import_doi; done
+Test-Command: for py in `py3versions -s`; do $py -m pytest -k test_import_doi /usr/lib/python3/dist-packages/duecredit/tests; done
 Depends: python3-duecredit,
  python3-pytest,
  python3-all
