@@ -1,11 +1,10 @@
-import re
-
-def extract_references_from_rst(rst):
+def extract_references_from_rst(rst: str) -> None:
     # for now will be very simple, just trying to separate
     # then up until the end or another section starting
     pass
 
-def test_extract_references_from_rst():
+
+def test_extract_references_from_rst() -> None:
     # some obscure examples of how people specify references
     samples = [
         """
@@ -18,7 +17,6 @@ def test_extract_references_from_rst():
            line12
 
         """,
-
         """
     References
     ----------
@@ -27,7 +25,6 @@ def test_extract_references_from_rst():
       line2
 
         """,
-
         """
         References
         ----------
@@ -42,7 +39,6 @@ def test_extract_references_from_rst():
         Buga duga
         ---------
         """,
-
         """
         References
         ----------
@@ -52,6 +48,6 @@ def test_extract_references_from_rst():
 
         line11
         line12
-        """
-        ]
+        """,
+    ]
     extract_references_from_rst(samples[0])

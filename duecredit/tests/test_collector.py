@@ -6,19 +6,26 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
 
-from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
-    CollectorSummary, Citation
+import os
+from typing import TYPE_CHECKING, Any
+
+import pytest
+
+from ..collector import Citation, CitationKey, CollectorSummary, DueCreditCollector
 from ..dueswitch import DueSwitch
 from ..entries import BibTeX, Doi
 from ..io import PickleOutput
+from ..stub import InactiveDueCreditCollector
 
-import os
-import pytest
+if TYPE_CHECKING:
+    import py
 
 
-def _test_entry(due, entry):
+def _test_entry(due, entry) -> None:
     due.add(entry)
+
 
 _sample_bibtex = """
 @ARTICLE{XXX0,
@@ -51,7 +58,7 @@ _sample_bibtex2 = """
 _sample_doi = "10.3389/fninf.2012.00022"
 
 
-def test_citation_paths():
+def test_citation_paths() -> None:
     entry = BibTeX(_sample_bibtex)
 
     cit1 = Citation(entry, path="somemodule")
@@ -83,53 +90,55 @@ def test_citation_paths():
     assert cit4 not in cit1
 
 
-def test_entry():
+def test_entry() -> None:
     entry = BibTeX(_sample_bibtex)
     _test_entry(DueCreditCollector(), entry)
 
-    entries = [BibTeX(_sample_bibtex), BibTeX(_sample_bibtex),
-               Doi(_sample_doi)]
+    entries = [BibTeX(_sample_bibtex), BibTeX(_sample_bibtex), Doi(_sample_doi)]
     _test_entry(DueCreditCollector(), entries)
 
 
-def _test_dcite_basic(due, callable):
-    assert callable("magical", 1) == "load"
+def _test_dcite_basic(_due, func) -> None:
+    assert func("magical", 1) == "load"
     # verify that @wraps correctly passes all the docstrings etc
-    assert callable.__name__ == "method"
-    assert callable.__doc__ == "docstring"
+    assert func.__name__ == "method"
+    assert func.__doc__ == "docstring"
 
 
-def test_dcite_method():
+def test_dcite_method() -> None:
     # Test basic wrapping that we don't mask out the arguments
     for due in [DueCreditCollector(), InactiveDueCreditCollector()]:
+        assert isinstance(due, (DueCreditCollector, InactiveDueCreditCollector))
         active = isinstance(due, DueCreditCollector)
         due.add(BibTeX(_sample_bibtex))
 
-        @due.dcite("XXX0", path='method')
-        def method(arg1, kwarg2="blah"):
+        @due.dcite("XXX0", path="method")
+        def method(arg1: str, kwarg2: str = "blah") -> str:
             """docstring"""
             assert arg1 == "magical"
             assert kwarg2 == 1
             return "load"
 
-        class SomeClass(object):
-            @due.dcite("XXX0", path='someclass:method')
-            def method(self, arg1, kwarg2="blah"):
+        class SomeClass:
+            @due.dcite("XXX0", path="someclass:method")  # type: ignore
+            def method(self, arg1: str, kwarg2: str = "blah") -> str:
                 """docstring"""
                 assert arg1 == "magical"
                 assert kwarg2 == 1
                 return "load"
 
         if active:
+            assert isinstance(due, DueCreditCollector)
             assert due.citations == {}
             assert len(due._entries) == 1
 
         _test_dcite_basic(due, method)
 
         if active:
+            assert isinstance(due, DueCreditCollector)
             assert len(due.citations) == 1
             assert len(due._entries) == 1
-            citation = due.citations[("method", "XXX0")]
+            citation = due.citations[CitationKey("method", "XXX0")]
             assert citation.count == 1
             # TODO: this is probably incomplete path but unlikely we would know
             # any better
@@ -139,20 +148,21 @@ def test_dcite_method():
         _test_dcite_basic(due, instance.method)
 
         if active:
+            assert isinstance(due, DueCreditCollector)
             assert len(due.citations) == 2
             assert len(due._entries) == 1
             # TODO: we should actually get path/counts pairs so here
-            citation = due.citations[("someclass:method", "XXX0")]
+            citation = due.citations[CitationKey("someclass:method", "XXX0")]
             assert citation.path == "someclass:method"
             assert citation.count == 1
 
             # And we explicitly stated that module need to be cited
             assert citation.cite_module
 
-        class SomeClass2(object):
+        class SomeClass2:
             # Used to test for classes that are not instantiated
-            @due.dcite("XXX0", path="some.module.without.method")
-            def method2(self, arg1, kwarg2="blah"):
+            @due.dcite("XXX0", path="some.module.without.method")  # type: ignore
+            def method2(self, arg1, kwarg2="blah"):  # noqa: U100
                 assert arg1 == "magical"
                 return "load"
 
@@ -161,6 +171,7 @@ def test_dcite_method():
 
         _test_dcite_basic(due, instance2.method)
         if active:
+            assert isinstance(due, DueCreditCollector)
             assert len(due.citations) == 2  # different paths
             assert len(due._entries) == 1  # the same entry
             # TODO: we should actually get path/counts pairs so here
@@ -169,137 +180,156 @@ def test_dcite_method():
             assert citation.cite_module
 
 
-def _test_args_match_conditions(conds):
+def _test_args_match_conditions(conds: dict[tuple[int, str], set[str]]) -> None:
     args_match_conditions = DueCreditCollector._args_match_conditions
     assert args_match_conditions(conds)
     assert args_match_conditions(conds, None)
     assert args_match_conditions(conds, someirrelevant=True)
-    assert args_match_conditions(conds, method='purge')
-    assert args_match_conditions(conds, method='fullpurge')
-    assert args_match_conditions(conds, None, 'purge')
-    assert args_match_conditions(conds, None, 'fullpurge')
-    assert args_match_conditions(conds, None, 'fullpurge', someirrelevant="buga")
-    assert not args_match_conditions(conds, None, 'push')
-    assert not args_match_conditions(conds, method='push')
+    assert args_match_conditions(conds, method="purge")
+    assert args_match_conditions(conds, method="fullpurge")
+    assert args_match_conditions(conds, None, "purge")
+    assert args_match_conditions(conds, None, "fullpurge")
+    assert args_match_conditions(conds, None, "fullpurge", someirrelevant="buga")
+    assert not args_match_conditions(conds, None, "push")
+    assert not args_match_conditions(conds, method="push")
     if len(conds) < 2:
         return
     #  got compound case
-    assert args_match_conditions(conds, scope='life')
-    assert not args_match_conditions(conds, scope='someother')
+    assert args_match_conditions(conds, scope="life")
+    assert not args_match_conditions(conds, scope="someother")
     # should be "and", so if one not matching -- both not matching
-    assert not args_match_conditions(conds, method="wrong", scope='life')
-    assert not args_match_conditions(conds, method="purge", scope='someother')
+    assert not args_match_conditions(conds, method="wrong", scope="life")
+    assert not args_match_conditions(conds, method="purge", scope="someother")
     # assert args_match_conditions(conds, None, None, 'life')  # ambiguous/conflicting
 
 
-def test_args_match_conditions():
-    _test_args_match_conditions({(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'}})
-    _test_args_match_conditions({(1, 'method'): {'purge', 'fullpurge', 'DC_DEFAULT'},
-                                 (2, 'scope'): {'life', 'DC_DEFAULT'}})
+def test_args_match_conditions() -> None:
+    _test_args_match_conditions({(1, "method"): {"purge", "fullpurge", "DC_DEFAULT"}})
+    _test_args_match_conditions(
+        {
+            (1, "method"): {"purge", "fullpurge", "DC_DEFAULT"},
+            (2, "scope"): {"life", "DC_DEFAULT"},
+        }
+    )
 
 
-def _test_dcite_match_conditions(due, callable, path):
+def _test_dcite_match_conditions(due, func, path: str) -> None:
     assert due.citations == {}
     assert len(due._entries) == 1
 
-    assert callable("magical", "unknown") == "load unknown"
+    assert func("magical", "unknown") == "load unknown"
     assert due.citations == {}
     assert len(due._entries) == 1
 
-    assert callable("magical") == "load blah"
+    assert func("magical") == "load blah"
 
     assert len(due.citations) == 1
     assert len(due._entries) == 1
-    entry = due._entries['XXX0']
-    assert due.citations[(path, 'XXX0')].count == 1
+    entry = due._entries["XXX0"]  # noqa: F841
+    assert due.citations[(path, "XXX0")].count == 1
 
     # Cause the same citation
-    assert callable("magical", "blah") == "load blah"
+    assert func("magical", "blah") == "load blah"
     # Nothing should change
     assert len(due.citations) == 1
     assert len(due._entries) == 1
-    assert due.citations[(path, 'XXX0')].count == 2  # Besides the count
+    assert due.citations[(path, "XXX0")].count == 2  # Besides the count
 
     # Now cause new citation given another value
-    assert callable("magical", "boo") == "load boo"
+    assert func("magical", "boo") == "load boo"
     assert len(due.citations) == 2
     assert len(due._entries) == 2
-    assert due.citations[(path, 'XXX0')].count == 2  # Count should stay the same for XXX0
-    assert due.citations[(path, "10.3389/fninf.2012.00022")].count == 1  # but we get a new one
+    assert (
+        due.citations[(path, "XXX0")].count == 2
+    )  # Count should stay the same for XXX0
+    assert (
+        due.citations[(path, "10.3389/fninf.2012.00022")].count == 1
+    )  # but we get a new one
 
 
-def test_dcite_match_conditions_function():
+def test_dcite_match_conditions_function() -> None:
     due = DueCreditCollector()
     due.add(BibTeX(_sample_bibtex))
 
-    @due.dcite("XXX0", path='callable',
-               conditions={(1, "kwarg2"): {"blah", "DC_DEFAULT"}})
-    @due.dcite(Doi(_sample_doi), path='callable',
-               conditions={(1, "kwarg2"): {"boo"}})
-    def method(arg1, kwarg2="blah"):
+    @due.dcite(
+        "XXX0", path="callable", conditions={(1, "kwarg2"): {"blah", "DC_DEFAULT"}}
+    )
+    @due.dcite(Doi(_sample_doi), path="callable", conditions={(1, "kwarg2"): {"boo"}})
+    def method(arg1: str, kwarg2: str = "blah") -> str:
         """docstring"""
         assert arg1 == "magical"
         return "load %s" % kwarg2
 
-    _test_dcite_match_conditions(due, method, 'callable')
+    _test_dcite_match_conditions(due, method, "callable")
 
 
-def test_dcite_match_conditions_method():
-
+def test_dcite_match_conditions_method() -> None:
     due = DueCreditCollector()
     due.add(BibTeX(_sample_bibtex))
 
-    class Citeable(object):
-        def __init__(self, param=None):
+    class Citeable:
+        def __init__(self, param: str | None = None) -> None:
             self.param = param
 
-        @due.dcite("XXX0", path='obj.callable',
-                   conditions={(2, "kwarg2"): {"blah", "DC_DEFAULT"},
-                               (0, 'self.param'): {"paramvalue"}  # must be matched
-                               })
-        @due.dcite(Doi(_sample_doi), path='obj.callable',
-                   conditions={(2, "kwarg2"): {"boo"}})
-        def method(self, arg1, kwarg2="blah"):
+        @due.dcite(
+            "XXX0",
+            path="obj.callable",
+            conditions={
+                (2, "kwarg2"): {"blah", "DC_DEFAULT"},
+                (0, "self.param"): {"paramvalue"},  # must be matched
+            },
+        )
+        @due.dcite(
+            Doi(_sample_doi), path="obj.callable", conditions={(2, "kwarg2"): {"boo"}}
+        )
+        def method(self, arg1: str, kwarg2: str = "blah") -> str:
             """docstring"""
             assert arg1 == "magical"
             return "load %s" % kwarg2
 
     citeable = Citeable(param="paramvalue")
-    _test_dcite_match_conditions(due, citeable.method, 'obj.callable')
+    _test_dcite_match_conditions(due, citeable.method, "obj.callable")
 
     # now test for self.param -
 
 
-def test_get_output_handler_method(tmpdir, monkeypatch):
+def test_get_output_handler_method(tmpdir: py.path.local, monkeypatch) -> None:
     tempfile = str(tmpdir.mkdir("sub").join("tempfile.txt"))
-    monkeypatch.setitem(os.environ, 'DUECREDIT_OUTPUTS', 'pickle')
+    monkeypatch.setitem(os.environ, "DUECREDIT_OUTPUTS", "pickle")
     entry = BibTeX(_sample_bibtex)
     collector = DueCreditCollector()
-    collector.cite(entry, path='module')
+    collector.cite(entry, path="module")
 
     summary = CollectorSummary(collector, fn=tempfile)
-    handlers = [summary._get_output_handler(type_, collector)
-                for type_ in ['pickle']]
+    handlers = [summary._get_output_handler(type_, collector) for type_ in ["pickle"]]
 
     # assert isinstance(handlers[0], TextOutput)
     assert isinstance(handlers[0], PickleOutput)
 
-    pytest.raises(NotImplementedError, summary._get_output_handler,
-                  'nothing', collector)
+    pytest.raises(
+        NotImplementedError, summary._get_output_handler, "nothing", collector
+    )
 
 
-def test_collectors_uniform_api():
-    get_api = lambda objs: [x for x in sorted(sum((dir(obj) for obj in objs), []))
-                           if not x.startswith('_') or x in '__call__']
-    assert get_api([DueCreditCollector, DueSwitch]) == get_api([InactiveDueCreditCollector])
+def test_collectors_uniform_api() -> None:
+    def get_api(objs) -> list[str]:
+        return [
+            x
+            for x in sorted(sum((dir(obj) for obj in objs), []))
+            if not x.startswith("_") or x in "__call__"
+        ]
+
+    assert get_api([DueCreditCollector, DueSwitch]) == get_api(
+        [InactiveDueCreditCollector]
+    )
 
 
-def _test__docs__(method):
+def _test__docs__(method: Any) -> None:
     assert "entry:" in method.__doc__
     assert "tags: " in method.__doc__
 
 
-def test__docs__():
+def test__docs__() -> None:
     _test__docs__(DueCreditCollector.cite)
     _test__docs__(DueCreditCollector.dcite)
     _test__docs__(Citation.__init__)

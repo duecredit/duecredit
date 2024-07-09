@@ -8,17 +8,27 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for numpy module
 """
+from __future__ import annotations
 
-from ..entries import Doi, BibTeX
+from typing import TYPE_CHECKING
+
+from ..entries import BibTeX
 
 # If defined, would determine from which to which version of the corresponding
 # module to care about
 min_version = None
 max_version = None
 
+if TYPE_CHECKING:
+    from .injector import DueCreditInjector
 
-def inject(injector):
-    injector.add('numpy', None, BibTeX(r"""
+
+def inject(injector: DueCreditInjector) -> None:
+    injector.add(
+        "numpy",
+        None,
+        BibTeX(
+            r"""
     @article{van2011numpy,
         title={The NumPy array: a structure for efficient numerical computation},
         author={Van Der Walt, Stefan and Colbert, S Chris and Varoquaux, Gael},
@@ -30,7 +40,9 @@ def inject(injector):
         publisher={AIP Publishing},
         doi={10.1109/MCSE.2011.37}
         }
-    """),
-    tags=['implementation'],
-    cite_module=True,
-    description="Scientific tools library")
+    """
+        ),
+        tags=["implementation"],
+        cite_module=True,
+        description="Scientific tools library",
+    )

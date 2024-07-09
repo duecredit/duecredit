@@ -7,38 +7,45 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Helper to use duecredit as a "runnable" module with  -m duecredit"""
+from __future__ import annotations
 
 import sys
-from . import due, __version__
+
+from . import __version__, due
 from .log import lgr
 
+
 def usage(outfile, executable=sys.argv[0]):
-    if '__main__.py' in executable:
+    if "__main__.py" in executable:
         # That was -m duecredit way to launch
         executable = "%s -m duecredit" % sys.executable
-    outfile.write("""Usage: %s [OPTIONS] <file> [ARGS]
+    outfile.write(
+        """Usage: %s [OPTIONS] <file> [ARGS]
 
 Meta-options:
 --help                Display this help then exit.
 --version             Output version information then exit.
-""" % executable)
+"""
+        % executable
+    )
 
 
-def runctx(cmd, globals=None, locals=None):
-    if globals is None:
-        globals = {}
-    if locals is None:
-        locals = {}
+def runctx(cmd, global_ctx=None, local_ctx=None):
+    if global_ctx is None:
+        global_ctx = {}
+    if local_ctx is None:
+        local_ctx = {}
 
     try:
-        exec(cmd, globals, locals)
+        exec(cmd, global_ctx, local_ctx)
     finally:
         # good opportunity to avoid atexit I guess. pass for now
         pass
 
+
 def main(argv=None):
-    import os
     import getopt
+    import os
 
     if argv is None:
         argv = sys.argv
@@ -49,15 +56,13 @@ def main(argv=None):
         # probably needs to hook in somehow into commands/options available
         # under cmdline/
     except getopt.error as msg:
-        sys.stderr.write("%s: %s\n" % (sys.argv[0], msg))
-        sys.stderr.write("Try `%s --help' for more information\n"
-                         % sys.argv[0])
+        sys.stderr.write("{}: {}\n".format(sys.argv[0], msg))
+        sys.stderr.write("Try `%s --help' for more information\n" % sys.argv[0])
         sys.exit(1)
-
 
     # and now we need to execute target script "manually"
     # Borrowing up on from trace.py
-    for opt, val in opts:
+    for opt, _ in opts:
         if opt == "--help":
             usage(sys.stdout, executable=argv[0])
             sys.exit(0)
@@ -72,23 +77,24 @@ def main(argv=None):
 
     try:
         with open(progname) as fp:
-            code = compile(fp.read(), progname, 'exec')
+            code = compile(fp.read(), progname, "exec")
         # try to emulate __main__ namespace as much as possible
         globs = {
-            '__file__': progname,
-            '__name__': '__main__',
-            '__package__': None,
-            '__cached__': None,
+            "__file__": progname,
+            "__name__": "__main__",
+            "__package__": None,
+            "__cached__": None,
         }
         # Since used explicitly -- activate the beast
         due.activate(True)
         runctx(code, globs, globs)
         # TODO: see if we could hide our presence from the final tracebacks if execution fails
-    except IOError as err:
-        lgr.error("Cannot run file %r because: %s" % (sys.argv[0], err))
+    except OSError as err:
+        lgr.error("Cannot run file {!r} because: {}".format(sys.argv[0], err))
         sys.exit(1)
     except SystemExit:
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -6,52 +6,54 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+from __future__ import annotations
+
 """Module to help maintain a registry of versions for external modules etc
 """
-import sys
+from collections.abc import KeysView
+from importlib.metadata import version as metadata_version
 from os import linesep
-from six import string_types
+import sys
+from types import ModuleType
+from typing import Any
 
-from distutils.version import StrictVersion, LooseVersion
-
-try:
-    from importlib.metadata import version as metadata_version
-except ImportError:
-    from importlib_metadata import version as metadata_version
+from looseversion import LooseVersion
+from packaging.version import Version
 
 
 # To depict an unknown version, which can't be compared by mistake etc
 class UnknownVersion:
-    """For internal use
-    """
+    """For internal use"""
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "UNKNOWN"
 
-    def __cmp__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if other is self:
-            return 0
+            return True
         raise TypeError("UNKNOWN version is not comparable")
 
 
-class ExternalVersions(object):
+class ExternalVersions:
     """Helper to figure out/use versions of the external modules.
 
-    It maintains a dictionary of `distuil.version.StrictVersion`s to make
-    comparisons easy.  If version string doesn't conform the StrictVersion
-    LooseVersion will be used.  If version can't be deduced for the module,
+    It maintains a dictionary of `packaging.version.Version`s to make
+    comparisons easy.  If a version string doesn't conform to Version,
+    LooseVersion will be used.  If a version can't be deduced for a module,
     'None' is assigned
     """
 
     UNKNOWN = UnknownVersion()
 
-    def __init__(self):
-        self._versions = {}
+    def __init__(self) -> None:
+        self._versions: dict[str, Version | LooseVersion | UnknownVersion] = {}
 
     @classmethod
-    def _deduce_version(klass, module):
+    def _deduce_version(
+        klass, module: ModuleType
+    ) -> Version | LooseVersion | UnknownVersion:
         version = None
-        for attr in ('__version__', 'version'):
+        for attr in ("__version__", "version"):
             if hasattr(module, attr):
                 version = getattr(module, attr)
                 break
@@ -68,24 +70,26 @@ class ExternalVersions(object):
             modname = module.__name__
             try:
                 version = metadata_version(
-                    {'citeproc': 'citeproc-py'}.get(modname, modname)
+                    {"citeproc": "citeproc-py"}.get(modname, modname)
                 )
             except Exception:
                 pass  # oh well - no luck either
 
         if version:
             try:
-                return StrictVersion(version)
+                return Version(version)
             except ValueError:
                 # let's then go with Loose one
                 return LooseVersion(version)
         else:
             return klass.UNKNOWN
 
-    def __getitem__(self, module):
+    def __getitem__(
+        self, module: Any
+    ) -> Version | LooseVersion | UnknownVersion | None:
         # when ran straight in its source code -- fails to discover nipy's version.. TODO
-        #if module == 'nipy':
-        if not isinstance(module, string_types):
+        # if module == 'nipy':
+        if not isinstance(module, str):
             modname = module.__name__
         else:
             modname = module
@@ -105,19 +109,19 @@ class ExternalVersions(object):
 
         return self._versions.get(modname, self.UNKNOWN)
 
-    def keys(self):
+    def keys(self) -> KeysView[str]:
         """Return names of the known modules"""
         return self._versions.keys()
 
-    def __contains__(self, item):
+    def __contains__(self, item: str) -> bool:
         return item in self._versions
 
     @property
-    def versions(self):
+    def versions(self) -> dict[str, Version | LooseVersion | UnknownVersion]:
         """Return dictionary (copy) of versions"""
         return self._versions.copy()
 
-    def dumps(self, indent=False, preamble="Versions:"):
+    def dumps(self, indent: bool | str = False, preamble: str = "Versions:") -> str:
         """Return listing of versions as a string
 
         Parameters
@@ -128,14 +132,13 @@ class ExternalVersions(object):
         preamble: str, optional
           What preamble to the listing to use
         """
-        if indent and (indent is True):
-            indent = ' '
-        items = ["%s=%s" % (k, self._versions[k]) for k in sorted(self._versions)]
+        items = ["{}={}".format(k, self._versions[k]) for k in sorted(self._versions)]
         out = "%s" % preamble
         if indent:
-            out += (linesep + indent).join([''] + items) + linesep
+            indent_ = " " if indent is True else indent
+            out += (linesep + indent_).join([""] + items) + linesep
         else:
-            out += " " + ' '.join(items)
+            out += " " + " ".join(items)
         return out
 
 

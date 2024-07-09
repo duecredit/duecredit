@@ -1,3 +1,117 @@
+# 0.10.2 (Tue Jun 04 2024)
+
+#### 🐛 Bug Fix
+
+- Do not bother testing with psychopy installed [#216](https://github.com/duecredit/duecredit/pull/216) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 1
+
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
+# 0.10.1 (Fri May 17 2024)
+
+#### 🐛 Bug Fix
+
+- Fix assertion placement + test on CI having numpy installed in a separate matrix run [#215](https://github.com/duecredit/duecredit/pull/215) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 1
+
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
+# 0.10.0 (Mon May 13 2024)
+
+#### 🚀 Enhancement
+
+- Log to stderr not stdout by default [#213](https://github.com/duecredit/duecredit/pull/213) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### 🐛 Bug Fix
+
+- Update README.md [#212](https://github.com/duecredit/duecredit/pull/212) ([@marcelzwiers](https://github.com/marcelzwiers))
+- add more type annotations [#209](https://github.com/duecredit/duecredit/pull/209) ([@a-detiste](https://github.com/a-detiste))
+- Stop using distutils; test against Python 3.12 [#207](https://github.com/duecredit/duecredit/pull/207) ([@jwodder](https://github.com/jwodder))
+- Remove use of importlib.metadata backport [#208](https://github.com/duecredit/duecredit/pull/208) ([@jwodder](https://github.com/jwodder))
+- Add & apply pre-commit with black and isort [#199](https://github.com/duecredit/duecredit/pull/199) ([@jwodder](https://github.com/jwodder) [@yarikoptic](https://github.com/yarikoptic))
+- Apply and conform to better linting [#197](https://github.com/duecredit/duecredit/pull/197) ([@jwodder](https://github.com/jwodder) [@yarikoptic](https://github.com/yarikoptic))
+- raise, do not return some NotImplemented if type is other than what we can compare [#206](https://github.com/duecredit/duecredit/pull/206) ([@yarikoptic](https://github.com/yarikoptic))
+- Stop executing `setup.py` [#198](https://github.com/duecredit/duecredit/pull/198) ([@jwodder](https://github.com/jwodder) [@yarikoptic](https://github.com/yarikoptic))
+- Better coverage config [#200](https://github.com/duecredit/duecredit/pull/200) ([@jwodder](https://github.com/jwodder))
+- Use Dependabot to update GitHub Actions versions [#201](https://github.com/duecredit/duecredit/pull/201) ([@jwodder](https://github.com/jwodder))
+- Don't `pip install codecov` [#202](https://github.com/duecredit/duecredit/pull/202) ([@jwodder](https://github.com/jwodder))
+- Remove mutable default argument [#196](https://github.com/duecredit/duecredit/pull/196) ([@jwodder](https://github.com/jwodder))
+- misc. move typing improvements, WIP [#195](https://github.com/duecredit/duecredit/pull/195) ([@a-detiste](https://github.com/a-detiste))
+- Drop python 3.6 and 3.7 and pyupgrade to 3.8 [#194](https://github.com/duecredit/duecredit/pull/194) ([@yarikoptic](https://github.com/yarikoptic))
+- Improve type annotation of codebase, add CI for mypy, fix a string format in test [#191](https://github.com/duecredit/duecredit/pull/191) ([@a-detiste](https://github.com/a-detiste) [@yarikoptic](https://github.com/yarikoptic))
+- This super simple PR allows programmers to more easily create (manage) pipeline specific .duecredit.p files / reports [#193](https://github.com/duecredit/duecredit/pull/193) ([@marcelzwiers](https://github.com/marcelzwiers))
+
+#### ⚠️ Pushed to `master`
+
+- Revert "raise, do not return some NotImplemented if type is other than what we can compare" ([@yarikoptic](https://github.com/yarikoptic))
+
+#### 🏠 Internal
+
+- [gh-actions](deps): Bump actions/setup-python from 4 to 5 [#210](https://github.com/duecredit/duecredit/pull/210) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- [gh-actions](deps): Bump codespell-project/actions-codespell from 1 to 2 [#203](https://github.com/duecredit/duecredit/pull/203) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- [gh-actions](deps): Bump actions/checkout from 2 to 4 [#204](https://github.com/duecredit/duecredit/pull/204) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+- [gh-actions](deps): Bump actions/setup-python from 2 to 4 [#205](https://github.com/duecredit/duecredit/pull/205) ([@dependabot[bot]](https://github.com/dependabot[bot]))
+
+#### 📝 Documentation
+
+- Add some more `cite()` information to the README.md [#192](https://github.com/duecredit/duecredit/pull/192) ([@marcelzwiers](https://github.com/marcelzwiers))
+
+#### Authors: 5
+
+- [@dependabot[bot]](https://github.com/dependabot[bot])
+- Alexandre Detiste ([@a-detiste](https://github.com/a-detiste))
+- John T. Wodder II ([@jwodder](https://github.com/jwodder))
+- Marcel Zwiers ([@marcelzwiers](https://github.com/marcelzwiers))
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
+# 0.9.3 (Sun Nov 12 2023)
+
+#### 🐛 Bug Fix
+
+- ENH: codespell [#185](https://github.com/duecredit/duecredit/pull/185) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### 🏠 Internal
+
+- RF: remove remaining usage of SIX, and thus move away fully from Python 2 [#186](https://github.com/duecredit/duecredit/pull/186) ([@a-detiste](https://github.com/a-detiste) [@yarikoptic](https://github.com/yarikoptic))
+- Ignore "vor" which is now detected as typo [#186](https://github.com/duecredit/duecredit/pull/186) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### 🧪 Tests
+
+- Use teardown_method instead of nose-y teardown [#190](https://github.com/duecredit/duecredit/pull/190) ([@yarikoptic](https://github.com/yarikoptic))
+- Move from Travis to github workflow, disable coveralls [#187](https://github.com/duecredit/duecredit/pull/187) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 2
+
+- Alexandre Detiste ([@a-detiste](https://github.com/a-detiste))
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
+# 0.9.2 (Wed Feb 01 2023)
+
+#### 🐛 Bug Fix
+
+- Tell LGTM to ignore unused imports in stub.py [#179](https://github.com/duecredit/duecredit/pull/179) ([@jwodder](https://github.com/jwodder))
+
+#### 🏠 Internal
+
+- Make Debian Python version PEP440 compliant [#184](https://github.com/duecredit/duecredit/pull/184) ([@bdrung](https://github.com/bdrung))
+
+#### Authors: 2
+
+- Benjamin Drung ([@bdrung](https://github.com/bdrung))
+- John T. Wodder II ([@jwodder](https://github.com/jwodder))
+
+---
+
 # 0.9.1 (Tue Apr 13 2021)
 
 #### 🐛 Bug Fix
@@ -35,7 +149,7 @@
 
 - Prevent warnings from the injector's `__del__`.
 - InactiveDueCollector in `stub.py` now provides also `active=False`
-  attribute (so external tools could directly query if duecredit is 
+  attribute (so external tools could directly query if duecredit is
   active) and no-op `activate` and `dump` for consistent API with a
   `due` object whenever `duecredit` is available.
 - Provide `Text` citation entry for free form text. It does not have any

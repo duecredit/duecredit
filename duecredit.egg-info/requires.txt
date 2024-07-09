@@ -1,0 +1,10 @@
+citeproc-py>=0.4
+looseversion
+packaging
+requests
+
+[tests]
+pytest
+pytest-cov
+vcrpy
+contextlib2
