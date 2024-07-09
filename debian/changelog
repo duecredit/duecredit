@@ -7,6 +7,9 @@ duecredit (0.10.2-1) UNRELEASED; urgency=medium
       at http://snapshot.debian.org/package/duecredit/
     - update debian/gbp.conf
   * update debian/watch to version 4 @ANY_VERSION@@ARCHIVE_EXT@
+  * update Build-Depends
+    - add python3-looseversion, python3-pytest-cov
+    - drop python3-mock, python3-six
   * drop debian patches (applied upstream)
   * run tests from toplevel since many fail from build_dir
     - skip test_injector_del at build time. It passes at runtime.

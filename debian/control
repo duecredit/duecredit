@@ -9,10 +9,10 @@ Build-Depends: debhelper-compat (= 13), dh-python,
                python3-setuptools,
                python3-citeproc,
                python3-contextlib2,
-               python3-mock,
+               python3-looseversion,
                python3-pytest,
+               python3-pytest-cov,
                python3-requests,
-               python3-six,
 Standards-Version: 3.9.6
 Homepage: https://github.com/duecredit/duecredit
 
