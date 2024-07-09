@@ -1,3 +1,12 @@
+duecredit (0.9.1-2) UNRELEASED; urgency=medium
+
+  * move duecredit to the Debian Python Team
+    - add Drew Parsons as Uploader
+    - git repo created using gbp import-dsc from .dsc files
+      at http://snapshot.debian.org/package/duecredit/
+
+ -- Drew Parsons <dparsons@debian.org>  Tue, 09 Jul 2024 12:14:52 +0200
+
 duecredit (0.9.1-1.1) unstable; urgency=medium
 
   * Non-maintainer upload.
