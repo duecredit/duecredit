@@ -9,6 +9,7 @@
 
 from ..collector import DueCreditCollector, InactiveDueCreditCollector, \
     CollectorSummary, Citation
+from ..dueswitch import DueSwitch
 from ..entries import BibTeX, Doi
 from ..io import PickleOutput
 
@@ -37,7 +38,7 @@ _sample_bibtex2 = """
 @ARTICLE{Atkins_2002,
   title = {title},
   volume = {666},
-  url = {http://dx.doi.org/10.1038/nrd842},
+  url = {https://doi.org/10.1038/nrd842},
   DOI = {10.1038/nrd842},
   number = {3009},
   journal = {My Fancy. Journ.},
@@ -288,9 +289,9 @@ def test_get_output_handler_method(tmpdir, monkeypatch):
 
 
 def test_collectors_uniform_api():
-    get_api = lambda obj: [x for x in sorted(dir(obj))
+    get_api = lambda objs: [x for x in sorted(sum((dir(obj) for obj in objs), []))
                            if not x.startswith('_') or x in '__call__']
-    assert get_api(DueCreditCollector) == get_api(InactiveDueCreditCollector)
+    assert get_api([DueCreditCollector, DueSwitch]) == get_api([InactiveDueCreditCollector])
 
 
 def _test__docs__(method):
