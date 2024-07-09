@@ -2,6 +2,7 @@ duecredit (0.10.2-1) UNRELEASED; urgency=medium
 
   * New upstream release.
   * move duecredit to the Debian Python Team
+    - debian repo https://salsa.debian.org/python-team/packages/duecredit
     - add Drew Parsons as Uploader
     - git repo created using gbp import-dsc from .dsc files
       at http://snapshot.debian.org/package/duecredit/
