@@ -11,8 +11,10 @@ duecredit (0.10.2-1) UNRELEASED; urgency=medium
     - add python3-looseversion, python3-pytest-cov
     - drop python3-mock, python3-six
   * drop debian patches (applied upstream)
-  * run tests from toplevel since many fail from build_dir
+  * run tests from toplevel (since many fail from build_dir)
     - skip test_injector_del at build time. It passes at runtime.
+    - skip test_import_doi at build-time (needs internet),
+      run separately with Restrictions: needs-internet in debian/tests
   * add debian/tests for debci (autopkgtest)
   * debian/control: remove unknown field XB-Python-Egg-Name
   * debhelper compatibility level 13 (remove debian/compat)

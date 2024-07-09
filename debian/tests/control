@@ -1,4 +1,10 @@
-Test-Command: for py in `py3versions -s`; do $py -m pytest; done
+Test-Command: for py in `py3versions -s`; do $py -m pytest -k "not test_import_doi"; done
 Depends: python3-duecredit,
  python3-pytest,
  python3-all
+
+Test-Command: for py in `py3versions -s`; do $py -m pytest -k test_import_doi; done
+Depends: python3-duecredit,
+ python3-pytest,
+ python3-all
+Restrictions: needs-internet
