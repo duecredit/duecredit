@@ -7,6 +7,7 @@ duecredit (0.10.2-1) UNRELEASED; urgency=medium
       at http://snapshot.debian.org/package/duecredit/
     - update debian/gbp.conf
   * update debian/watch to version 4 @ANY_VERSION@@ARCHIVE_EXT@
+  * drop debian patches (applied upstream)
 
  -- Drew Parsons <dparsons@debian.org>  Tue, 09 Jul 2024 12:14:52 +0200
 
