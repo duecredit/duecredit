@@ -1,0 +1,12 @@
+__pycache__
+*.py[co]
+/build
+/dist
+/MANIFEST
+/duecredit/version.py
+/venv*
+/.tox
+.duecredit.p
+.coverage
+*.egg-info
+/duecredit/tests/test_import_doi

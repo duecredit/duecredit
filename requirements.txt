@@ -1,0 +1,7 @@
+mock
+nose>=1.3.4
+vcrpy
+contextlib2
+requests
+citeproc-py
+six

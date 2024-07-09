@@ -1,0 +1,42 @@
+# vim ft=yaml
+# travis-ci.org definition for DueCredit build
+language: python
+sudo: false
+python:
+  - "2.7"
+#  - "3.2"
+  - "3.3"
+  - "3.4"
+#  - "pypy"
+#  - "pypy3"
+before_install:
+  # - if [[ $TRAVIS_PYTHON_VERSION == 2.7 ]]; then travis_retry sudo apt-get update -qq; fi
+
+git:
+  depth: 99999
+
+install:
+  - if [[ $TRAVIS_PYTHON_VERSION == pypy ]] ; then dpkg --compare-versions $(pypy --version 2>&1 | awk '/PyPy/{print $2;}') ge 2.5.1 || { d=$PWD; cd /tmp; wget --no-check-certificate https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.1-linux64.tar.bz2; tar -xjvf pypy*bz2; cd pypy-*/bin/; export PATH=$PWD:$PATH; cd $d; } ; fi
+  - travis_retry pip install -q coveralls 
+  - pip install -r requirements.txt
+  - python setup.py --help # just to trigger generation of .version
+  - pip install -e .
+
+script:
+  - nosetests --with-doctest --with-cov --cover-package duecredit --logging-level=INFO -v
+  - python setup.py install  # test installation
+
+after_success:
+  - coveralls
+
+deploy:
+  provider: pypi
+  distributions: sdist
+  user: yarikoptic
+  password:
+    secure: mTxbioGS+sdfxnJRbAGZCxjWlaGJx+KqXPfYGESKcg6IVaSUM9D4CUhxgHHW88FYSnkmCvwuu57w7AAot9FyG6Q/1q656gluCbEJzfDJerSH1S06HqAEmjSPJvIEG/zwvPIUm3RPc+8j9XtedztM3aVWkqBHAzvUzEnsX1jJpic=
+  on:
+    tags: true
+    branch: master
+    repo: duecredit/duecredit
+    condition: "$TRAVIS_PYTHON_VERSION == 2.7 && $TRAVIS_TAG =~ ^[0-9][.][0-9]*[02468][.]"
