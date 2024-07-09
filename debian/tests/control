@@ -1,0 +1,4 @@
+Test-Command: for py in `py3versions -s`; do $py -m pytest; done
+Depends: python3-duecredit,
+ python3-pytest,
+ python3-all
