@@ -9,10 +9,12 @@
 """Module to help maintain a registry of versions for external modules etc
 """
 import sys
+import pkg_resources
 from os import linesep
 from six import string_types
 
 from distutils.version import StrictVersion, LooseVersion
+
 
 # To depict an unknown version, which can't be compared by mistake etc
 class UnknownVersion:
@@ -53,6 +55,19 @@ class ExternalVersions(object):
         if isinstance(version, tuple) or isinstance(version, list):
             #  Generate string representation
             version = ".".join(str(x) for x in version)
+
+        if not version:
+            # Try pkg_resources
+            # module name might be different, and I found no way to
+            # deduce it for citeproc which comes from "citeproc-py"
+            # distribution
+            modname = module.__name__
+            try:
+                version = pkg_resources.get_distribution(
+                    {'citeproc': 'citeproc-py'}.get(modname, modname)
+                ).version
+            except Exception:
+                pass  # oh well - no luck either
 
         if version:
             try:

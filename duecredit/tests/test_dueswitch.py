@@ -11,7 +11,7 @@ import atexit
 import pytest
 
 from ..injections.injector import DueCreditInjector
-from ..dueswitch import due
+from ..dueswitch import DueSwitch, due
 
 
 def test_dueswitch_activate(monkeypatch):
@@ -39,3 +39,10 @@ def test_dueswitch_activate(monkeypatch):
     assert state["activate"] == 1
     assert state["register"] == 1
     assert state["register_func"] == due.dump
+
+
+def test_a_bad_one():
+    # We might get neither of those and should fail
+    # see https://github.com/duecredit/duecredit/issues/142
+    # So let's through ValueError right away
+    pytest.raises(ValueError, DueSwitch, None, None, True)
