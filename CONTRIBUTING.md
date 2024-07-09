@@ -152,13 +152,13 @@ OS X.
 Then use that virtual environment to run the tests, via
 
 ```sh
-python -m nose -s -v duecredit
+python -m py.test -s -v duecredit
 ```
 
 or similarly,
 
 ```sh
-nosetests -s -v duecredit
+py.test -s -v duecredit
 ```
 
 then to later deactivate the virtualenv just simply enter 
@@ -174,8 +174,9 @@ You can also check for common programming errors with the following tools:
 
 - Code with good unittest coverage (at least 80%), check with:
 
-          pip install nose coverage
-          nosetests --with-coverage duecredit
+          pip install pytest coverage
+          coverage run --source duecredit -m py.test
+          coverage report
 
 
 ### Linting

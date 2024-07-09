@@ -11,7 +11,6 @@
 
 __docformat__ = 'restructuredtext'
 
-import pdb
 import os
 from os.path import basename, join as pathjoin, dirname
 from glob import glob

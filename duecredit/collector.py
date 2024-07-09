@@ -53,7 +53,8 @@ class Citation(object):
           its use (e.g. numpy)
         tags: list of str, optional
           Tags to associate with the given code/reference combination.  Some tags have
-          associated semantics in duecredit, e.g.
+          associated semantics in duecredit, e.g. (see full list in README.md or
+          https://github.com/duecredit/duecredit/#tags)
           - "implementation" [default] tag describes as an implementation of the cited
             method
           - "reference-implementation" tag describes as the original implementation (ideally

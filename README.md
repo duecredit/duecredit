@@ -1,9 +1,8 @@
-duecredit
-=========
+# duecredit
+
 
 [![Build Status](https://travis-ci.org/duecredit/duecredit.svg?branch=master)](https://travis-ci.org/duecredit/duecredit)
 [![Coverage Status](https://coveralls.io/repos/duecredit/duecredit/badge.svg)](https://coveralls.io/r/duecredit/duecredit)
-
 
 duecredit is being conceived to address the problem of inadequate
 citation of scientific software and methods, and limited visibility of
@@ -16,20 +15,41 @@ level of reference detail, i.e. only references for actually used
 functionality will be presented back if software provides multiple
 citeable implementations.
 
-duecredit 101
-=============
+## Installation
+
+Duecredit is easy to install via pip, simply type:
+ 
+ `pip install duecredit`
+
+## Examples
+
+### To cite the modules and methods you are using 
 
 You can already start "registering" citations using duecredit in your
 Python modules and even registering citations (we call this approach "injections")
 for modules which do not (yet) use duecredit.  duecredit will remain an optional
 dependency, i.e. your software will work correctly even without duecredit installed.
 
-"Native" use of duecredit (recommended)
----------------------------------------
+For example, list citations of the modules and methods `yourproject` uses with few simple commands:
+```bash
+cd /path/to/yourmodule # for ~/yourproject
+cd yourproject # change directory into where the main code base is
+python -m duecredit yourproject.py
+```
+Or you can also display them in BibTex format, using:
+```bash
+duecredit summary --format=bibtex
+```
+See this gif animation for better illustration:
+![Example](examples/duecredit_example.gif)
+
+
+### To let others cite your software
+
 
 For using duecredit in your software
 
-1. copy `duecredit/stub.py` to your codebase, e.g.
+1. Copy `duecredit/stub.py` to your codebase, e.g.
 
         wget -q -O /path/tomodule/yourmodule/due.py \
           https://raw.githubusercontent.com/duecredit/duecredit/master/duecredit/stub.py
@@ -42,15 +62,17 @@ For using duecredit in your software
 
         from .due import due, Doi, BibTeX
 
-     to provide reference for the entire module just use e.g.
+     To provide reference for the entire module just use e.g.
 
          due.cite(Doi("1.2.3/x.y.z"), description="Solves all your problems", path="magicpy")
 
-     To provide a reference for a function or a method, use dcite decorator
+     To provide a reference for a function or a method, use `dcite` decorator
 
          @due.dcite(Doi("1.2.3/x.y.z"), description="Resolves constipation issue")
          def pushit():
              ...
+
+    You can easily obtain DOI for your software using Zenodo.org and few other DOI providers.
 
 References can also be entered as BibTeX entries
 
@@ -63,26 +85,30 @@ References can also be entered as BibTeX entries
                 """), 
                 description="Solves all your problems", path="magicpy")
         
+## Now what
         
-Add injections for other existing modules
------------------------------------------
+### Do the due
 
-We hope that eventually this somewhat cruel approach will not be necessary.  But
+Once you obtained the references in the duecredit output, include them in in the references section of your paper or software, which used the cited software.
+        
+### Add injections for other existing modules
+
+We hope that eventually this somewhat cruel approach will not be necessary. But
 until other packages support duecredit "natively" we have provided a way to "inject"
-citations for modules and/or functions and methods via injections:  citations will be
+citations for modules and/or functions and methods via injections: citations will be
 added to the corresponding functionality upon those modules import.
 
 All injections are collected under
 [duecredit/injections](https://github.com/duecredit/duecredit/tree/master/duecredit/injections).
-See any file there with `mod_` prefix for a complete example.  But
+See any file there with `mod_` prefix for a complete example. But
 overall it is just a regular Python module defining a function
 `inject(injector)` which will then add new entries to the injector,
 which will in turn add those entries to the duecredit whenever the
 corresponding module gets imported.
 
 
-User-view
----------
+## User-view
+
 
 By default `duecredit` does exactly nothing -- all decorators do not
 decorate, all `cite` functions just return, so there should be no fear
@@ -151,7 +177,7 @@ ready for reuse, e.g.:
 
 and if by default only references for "implementation" are listed, we
 can enable listing of references for other tags as well (e.g. "edu"
-depicting instructional materials -- textbooks etc on the topic):
+depicting instructional materials -- textbooks etc. on the topic):
 
     $> DUECREDIT_REPORT_TAGS=* duecredit summary
     
@@ -207,12 +233,35 @@ an uncited function from that package.
     [3] Sneath, P.H. & Sokal, R.R., 1962. Numerical taxonomy. Nature, 193(4818), pp.855–860.
     ...
 
+## Tags
 
-Ultimate goals
-==============
 
-Reduce demand for prima ballerina projects
-------------------------------------------
+You are welcome to introduce new tags specific for your citations but we hope
+that for consistency across projects, you would use following tags
+
+- `implementation` (default) — an implementation of the cited method
+- `reference-implementation` — the original implementation (ideally by
+  the authors of the paper) of the cited method
+- `another-implementation` — some other implementation of
+   the method, e.g. if you would like to provide citation for another
+   implementation of the method you have implemented in your code and for
+   which you have already provided `implementation` or
+   `reference-implementation` tag
+- `use` — publications demonstrating a worthwhile noting use of the
+  method
+- `edu` — tutorials, textbooks and other materials useful to learn
+  more about cited functionality
+- `donate` — should be commonly used with Url entries to point to the
+  websites  describing how to contribute some funds to the referenced
+  project
+- `funding` — to point to the sources of funding which provided support
+  for a given functionality implementation and/or method development
+- `dataset` - for datasets
+
+## Ultimate goals
+
+
+### Reduce demand for prima ballerina projects
 
 **Problem**: Scientific software is often developed to gain citations for
 original publication through the use of the software implementing it.
@@ -232,8 +281,7 @@ standardization of scientific software development, thus addressing
 many (if not all) core problems with scientific software development
 everyone likes to bash about (reproducibility, longevity, etc.).
 
-Adequately reference core libraries
------------------------------------
+### Adequately reference core libraries
 
 **Problem**: Scientific software often, if not always, uses 3rd party
 libraries (e.g., NumPy, SciPy, atlas) which might not even be visible
@@ -252,11 +300,30 @@ making new methodological developments readily available to even wider
 audiences without proliferation of the low quality scientific software.
 
 
-Similar/related projects
-========================
+## Similar/related projects
 
 [sempervirens](https://github.com/njsmith/sempervirens) -- *an
 experimental prototype for gathering anonymous, opt-in usage data for
 open scientific software*.  Eventually in duecredit we aim either to
 provide similar functionality (since we are collecting such
 information as well) or just interface/report to sempervirens.
+
+## Currently used by
+
+This is a running list of projects that use DueCredit natively. If you
+are using DueCredit, or plan to use it, please consider sending a pull
+request and add your project to this list. Thanks to
+[@fedorov](https://github.com/fedorov) for the idea.
+
+- [PyMVPA](http://www.pymvpa.org)
+- [fatiando](https://github.com/fatiando/fatiando)
+- [Nipype](https://github.com/nipy/nipype)
+- [QInfer](https://github.com/QInfer/python-qinfer)
+- [shablona](https://github.com/uwescience/shablona)
+- [gfusion](https://github.com/mvdoc/gfusion)
+- [pybids](https://github.com/INCF/pybids)
+- [Quickshear](https://github.com/nipy/quickshear)
+- [meqc](https://github.com/emdupre/meqc)
+- [MDAnalysis](https://www.mdanalysis.org)
+
+Last updated 2017-06-27.

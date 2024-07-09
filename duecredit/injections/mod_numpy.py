@@ -27,7 +27,8 @@ def inject(injector):
         number={2},
         pages={22--30},
         year={2011},
-        publisher={AIP Publishing}
+        publisher={AIP Publishing},
+        doi={10.1109/MCSE.2011.37}
         }
     """),
     tags=['implementation'],
