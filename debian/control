@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Debian Python Team <team+python@tracker.debian.org>
 Uploader: Yaroslav Halchenko <debian@onerussian.com>,
  Drew Parsons <dparsons@debian.org>
-Build-Depends: debhelper (>= 9), dh-python,
+Build-Depends: debhelper-compat (= 13), dh-python,
                python3-all,
                python3-setuptools,
                python3-citeproc,
