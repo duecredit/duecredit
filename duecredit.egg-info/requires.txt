@@ -1,0 +1,2 @@
+requests
+citeproc-py

@@ -1,0 +1,48 @@
+Metadata-Version: 1.1
+Name: duecredit
+Version: 0.4.5.3
+Summary: Publications (and donations) tracer
+Home-page: https://github.com/duecredit/duecredit
+Author: Yaroslav Halchenko, Matteo Visconti di Oleggio Castello
+Author-email: yoh@onerussian.com
+License: 2-clause BSD License
+Download-URL: https://github.com/duecredit/duecredit/releases/tag/0.4.5.3
+Description: duecredit is being conceived to address the problem of inadequate
+        citation of scientific software and methods, and limited visibility of
+        donation requests for open-source software.
+        
+        It provides a simple framework (at the moment for Python only) to
+        embed publication or other references in the original code so they are
+        automatically collected and reported to the user at the necessary
+        level of reference detail, i.e. only references for actually used
+        functionality will be presented back if software provides multiple
+        citeable implementations.
+        
+        To get a sense of what duecredit is about, run for example shipped along
+        example script, or your analysis script with `-m duecredit`, e.g.
+        
+            python -m duecredit examples/example_scipy.py
+        
+        
+Keywords: citation tracing
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Environment :: Other Environment
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Intended Audience :: Legal Industry
+Classifier: Intended Audience :: Other Audience
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Documentation
+Classifier: Topic :: Printing
+Classifier: Topic :: Software Development :: Documentation
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Provides: duecredit
