@@ -21,7 +21,6 @@ Architecture: all
 Depends: ${misc:Depends}, ${python3:Depends},
 Recommends: ${python3:Recommends}
 Suggests: ${python3:Suggests}
-XB-Python-Egg-Name: duecredit
 Description: Publications (and donations) tracer
  duecredit is being conceived to address the problem of inadequate
  citation of scientific software and methods, and limited visibility of
