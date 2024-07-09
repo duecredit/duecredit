@@ -1,6 +1,6 @@
-duecredit (0.10.2-1) UNRELEASED; urgency=medium
+duecredit (0.10.2-1) unstable; urgency=medium
 
-  * New upstream release.
+  * New upstream release. Closes: #1066800.
   * move duecredit to the Debian Python Team
     - debian repo https://salsa.debian.org/python-team/packages/duecredit
     - add Drew Parsons as Uploader
@@ -22,7 +22,7 @@ duecredit (0.10.2-1) UNRELEASED; urgency=medium
   * debhelper compatibility level 13 (remove debian/compat)
   * Standards-Version: 4.7.0
 
- -- Drew Parsons <dparsons@debian.org>  Tue, 09 Jul 2024 12:14:52 +0200
+ -- Drew Parsons <dparsons@debian.org>  Tue, 09 Jul 2024 17:20:16 +0200
 
 duecredit (0.9.1-1.1) unstable; urgency=medium
 
