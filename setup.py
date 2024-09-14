@@ -96,7 +96,7 @@ setup(
         "packaging",
         "requests",
     ],
-    extras_require={"tests": ["pytest", "pytest-cov", "vcrpy", "contextlib2"]},
+    extras_require={"tests": ["pytest", "pytest-cov", "vcrpy"]},
     include_package_data=True,
     entry_points={
         "console_scripts": [
