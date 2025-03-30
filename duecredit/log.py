@@ -91,7 +91,7 @@ class ColorFormatter(logging.Formatter):
     BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 
     RESET_SEQ = "\033[0m"
-    COLOR_SEQ = "\033[1;%dm"
+    COLOR_SEQ = "\033[1;{}m"
     BOLD_SEQ = "\033[1m"
 
     COLORS = {
@@ -143,7 +143,7 @@ class ColorFormatter(logging.Formatter):
         if self.use_color and levelname in self.COLORS:
             fore_color = 30 + self.COLORS[levelname]
             levelname_color = (
-                self.COLOR_SEQ % fore_color + "%-7s" % levelname + self.RESET_SEQ
+                self.COLOR_SEQ.format(fore_color) + f"{levelname:<7}" + self.RESET_SEQ
             )
             record.levelname = levelname_color
         record.msg = record.msg.replace("\n", "\n| ")

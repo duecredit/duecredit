@@ -458,7 +458,7 @@ class DueCreditCollector:
 
     @never_fail
     def __str__(self) -> str:
-        return self.__class__.__name__ + f" {len(self._entries):d} entries, {len(self.citations):d} citations"
+        return f"{self.__class__.__name__} {len(self._entries)} entries, {len(self.citations)} citations"
 
 
 # TODO: redo heavily -- got very messy

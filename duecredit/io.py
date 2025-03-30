@@ -301,7 +301,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = "harvard1") -> str:
     except ImportError as e:
         raise RuntimeError(
             "For formatted output we need citeproc and all of its dependencies "
-            f"(such as lxml) but there is a problem while importing citeproc: {str(e)}"
+            f"(such as lxml) but there is a problem while importing citeproc: {e}"
         )
     decode_exceptions: tuple[type[Exception], ...]
     try:

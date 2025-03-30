@@ -139,7 +139,7 @@ class DueSwitch:
             try:
                 self.__prepare_exit_and_injections()
             except Exception as e:
-                lgr.error(f"Failed to prepare injections etc: {str(e)}")
+                lgr.error(f"Failed to prepare injections etc: {e}")
             finally:
                 self.__activations_done = True
 

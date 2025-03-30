@@ -68,7 +68,7 @@ except Exception as e:
         import logging
 
         logging.getLogger("duecredit").error(
-            f"Failed to import duecredit due to {str(e)}"
+            f"Failed to import duecredit due to {e}"
         )
     # Initiate due stub
     due = InactiveDueCreditCollector()  # type: ignore

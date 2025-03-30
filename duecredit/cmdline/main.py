@@ -197,5 +197,5 @@ def main(args: Any = None) -> None:
         try:
             args.func(args)
         except Exception as exc:
-            lgr.error(f"{str(exc)} ({exc.__class__.__name__})")
+            lgr.error(f"{exc} ({exc.__class__.__name__})")
             sys.exit(1)
