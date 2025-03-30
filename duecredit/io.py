@@ -202,7 +202,7 @@ class TextOutput(Output):
         pmo.update(objects)
 
         # get all the paths
-        paths = sorted(list(pmo))
+        paths = sorted(pmo)
         # get all the entry_keys in order
         entry_keys = [c.entry.key for p in paths for c in pmo[p]]
         # make a dictionary entry_key -> citation_nr
@@ -400,7 +400,7 @@ class BibTeXOutput(Output):
         pmo.update(objects)
 
         # get all the paths
-        paths = sorted(list(pmo))
+        paths = sorted(pmo)
 
         entries = []
         for path in paths:
