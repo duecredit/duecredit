@@ -18,7 +18,7 @@ import pytest
 
 from duecredit.collector import DueCreditCollector
 from duecredit.entries import Doi
-import duecredit.tests.mod as mod
+from duecredit.tests import mod
 
 from .. import __version__
 from ..injections.injector import (
@@ -81,7 +81,7 @@ class TestActiveInjector:
         assert len(self.due._entries) == 1  # we should get an entry now
         assert len(self.due.citations) == 0  # but not yet a citation
 
-        import duecredit.tests.mod as mod
+        from duecredit.tests import mod
 
         _, _, obj = find_object(mod, func)
         assert obj.__duecredited__  # we wrapped
@@ -138,7 +138,7 @@ class TestActiveInjector:
         assert len(self.due._entries) == 2  # we should get two entries now
         assert len(self.due.citations) == 0  # but not yet a citation
 
-        import duecredit.tests.mod as mod
+        from duecredit.tests import mod
 
         _, _, obj = find_object(mod, func)
         assert obj.__duecredited__  # we wrapped
