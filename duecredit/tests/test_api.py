@@ -216,10 +216,10 @@ def test_noincorrect_import_if_no_lxml_numpy(
         assert ret == 0  # but we must not fail overall regardless
 
     if (
-        os.environ.get("DUECREDIT_ENABLE", False) and on_windows
+        os.environ.get("DUECREDIT_ENABLE", None) and on_windows
     ):  # TODO this test fails on windows
         pytest.xfail("Fails for some reason on Windows")
-    elif os.environ.get("DUECREDIT_ENABLE", False):  # we enabled duecredit
+    elif os.environ.get("DUECREDIT_ENABLE", None):  # we enabled duecredit
         if (
             os.environ.get("DUECREDIT_REPORT_TAGS", None) == "*"
             and kwargs.get("script")

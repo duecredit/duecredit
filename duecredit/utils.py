@@ -214,7 +214,7 @@ def never_fail(f):
                 % (f, e)
             )
 
-    if os.environ.get("DUECREDIT_ALLOW_FAIL", False):
+    if os.environ.get("DUECREDIT_ALLOW_FAIL", None):
         return f
     else:
         return wrapped_func

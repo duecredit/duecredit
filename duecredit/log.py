@@ -112,7 +112,7 @@ class ColorFormatter(logging.Formatter):
         msg = self.formatter_msg(self._get_format(log_name), self.use_color)
         self._tb = (
             TraceBack(collide=os.environ.get("DUECREDIT_LOGTRACEBACK", "") == "collide")
-            if os.environ.get("DUECREDIT_LOGTRACEBACK", False)
+            if os.environ.get("DUECREDIT_LOGTRACEBACK", None)
             else None
         )
         logging.Formatter.__init__(self, msg)
