@@ -315,7 +315,7 @@ def setup_exceptionhook() -> None:
             import traceback
 
             traceback.print_exception(exc_type, exc_value, exc_tb)
-            print
+            print()
             pdb.post_mortem(exc_tb)
         else:
             lgr.warn("We cannot setup exception hook since not in interactive mode")
