@@ -39,7 +39,7 @@ def test_main_version(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setattr(sys, fakeout, fakestdout)
 
     pytest.raises(SystemExit, main.main, ["--version"])
-    assert (fakestdout.getvalue()).split("\n")[0] == "duecredit %s" % __version__
+    assert (fakestdout.getvalue()).split("\n")[0] == f"duecredit {__version__}"
 
 
 # smoke test the cmd_summary

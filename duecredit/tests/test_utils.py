@@ -29,10 +29,10 @@ def test_is_interactive_crippled_stdout(monkeypatch: MonkeyPatch) -> None:
             return True
 
     for inout in ("in", "out", "err"):
-        monkeypatch.setattr(sys, "std%s" % inout, MockedOut())
+        monkeypatch.setattr(sys, f"std{inout}", MockedOut())
         assert not is_interactive()
 
     # just for paranoids
     for inout in ("in", "out", "err"):
-        monkeypatch.setattr(sys, "std%s" % inout, MockedIsaTTY())
+        monkeypatch.setattr(sys, f"std{inout}", MockedIsaTTY())
     assert is_interactive()

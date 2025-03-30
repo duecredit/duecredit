@@ -294,9 +294,9 @@ def test_text_output() -> None:
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=["*"])
     value = strio.getvalue()
-    assert "0 packages cited" in value, "value was %s" % value
-    assert "0 modules cited" in value, "value was %s" % value
-    assert "0 functions cited" in value, "value was %s" % value
+    assert "0 packages cited" in value, f"value was {value}"
+    assert "0 modules cited" in value, f"value was {value}"
+    assert "0 functions cited" in value, f"value was {value}"
 
     # but it should be cited if cite_module=True
     collector = DueCreditCollector()
@@ -305,9 +305,9 @@ def test_text_output() -> None:
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=["*"])
     value = strio.getvalue()
-    assert "1 package cited" in value, "value was %s" % value
-    assert "0 modules cited" in value, "value was %s" % value
-    assert "0 functions cited" in value, "value was %s" % value
+    assert "1 package cited" in value, f"value was {value}"
+    assert "0 modules cited" in value, f"value was {value}"
+    assert "0 functions cited" in value, f"value was {value}"
 
     # in this case, we should be citing the package since we are also citing a
     # submodule
@@ -318,10 +318,10 @@ def test_text_output() -> None:
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=["*"])
     value = strio.getvalue()
-    assert "1 package cited" in value, "value was %s" % value
-    assert "1 module cited" in value, "value was %s" % value
-    assert "0 functions cited" in value, "value was %s" % value
-    assert "Halchenko, Y.O." in value, "value was %s" % value
+    assert "1 package cited" in value, f"value was {value}"
+    assert "1 module cited" in value, f"value was {value}"
+    assert "0 functions cited" in value, f"value was {value}"
+    assert "Halchenko, Y.O." in value, f"value was {value}"
     assert value.strip().endswith("Frontiers in Neuroinformatics, 6(22).")
 
     # in this case, we should be citing the package since we are also citing a
@@ -334,12 +334,12 @@ def test_text_output() -> None:
     strio = StringIO()
     TextOutput(strio, collector).dump(tags=["*"])
     value = strio.getvalue()
-    assert "1 package cited" in value, "value was %s" % value
-    assert "1 module cited" in value, "value was %s" % value
-    assert "0 functions cited" in value, "value was %s" % value
-    assert "Halchenko, Y.O." in value, "value was %s" % value
-    assert "[1, 2]" in value, "value was %s" % value
-    assert "[3]" not in value, "value was %s" % value
+    assert "1 package cited" in value, f"value was {value}"
+    assert "1 module cited" in value, f"value was {value}"
+    assert "0 functions cited" in value, f"value was {value}"
+    assert "Halchenko, Y.O." in value, f"value was {value}"
+    assert "[1, 2]" in value, f"value was {value}"
+    assert "[3]" not in value, f"value was {value}"
 
 
 def test_text_output_dump_formatting() -> None:
@@ -539,9 +539,9 @@ def _generate_sample_bibtex() -> str:
         ("year", year),
     ]
 
-    sample_bibtex = "@ARTICLE{%s,\n" % key
+    sample_bibtex = f"@ARTICLE{{{key},\n"
     for string, value in elements:
-        sample_bibtex += "{}={{{}}},\n".format(string, value)
+        sample_bibtex += f"{string}={{{value}}},\n"
     sample_bibtex += "}"
     return sample_bibtex
 

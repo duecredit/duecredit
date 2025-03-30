@@ -268,7 +268,7 @@ def get_bibtex_rendering(entry: DueCreditEntry) -> BibTeX:
     elif isinstance(entry, BibTeX):
         return entry
     else:
-        raise ValueError("Have no clue how to get bibtex out of %s" % entry)
+        raise ValueError(f"Have no clue how to get bibtex out of {entry}")
 
 
 def condition_bibtex(bibtex: str) -> bytes:
@@ -301,8 +301,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = "harvard1") -> str:
     except ImportError as e:
         raise RuntimeError(
             "For formatted output we need citeproc and all of its dependencies "
-            "(such as lxml) but there is a problem while importing citeproc: %s"
-            % str(e)
+            f"(such as lxml) but there is a problem while importing citeproc: {str(e)}"
         )
     decode_exceptions: tuple[type[Exception], ...]
     try:
@@ -330,7 +329,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = "harvard1") -> str:
                 # we should be able to provide encoding argument
                 bib_source = cpBibTeX(fname, encoding="utf-8")
         except Exception as e:
-            msg = "Failed to process BibTeX file {}: {}.".format(fname, e)
+            msg = f"Failed to process BibTeX file {fname}: {e}."
             if "unexpected keyword argument" in str(e):
                 citeproc_version = external_versions["citeproc"]
                 if isinstance(citeproc_version, Version) and citeproc_version < Version(
@@ -341,7 +340,7 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = "harvard1") -> str:
             else:
                 err = str(e)
             lgr.error(msg)
-            return "ERRORED: %s" % err
+            return f"ERRORED: {err}"
         finally:
             # return warnings back
             warnings.filters = old_filters

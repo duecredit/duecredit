@@ -143,7 +143,7 @@ def setup_parser() -> argparse.ArgumentParser:
 
         # configure 'run' function for this command
         subparser.set_defaults(
-            func=subcmdmod.run, logger=logging.getLogger("duecredit.%s" % cmd)
+            func=subcmdmod.run, logger=logging.getLogger(f"duecredit.{cmd}")
         )
         # store short description for later
         sdescr = getattr(
@@ -155,8 +155,7 @@ def setup_parser() -> argparse.ArgumentParser:
     cmd_summary = []
     for cd in cmd_short_description:
         cmd_summary.append(
-            "%s\n%s\n\n"
-            % (
+            "{}\n{}\n\n".format(
                 cd[0],
                 textwrap.fill(
                     cd[1],
@@ -166,15 +165,14 @@ def setup_parser() -> argparse.ArgumentParser:
                 ),
             )
         )
-    parser.description = "%s\n%s\n\n%s" % (
+    parser.description = "{}\n{}\n\n{}".format(
         parser.description,
         "\n".join(cmd_summary),
         textwrap.fill(
-            """\
+            f"""\
     Detailed usage information for individual commands is
     available via command-specific help options, i.e.:
-    %s <command> --help"""
-            % sys.argv[0],
+    {sys.argv[0]} <command> --help""",
             75,
             initial_indent="",
             subsequent_indent="",
@@ -199,5 +197,5 @@ def main(args: Any = None) -> None:
         try:
             args.func(args)
         except Exception as exc:
-            lgr.error("{} ({})".format(str(exc), exc.__class__.__name__))
+            lgr.error(f"{str(exc)} ({exc.__class__.__name__})")
             sys.exit(1)
