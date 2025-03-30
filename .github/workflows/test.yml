@@ -34,6 +34,7 @@ jobs:
           - '3.10'  # Needs quotes so YAML doesn't think it's 3.1
           - '3.11'
           - '3.12'
+          - '3.13'
         mode:
           - normal
         extra-pip:
@@ -43,7 +44,7 @@ jobs:
             python: 3.8
             extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib
           - os: ubuntu-latest
-            python: 3.12
+            python: 3.13
             extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib
     steps:
     - name: Set up environment
