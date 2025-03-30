@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 def _get_duecredit_enable() -> bool:
     env_enable = os.environ.get("DUECREDIT_ENABLE", "no")
-    if not env_enable.lower() in ("0", "1", "yes", "no", "true", "false"):
+    if env_enable.lower() not in ("0", "1", "yes", "no", "true", "false"):
         lgr.warning(
             "Misunderstood value %s for DUECREDIT_ENABLE. "
             "Use 'yes' or 'no', or '0' or '1'"

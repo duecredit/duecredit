@@ -130,7 +130,7 @@ class Citation:
     def cites_module(self) -> bool | None:
         if not self.path:
             return None
-        return not (":" in self.path)
+        return ":" not in self.path
 
     @property
     def module(self) -> str | None:
@@ -318,7 +318,7 @@ class DueCreditCollector:
             # main logic -- assess default and if get to the next one if
             # given argument is not present
             if not ((len(fargs) > argpos) or (kwarg in fkwargs)):
-                if not ("DC_DEFAULT" in values):
+                if "DC_DEFAULT" not in values:
                     # if value was specified but not provided and not default
                     # conditions are not satisfied
                     return False
@@ -339,7 +339,7 @@ class DueCreditCollector:
                     value = getattr(value, attr)
 
             # Value is present but not matching
-            if not (value in values):
+            if value not in values:
                 return False
 
         # if checks passed -- we must have matched conditions
