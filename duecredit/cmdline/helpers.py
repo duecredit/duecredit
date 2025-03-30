@@ -15,7 +15,7 @@ __docformat__ = "restructuredtext"
 import argparse
 import re
 import sys
-from typing import Any, Pattern
+from typing import Any
 
 from ..utils import is_interactive
 
@@ -122,7 +122,7 @@ class RegexpType:
     but we might provide a mode where we operate solely from cmdline
     """
 
-    def __call__(self, string: str | None) -> Pattern[str] | None:
+    def __call__(self, string: str | None) -> re.Pattern[str] | None:
         if string:
             return re.compile(string)
         else:

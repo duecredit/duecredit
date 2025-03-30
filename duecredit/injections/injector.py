@@ -131,7 +131,7 @@ class DueCreditInjector:
         self,
         modulename: str,
         obj: str | None,
-        entry: 'Doi' | 'BibTeX' | 'Url',
+        entry: Doi | BibTeX | Url,
         min_version=None,
         max_version=None,
         **kwargs: Any,
