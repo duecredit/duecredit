@@ -78,10 +78,10 @@ jobs:
         python -m pytest -s -v --cov=duecredit --cov-report=xml duecredit
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         # TODO
-        # token: ${{ secrets.CODECOV_TOKEN }}
+        token: ${{ secrets.CODECOV_TOKEN }}
         file: ./coverage.xml
         flags: unittests
         # name: codecov-umbrella
