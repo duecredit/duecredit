@@ -189,7 +189,7 @@ class DueCreditInjector:
                 inj_mod_name_full, fromlist=["duecredit.injections"]
             )
         except Exception as e:
-            if os.environ.get("DUECREDIT_ALLOW_FAIL", False):
+            if os.environ.get("DUECREDIT_ALLOW_FAIL", None):
                 raise
             raise RuntimeError("Failed to import {}: {!r}".format(inj_mod_name, e))
         # TODO: process min/max_versions etc
