@@ -58,7 +58,7 @@ class ExternalVersions:
                 version = getattr(module, attr)
                 break
 
-        if isinstance(version, tuple) or isinstance(version, list):
+        if isinstance(version, (tuple, list)):
             #  Generate string representation
             version = ".".join(str(x) for x in version)
 
