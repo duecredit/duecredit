@@ -36,7 +36,7 @@ def test_external_versions_basic():
     version_str = (
         str(ev["duecredit"]) if isinstance(ev["duecredit"], Version) else __version__
     )
-    assert ev.dumps() == "Versions: duecredit=%s" % version_str
+    assert ev.dumps() == f"Versions: duecredit={version_str}"
 
     # For non-existing one we get None
     assert ev["duecreditnonexisting"] is None
@@ -74,11 +74,11 @@ def test_external_versions_unknown() -> None:
 
 def _test_external(ev, modname: str) -> None:
     try:
-        exec("import %s" % modname, globals(), locals())
+        exec(f"import {modname}", globals(), locals())
     except ImportError:
         modname = pytest.importorskip(modname)
     except Exception as e:
-        pytest.skip("External {} fails to import: {}".format(modname, e))
+        pytest.skip(f"External {modname} fails to import: {e}")
     assert ev[modname] is not ev.UNKNOWN
     assert ev[modname] > Version("0.0.1")
     assert Version("1000000.0") > ev[modname]  # unlikely in our lifetimes

@@ -80,7 +80,7 @@ except OSError:
             exec(code, locals(), globals())
     else:
         __version__ = "0.0.0.dev"
-print("Version: %s" % __version__)
+print(f"Version: {__version__}")
 
 with open("README.md", encoding="utf-8") as f:
     README = f.read()

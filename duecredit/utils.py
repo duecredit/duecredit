@@ -145,9 +145,9 @@ def rmtemp(f: str, *args: Any, **kwargs: Any) -> None:
     """
     if not os.environ.get("DATALAD_TESTS_KEEPTEMP"):
         if not os.path.lexists(f):
-            lgr.debug("Path %s does not exist, so can't be removed" % f)
+            lgr.debug(f"Path {f} does not exist, so can't be removed")
             return
-        lgr.log(5, "Removing temp file: %s" % f)
+        lgr.log(5, f"Removing temp file: {f}")
         # Can also be a directory
         if os.path.isdir(f):
             rmtree(f, *args, **kwargs)
@@ -163,7 +163,7 @@ def rmtemp(f: str, *args: Any, **kwargs: Any) -> None:
                         raise
                 break
     else:
-        lgr.info("Keeping temp file: %s" % f)
+        lgr.info(f"Keeping temp file: {f}")
 
 
 #
@@ -209,9 +209,8 @@ def never_fail(f):
             return f(*args, **kwargs)
         except Exception as e:
             lgr.warning(
-                "DueCredit internal failure while running %s: %r. "
+                f"DueCredit internal failure while running {f}: {e!r}. "
                 "Please report to developers at https://github.com/duecredit/duecredit/issues"
-                % (f, e)
             )
 
     if os.environ.get("DUECREDIT_ALLOW_FAIL", None):

@@ -36,7 +36,7 @@ class HelpAction(argparse.Action):
                 import subprocess
 
                 subprocess.check_call(
-                    "man %s 2> /dev/null" % parser.prog.replace(" ", "-"),
+                    "man {} 2> /dev/null".format(parser.prog.replace(" ", "-")),
                     shell=True,
                 )
                 sys.exit(0)
@@ -44,7 +44,7 @@ class HelpAction(argparse.Action):
                 # ...but silently fall back if it doesn't work
                 pass
         if option_string == "-h":
-            helpstr = "%s\n%s" % (
+            helpstr = "{}\n{}".format(
                 parser.format_usage(),
                 "Use '--help' to get more comprehensive information.",
             )
@@ -65,7 +65,7 @@ class HelpAction(argparse.Action):
             usagestr = re.split(r"\n\n[A-Z]+", helpstr, maxsplit=1)[0]
             usage_length = len(usagestr)
             usagestr = re.subn(r"\s+", " ", usagestr.replace("\n", " "))[0]
-            helpstr = "{}\n{}".format(usagestr, helpstr[usage_length:])
+            helpstr = f"{usagestr}\n{helpstr[usage_length:]}"
         print(helpstr)
         sys.exit(0)
 

@@ -55,8 +55,8 @@ def _get_active_due() -> DueCreditCollector | InactiveDueCreditCollector:
             due_ = load_due(DUECREDIT_FILE)
         except Exception:
             lgr.warning(
-                "Failed to load previously collected %s. "
-                "DueCredit will not be active for this session." % DUECREDIT_FILE
+                f"Failed to load previously collected {DUECREDIT_FILE}. "
+                "DueCredit will not be active for this session."
             )
             return _get_inactive_due()
     else:
@@ -79,7 +79,7 @@ class DueSwitch:
         if not (inactive and active):
             raise ValueError(
                 "Both inactive and active collectors should be provided. "
-                "Got active=%r, inactive=%r" % (active, inactive)
+                f"Got active={active!r}, inactive={inactive!r}"
             )
         self.activate(activate)
 
@@ -139,7 +139,7 @@ class DueSwitch:
             try:
                 self.__prepare_exit_and_injections()
             except Exception as e:
-                lgr.error("Failed to prepare injections etc: %s" % str(e))
+                lgr.error(f"Failed to prepare injections etc: {e}")
             finally:
                 self.__activations_done = True
 

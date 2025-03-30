@@ -258,7 +258,7 @@ def test_dcite_match_conditions_function() -> None:
     def method(arg1: str, kwarg2: str = "blah") -> str:
         """docstring"""
         assert arg1 == "magical"
-        return "load %s" % kwarg2
+        return f"load {kwarg2}"
 
     _test_dcite_match_conditions(due, method, "callable")
 
@@ -285,7 +285,7 @@ def test_dcite_match_conditions_method() -> None:
         def method(self, arg1: str, kwarg2: str = "blah") -> str:
             """docstring"""
             assert arg1 == "magical"
-            return "load %s" % kwarg2
+            return f"load {kwarg2}"
 
     citeable = Citeable(param="paramvalue")
     _test_dcite_match_conditions(due, citeable.method, "obj.callable")

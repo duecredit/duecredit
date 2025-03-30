@@ -160,7 +160,7 @@ class DueCreditInjector:
             self._entry_records[modulename][obj] = []
         obj_entries = self._entry_records[modulename][obj]
         if "path" not in kwargs:
-            kwargs["path"] = modulename + ((":%s" % obj) if obj else "")
+            kwargs["path"] = modulename + ((f":{obj}") if obj else "")
         obj_entries.append(
             {
                 "entry": entry,
@@ -191,7 +191,7 @@ class DueCreditInjector:
         except Exception as e:
             if os.environ.get("DUECREDIT_ALLOW_FAIL", None):
                 raise
-            raise RuntimeError("Failed to import {}: {!r}".format(inj_mod_name, e))
+            raise RuntimeError(f"Failed to import {inj_mod_name}: {e!r}")
         # TODO: process min/max_versions etc
         assert hasattr(inj_mod, "inject")
         lgr.log(3, "Calling injector of %s", inj_mod_name_full)
@@ -227,7 +227,7 @@ class DueCreditInjector:
         try:
             mod = sys.modules[mod_name]
         except KeyError:
-            lgr.warning("Failed to access module %s among sys.modules" % mod_name)
+            lgr.warning(f"Failed to access module {mod_name} among sys.modules")
             return
 
         # go through the known entries and register them within the collector, and
@@ -241,7 +241,7 @@ class DueCreditInjector:
                     parent, obj_name, obj = find_object(mod, obj_path)
                 except (KeyError, AttributeError) as e:
                     lgr.warning(
-                        "Could not find {} in module {}: {}".format(obj_path, mod, e)
+                        f"Could not find {obj_path} in module {mod}: {e}"
                     )
                     continue
 

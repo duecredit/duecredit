@@ -52,7 +52,7 @@ def run(args: argparse.Namespace) -> int:
     from ..io import PickleOutput
 
     if not os.path.exists(args.filename):
-        lgr.debug("File {} doesn't exist.  No summary available".format(args.filename))
+        lgr.debug(f"File {args.filename} doesn't exist.  No summary available")
         return 1
 
     due = PickleOutput.load(args.filename)
@@ -64,6 +64,6 @@ def run(args: argparse.Namespace) -> int:
     elif args.format == "bibtex":
         out = BibTeXOutput(sys.stdout, due)
     else:
-        raise ValueError("unknown to treat %s" % args.format)
+        raise ValueError(f"unknown to treat {args.format}")
     out.dump()
     return 0

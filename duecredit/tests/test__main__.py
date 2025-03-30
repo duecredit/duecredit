@@ -28,7 +28,7 @@ def test_main_help(monkeypatch: MonkeyPatch) -> None:
 
     pytest.raises(SystemExit, __main__.main, ["__main__.py", "--help"])
     assert fakestdout.getvalue().startswith(
-        "Usage: %s -m duecredit [OPTIONS] <file> [ARGS]\n" % sys.executable
+        f"Usage: {sys.executable} -m duecredit [OPTIONS] <file> [ARGS]\n"
     )
 
 
@@ -38,7 +38,7 @@ def test_main_version(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setattr(sys, "stdout", fakestdout)
 
     pytest.raises(SystemExit, __main__.main, ["__main__.py", "--version"])
-    assert fakestdout.getvalue().rstrip() == "duecredit %s" % __version__
+    assert fakestdout.getvalue().rstrip() == f"duecredit {__version__}"
 
 
 def test_main_run_a_script(tmpdir: py.path.local, monkeypatch: MonkeyPatch) -> None:

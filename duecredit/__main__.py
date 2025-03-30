@@ -18,15 +18,14 @@ from .log import lgr
 def usage(outfile, executable=sys.argv[0]):
     if "__main__.py" in executable:
         # That was -m duecredit way to launch
-        executable = "%s -m duecredit" % sys.executable
+        executable = f"{sys.executable} -m duecredit"
     outfile.write(
-        """Usage: %s [OPTIONS] <file> [ARGS]
+        f"""Usage: {executable} [OPTIONS] <file> [ARGS]
 
 Meta-options:
 --help                Display this help then exit.
 --version             Output version information then exit.
 """
-        % executable
     )
 
 
@@ -56,8 +55,8 @@ def main(argv=None):
         # probably needs to hook in somehow into commands/options available
         # under cmdline/
     except getopt.error as msg:
-        sys.stderr.write("{}: {}\n".format(sys.argv[0], msg))
-        sys.stderr.write("Try `%s --help' for more information\n" % sys.argv[0])
+        sys.stderr.write(f"{sys.argv[0]}: {msg}\n")
+        sys.stderr.write(f"Try `{sys.argv[0]} --help' for more information\n")
         sys.exit(1)
 
     # and now we need to execute target script "manually"
@@ -68,7 +67,7 @@ def main(argv=None):
             sys.exit(0)
 
         if opt == "--version":
-            sys.stdout.write("duecredit %s\n" % __version__)
+            sys.stdout.write(f"duecredit {__version__}\n")
             sys.exit(0)
 
     sys.argv = prog_argv
@@ -90,7 +89,7 @@ def main(argv=None):
         runctx(code, globs, globs)
         # TODO: see if we could hide our presence from the final tracebacks if execution fails
     except OSError as err:
-        lgr.error("Cannot run file {!r} because: {}".format(sys.argv[0], err))
+        lgr.error(f"Cannot run file {sys.argv[0]!r} because: {err}")
         sys.exit(1)
     except SystemExit:
         pass

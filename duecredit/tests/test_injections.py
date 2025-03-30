@@ -65,7 +65,7 @@ class TestActiveInjector:
             "duecredit.tests.mod",
             func,
             Doi("1.2.3.4"),
-            description="Testing %s" % func,
+            description=f"Testing {func}",
             min_version="0.1",
             max_version="1.0",
             tags=["implementation", "very custom"],
@@ -92,7 +92,7 @@ class TestActiveInjector:
         exec('ret = %s(None, "somevalue")' % (func_call or func), globals_, locals_)
         # TODO: awkwardly 'ret' is not found in the scope while running pytest
         # under python3.4, although present in locals()... WTF?
-        assert locals_["ret"] == "%s: None, somevalue" % func
+        assert locals_["ret"] == f"{func}: None, somevalue"
         assert len(self.due._entries) == 1
         assert len(self.due.citations) == 1
 
@@ -112,7 +112,7 @@ class TestActiveInjector:
             "duecredit.tests.mod",
             func,
             Doi("1.2.3.4"),
-            description="Testing %s" % func,
+            description=f"Testing {func}",
             min_version="0.1",
             max_version="1.0",
             tags=["implementation", "very custom"],
@@ -122,7 +122,7 @@ class TestActiveInjector:
             "duecredit.tests.mod",
             func,
             Doi("1.2.3.5"),
-            description="Testing %s" % func,
+            description=f"Testing {func}",
             min_version="0.1",
             max_version="1.0",
             tags=["implementation", "very custom"],
@@ -149,7 +149,7 @@ class TestActiveInjector:
         exec('ret = %s(None, "somevalue")' % (func_call or func), globals_, locals_)
         # TODO: awkwardly 'ret' is not found in the scope while running pytest
         # under python3.4, although present in locals()... WTF?
-        assert locals_["ret"] == "%s: None, somevalue" % func
+        assert locals_["ret"] == f"{func}: None, somevalue"
         assert len(self.due._entries) == 2
         assert len(self.due.citations) == 2
 
@@ -193,7 +193,7 @@ class TestActiveInjector:
             # We do have injections for scipy
             import scipy  # noqa: F401
         except ImportError as e:
-            pytest.skip("scipy was not found: {}".format(e))
+            pytest.skip(f"scipy was not found: {e}")
 
     def test_import_mvpa2_suite(self) -> None:
         if not _have_mvpa2:

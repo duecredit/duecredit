@@ -239,7 +239,7 @@ class DueCreditCollector:
             raise ValueError("Must be a string")
 
     def _load_bib(self, src: str) -> None:
-        lgr.debug("Loading %s" % src)
+        lgr.debug(f"Loading {src}")
 
     # # TODO: figure out what would be the optimal use for the __call__
     # def __call__(self, *args, **kwargs):
@@ -405,7 +405,7 @@ class DueCreditCollector:
                 # deduce path from the actual function which was decorated
                 # TODO: must include class name  but can't !!!???
                 modname = func.__module__
-                path = kwargs["path"] = "{}:{}".format(modname, func.__name__)
+                path = kwargs["path"] = f"{modname}:{func.__name__}"
             else:
                 # TODO: we indeed need to separate path logic outside
                 modname = path.split(":", 1)[0]
@@ -420,7 +420,7 @@ class DueCreditCollector:
             # see e.g.
             # http://stackoverflow.com/questions/961048/get-class-that-defined-method
             lgr.debug(
-                "Decorating func {} within module {}".format(func.__name__, modname)
+                f"Decorating func {func.__name__} within module {modname}"
             )
             # TODO: unittest for all the __version__ madness
 
@@ -434,7 +434,7 @@ class DueCreditCollector:
                     ):
                         self.cite(*args, **kwargs)
                 except Exception as e:
-                    lgr.warning("Failed to cite due to {}".format(e))
+                    lgr.warning(f"Failed to cite due to {e}")
                 return func(*fargs, **fkwargs)
 
             cite_wrapper.__duecredited__ = func
@@ -458,9 +458,7 @@ class DueCreditCollector:
 
     @never_fail
     def __str__(self) -> str:
-        return self.__class__.__name__ + " {:d} entries, {:d} citations".format(
-            len(self._entries), len(self.citations)
-        )
+        return f"{self.__class__.__name__} {len(self._entries)} entries, {len(self.citations)} citations"
 
 
 # TODO: redo heavily -- got very messy

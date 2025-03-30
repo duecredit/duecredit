@@ -66,10 +66,10 @@ class TraceBack:
         entries_out = [entries[0]]
         for entry in entries[1:]:
             if entry[0] == entries_out[-1][0]:
-                entries_out[-1][1] += ",%s" % entry[1]
+                entries_out[-1][1] += f",{entry[1]}"
             else:
                 entries_out.append(entry)
-        sftb = ">".join(["{}:{}".format(mbasename(x[0]), x[1]) for x in entries_out])
+        sftb = ">".join([f"{mbasename(x[0])}:{x[1]}" for x in entries_out])
         if self.__collide:
             # lets remove part which is common with previous invocation
             prev_next = sftb
@@ -91,7 +91,7 @@ class ColorFormatter(logging.Formatter):
     BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 
     RESET_SEQ = "\033[0m"
-    COLOR_SEQ = "\033[1;%dm"
+    COLOR_SEQ = "\033[1;{}m"
     BOLD_SEQ = "\033[1m"
 
     COLORS = {
@@ -143,7 +143,7 @@ class ColorFormatter(logging.Formatter):
         if self.use_color and levelname in self.COLORS:
             fore_color = 30 + self.COLORS[levelname]
             levelname_color = (
-                self.COLOR_SEQ % fore_color + "%-7s" % levelname + self.RESET_SEQ
+                self.COLOR_SEQ.format(fore_color) + f"{levelname:<7}" + self.RESET_SEQ
             )
             record.levelname = levelname_color
         record.msg = record.msg.replace("\n", "\n| ")
@@ -163,7 +163,7 @@ class LoggerHelper:
     def _get_environ(
         self, var: str, default: str | None | bool = None
     ) -> str | None | bool:
-        return os.environ.get(self.name.upper() + "_%s" % var.upper(), default)
+        return os.environ.get(self.name.upper() + f"_{var.upper()}", default)
 
     def set_level(self, level: str | None = None, default: str = "WARNING") -> None:
         """Helper to set loglevel for an arbitrary logger
