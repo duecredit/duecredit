@@ -31,8 +31,7 @@ def mbasename(s: str) -> str:
     Also strip .py at the end
     """
     base = basename(s)
-    if base.endswith(".py"):
-        base = base[:-3]
+    base = base.removesuffix(".py")
     if base in {"base", "__init__"}:
         base = basename(dirname(s)) + "." + base
     return base
