@@ -1,4 +1,5 @@
 """Some test submodule"""
+
 from typing import Any
 
 

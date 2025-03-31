@@ -419,9 +419,7 @@ class DueCreditCollector:
             # TODO: might make use of inspect.getmro
             # see e.g.
             # http://stackoverflow.com/questions/961048/get-class-that-defined-method
-            lgr.debug(
-                f"Decorating func {func.__name__} within module {modname}"
-            )
+            lgr.debug(f"Decorating func {func.__name__} within module {modname}")
             # TODO: unittest for all the __version__ madness
 
             # TODO: check if we better use wrapt module which provides superior "correctness"
