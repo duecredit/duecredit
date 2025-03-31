@@ -240,7 +240,7 @@ def test_noincorrect_import_if_no_lxml_numpy(
         else:
             assert "done123" in out
     else:
-        assert "done123\n" or "done123\r\n" == out
+        assert out in ("done123\n", "done123\r\n")
 
 
 if __name__ == "__main__":
