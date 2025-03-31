@@ -6,8 +6,7 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-"""Importer which would also call decoration on a module upon import
-"""
+"""Importer which would also call decoration on a module upon import"""
 from __future__ import annotations
 
 __docformat__ = "restructuredtext"
@@ -105,9 +104,9 @@ class DueCreditInjector:
             collector = due
         self._collector = collector
         self._delayed_injections: dict[str, str] = {}
-        self._entry_records: dict[
-            str, dict[str | None, Any]
-        ] = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
+        self._entry_records: dict[str, dict[str | None, Any]] = (
+            {}
+        )  # dict:  modulename: {object: [('entry', cite kwargs)]}
         self._processed_modules: set[str] = set()
         # We need to process modules only after we are done with all nested imports, otherwise we
         # might be trying to process them too early -- whenever they are not yet linked to their
@@ -240,9 +239,7 @@ class DueCreditInjector:
                 try:
                     parent, obj_name, obj = find_object(mod, obj_path)
                 except (KeyError, AttributeError) as e:
-                    lgr.warning(
-                        f"Could not find {obj_path} in module {mod}: {e}"
-                    )
+                    lgr.warning(f"Could not find {obj_path} in module {mod}: {e}")
                     continue
 
             # there could be multiple per func

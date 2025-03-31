@@ -6,8 +6,7 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-"""Automatic injection of bibliography entries for nipy module
-"""
+"""Automatic injection of bibliography entries for nipy module"""
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

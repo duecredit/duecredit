@@ -112,13 +112,11 @@ def test_api(collector_class) -> None:
 
 
 @overload
-def run_python_command(cmd: str):
-    ...
+def run_python_command(cmd: str): ...
 
 
 @overload
-def run_python_command(cmd: None, script: str):
-    ...
+def run_python_command(cmd: None, script: str): ...
 
 
 def run_python_command(cmd: str | None = None, script: str | None = None):

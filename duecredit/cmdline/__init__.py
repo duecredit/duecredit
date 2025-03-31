@@ -6,8 +6,7 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-"""
-"""
+""" """
 
 __docformat__ = "restructuredtext"
 

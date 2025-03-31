@@ -6,8 +6,7 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-"""Facility to automagically decorate with references other modules
-"""
+"""Facility to automagically decorate with references other modules"""
 
 __docformat__ = "restructuredtext"
 
