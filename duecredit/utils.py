@@ -70,8 +70,7 @@ def is_explicit_path(path: str) -> bool:
     path = expandpath(path, force_absolute=False)
     return (
         isabs(path)
-        or path.startswith(os.curdir + os.sep)
-        or path.startswith(os.pardir + os.sep)
+        or path.startswith((os.curdir + os.sep, os.pardir + os.sep))
     )
 
 
