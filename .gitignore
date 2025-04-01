@@ -3,7 +3,7 @@ __pycache__
 /build
 /dist
 /MANIFEST
-/duecredit/version.py
+/duecredit/_version.py
 /venv*
 /.tox
 .duecredit.p

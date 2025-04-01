@@ -1,5 +1,4 @@
-include LICENSE README.md CHANGELOG.md requirements.txt tox.ini CONTRIBUTING.md setup.cfg
-include .coveragerc .travis.yml
+exclude .autorc .codespellrc .github_changelog_generator .gitignore .mailmap .pre-commit-config.yaml .zenodo.json appveyor.yml
+prune .github
+prune examples
 include examples/example_scipy.py
-graft duecredit
-global-exclude *.py[cod]

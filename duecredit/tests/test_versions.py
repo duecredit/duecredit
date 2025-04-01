@@ -12,7 +12,7 @@ from os import linesep
 
 import pytest
 
-from ..version import __version__
+from .._version import __version__
 from ..versions import ExternalVersions, Version
 
 

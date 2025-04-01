@@ -1,3 +1,56 @@
+[build-system]
+requires = ["setuptools>=61.2", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "duecredit"
+authors = [
+    {name = "Yaroslav Halchenko", email = "yoh@onerussian.com"},
+    {name = "Matteo Visconti di Oleggio Castello"},
+]
+description = "Publications (and donations) tracer"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords= ["citation tracing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Other Environment",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Legal Industry",
+    "Intended Audience :: Other Audience",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "citeproc-py>=0.4",
+    "looseversion",
+    "packaging",
+    "requests",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = ["pytest", "pytest-cov", "vcrpy"]
+
+[project.urls]
+Homepage = "https://github.com/duecredit/duecredit"
+
+[project.scripts]
+duecredit = "duecredit.cmdline.main:main"
+
+[tool.setuptools_scm]
+version_file = "duecredit/_version.py"
+
 [tool.ruff.lint]
 extend-select = [
     "B",
