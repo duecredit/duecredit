@@ -19,7 +19,7 @@ from ..cmdline import main
 
 
 def test_import() -> None:
-    import duecredit.cmdline  # noqa: F401
+    import duecredit.cmdline
     import duecredit.cmdline.main  # noqa: F401
 
 

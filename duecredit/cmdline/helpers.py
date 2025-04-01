@@ -23,8 +23,8 @@ class HelpAction(argparse.Action):
     def __call__(
         self,
         parser: argparse.ArgumentParser,
-        namespace: argparse.Namespace,  # noqa: U100
-        values,  # noqa: U100
+        namespace: argparse.Namespace,
+        values,
         option_string: str | None = None,
     ) -> None:
         # import pydb; pydb.debugger()
@@ -72,10 +72,10 @@ class HelpAction(argparse.Action):
 class LogLevelAction(argparse.Action):
     def __call__(
         self,
-        parser: argparse.ArgumentParser,  # noqa: U100
-        namespace: argparse.Namespace,  # noqa: U100
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
         values,
-        option_string: str | None = None,  # noqa: U100
+        option_string: str | None = None,
     ) -> None:
         from ..log import LoggerHelper
 

@@ -450,9 +450,9 @@ class DueCreditInjector:
         try:
             if self._active:
                 self.deactivate()
-        except:  # noqa: E722, B001
+        except:  # noqa: E722
             pass
         try:
             super(self.__class__, self).__del__()  # type: ignore
-        except:  # noqa: E722, B001
+        except:  # noqa: E722
             pass
