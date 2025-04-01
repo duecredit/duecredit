@@ -51,13 +51,21 @@ duecredit = "duecredit.cmdline.main:main"
 [tool.setuptools_scm]
 version_file = "duecredit/_version.py"
 
+[tool.ruff]
+line-length = 120
+
 [tool.ruff.lint]
 extend-select = [
     "B",
     "A",
+    "I",
     "W",
 ]
 ignore = [
     "B904",
     "E402",  # Module level import not at top of file
 ]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+relative-imports-order = "closest-to-furthest"
