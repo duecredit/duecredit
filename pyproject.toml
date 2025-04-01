@@ -51,9 +51,6 @@ duecredit = "duecredit.cmdline.main:main"
 [tool.setuptools_scm]
 version_file = "duecredit/_version.py"
 
-[tool.ruff]
-line-length = 120
-
 [tool.ruff.lint]
 extend-select = [
     "B",
