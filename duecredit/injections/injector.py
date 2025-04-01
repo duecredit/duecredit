@@ -357,7 +357,7 @@ class DueCreditInjector:
             if retrospect:
                 lgr.debug("Considering previously loaded %d modules", len(sys.modules))
                 # operate on keys() (not iterator) since we might end up importing delayed injection modules etc
-                for mod_name in sys.modules.keys():
+                for mod_name in sys.modules:
                     self.process(sys.modules[mod_name])
 
             lgr.debug("Assigning our importer")
