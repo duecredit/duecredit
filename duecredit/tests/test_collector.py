@@ -162,7 +162,7 @@ def test_dcite_method() -> None:
         class SomeClass2:
             # Used to test for classes that are not instantiated
             @due.dcite("XXX0", path="some.module.without.method")  # type: ignore
-            def method2(self, arg1, kwarg2="blah"):  # noqa: U100
+            def method2(self, arg1, kwarg2="blah"):
                 assert arg1 == "magical"
                 return "load"
 
