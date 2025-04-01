@@ -42,7 +42,7 @@ class DueCreditEntry:
         pass
 
     def __repr__(self) -> str:
-        argl = [repr(self._rawentry), f"key={repr(self._key)}"]
+        argl = [repr(self._rawentry), f"key={self._key!r}"]
         args = ", ".join(argl)
         return self.__class__.__name__ + f"({args})"
 

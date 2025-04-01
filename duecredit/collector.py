@@ -93,11 +93,11 @@ class Citation:
     def __repr__(self) -> str:
         argl = [repr(self._entry)]
         if self._description:
-            argl.append(f"description={repr(self._description)}")
+            argl.append(f"description={self._description!r}")
         if self._path:
-            argl.append(f"path={repr(self._path)}")
+            argl.append(f"path={self._path!r}")
         if self._cite_module:
-            argl.append(f"cite_module={repr(self._cite_module)}")
+            argl.append(f"cite_module={self._cite_module!r}")
 
         if argl:
             args = ", ".join(argl)
@@ -444,9 +444,9 @@ class DueCreditCollector:
     def __repr__(self) -> str:
         argl = []
         if self.citations:
-            argl.append(f"citations={repr(self.citations)}")
+            argl.append(f"citations={self.citations!r}")
         if self._entries:
-            argl.append(f"entries={repr(self._entries)}")
+            argl.append(f"entries={self._entries!r}")
 
         if argl:
             args = ", ".join(argl)
