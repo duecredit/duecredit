@@ -9,11 +9,6 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
 
-  - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 25.1.0
-    hooks:
-      - id: black
-
   - repo: https://github.com/PyCQA/flake8
     rev: 7.2.0
     hooks:
@@ -28,6 +23,7 @@ repos:
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
+      - id: ruff-format
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1

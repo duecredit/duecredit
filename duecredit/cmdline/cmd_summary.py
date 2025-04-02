@@ -7,6 +7,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Spit out the summary of the citations which were collected."""
+
 from __future__ import annotations
 
 import argparse

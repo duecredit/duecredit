@@ -10,6 +10,7 @@
 """
 Automatic injection of bibliography entries for mdp module
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
