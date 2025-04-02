@@ -68,10 +68,7 @@ def is_explicit_path(path: str) -> bool:
     './' is assumed to indicate a location on the filesystem. Any other
     path format is not considered explicit."""
     path = expandpath(path, force_absolute=False)
-    return (
-        isabs(path)
-        or path.startswith((os.curdir + os.sep, os.pardir + os.sep))
-    )
+    return isabs(path) or path.startswith((os.curdir + os.sep, os.pardir + os.sep))
 
 
 def rotree(path: str, ro: bool = True, chmod_files: bool = True) -> None:

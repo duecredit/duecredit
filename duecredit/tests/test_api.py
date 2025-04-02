@@ -183,7 +183,10 @@ def test_noincorrect_import_if_no_lxml(monkeypatch: MonkeyPatch) -> None:
     ],
 )
 def test_noincorrect_import_if_no_lxml_numpy(
-    monkeypatch: MonkeyPatch, kwargs, env, stubbed_env  # noqa: U100
+    monkeypatch: MonkeyPatch,
+    kwargs,
+    env,
+    stubbed_env,  # noqa: U100
 ) -> None:
     # Now make sure that we would not crash entire process at the end when unable to
     # produce sensible output when we have something to cite
