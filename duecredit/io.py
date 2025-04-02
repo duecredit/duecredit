@@ -11,7 +11,7 @@ from __future__ import annotations
 # Just for testing of robust operation
 import os
 
-if "DUECREDIT_TEST_EARLY_IMPORT_ERROR" in os.environ.keys():
+if "DUECREDIT_TEST_EARLY_IMPORT_ERROR" in os.environ:
     raise ImportError("DUECREDIT_TEST_EARLY_IMPORT_ERROR")
 
 from collections import defaultdict
@@ -175,7 +175,7 @@ class TextOutput(Output):
     def __init__(self, fd, collector, style=None) -> None:
         super().__init__(fd, collector)
         self.style = style
-        if "DUECREDIT_STYLE" in os.environ.keys():
+        if "DUECREDIT_STYLE" in os.environ:
             self.style = os.environ["DUECREDIT_STYLE"]
         else:
             self.style = "harvard1"

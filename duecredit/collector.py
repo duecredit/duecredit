@@ -255,7 +255,7 @@ class DueCreditCollector:
         # TODO: if cite is invoked but no path is provided -- we must figure it out
         # I guess from traceback, otherwise how would we know later to associate it
         # with modules???
-        path = kwargs.get("path", None)
+        path = kwargs.get("path")
         if path is None:
             raise ValueError("path must be provided")
 
@@ -279,7 +279,7 @@ class DueCreditCollector:
 
         # TODO: theoretically version shouldn't differ if we don't preload previous results
         if not citation.version:
-            version = kwargs.get("version", None)
+            version = kwargs.get("version")
 
             if not version and citation.path:
                 modname = citation.path.split(".", 1)[0]
@@ -400,7 +400,7 @@ class DueCreditCollector:
 
         def func_wrapper(func):
             conditions = kwargs.pop("conditions", {})
-            path = kwargs.get("path", None)
+            path = kwargs.get("path")
             if not path:
                 # deduce path from the actual function which was decorated
                 # TODO: must include class name  but can't !!!???
