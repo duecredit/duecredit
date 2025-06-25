@@ -12,8 +12,8 @@ Please see README.md shipped along with duecredit to get a better idea about
 its functionality
 """
 
+from ._version import __version__
 from .dueswitch import due
 from .entries import BibTeX, Doi, Text, Url
-from ._version import __version__
 
 __all__ = ["Doi", "BibTeX", "Url", "Text", "due", "__version__"]
