@@ -24,9 +24,9 @@ repos:
           - flake8-unused-arguments
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.2
+    rev: v0.12.7
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: ["--fix", "--show-fixes"]
 
   - repo: https://github.com/codespell-project/codespell
