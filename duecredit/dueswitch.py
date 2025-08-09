@@ -7,6 +7,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Provides an adapter to switch between two (active, inactive) collectors"""
+
 from __future__ import annotations
 
 import atexit

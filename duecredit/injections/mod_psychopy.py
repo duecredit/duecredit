@@ -9,6 +9,7 @@
 """
 Automatic injection of bibliography entries for psychopy module
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
