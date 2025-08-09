@@ -58,12 +58,24 @@ line-length = 120
 extend-select = [
     "B",
     "A",
+    "ARG",
     "I",
     "W",
 ]
 ignore = [
     "B904",
-    "E402",  # Module level import not at top of file
+    "ARG001", # Unused function argument
+    "ARG002", # Unused method argument
+    "E402",   # Module level import not at top of file
+]
+exclude = [
+    ".venv",
+    "venv-debug",
+    "venvs",
+    "build",
+    "dist",
+    "doc",
+    "git/ext",
 ]
 
 [tool.ruff.lint.isort]
