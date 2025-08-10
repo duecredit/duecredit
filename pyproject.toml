@@ -55,12 +55,13 @@ version_file = "duecredit/_version.py"
 extend-select = [
     "B",
     "A",
+    "C4",
     "ARG",
     "I",
     "W",
 ]
 ignore = [
-    "B904",
+    "C408",   # Unnecessary `dict()` call
     "ARG001", # Unused function argument
     "ARG002", # Unused method argument
     "E402",   # Module level import not at top of file
