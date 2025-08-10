@@ -96,8 +96,7 @@ class TestActiveInjector:
         assert len(self.due._entries) == 1
         assert len(self.due.citations) == 1
 
-        # TODO: there must be a cleaner way to get first value
-        citation = list(self.due.citations.values())[0]
+        citation = next(iter(self.due.citations.values()))
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version
@@ -153,8 +152,7 @@ class TestActiveInjector:
         assert len(self.due._entries) == 2
         assert len(self.due.citations) == 2
 
-        # TODO: there must be a cleaner way to get first value
-        citation = list(self.due.citations.values())[0]
+        citation = next(iter(self.due.citations.values()))
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version
