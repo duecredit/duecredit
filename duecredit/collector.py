@@ -10,12 +10,11 @@
 
 from __future__ import annotations
 
-from collections import namedtuple
 from functools import wraps
 import logging
 import os
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 from .config import DUECREDIT_FILE
 from .entries import DueCreditEntry
@@ -28,7 +27,10 @@ lgr = logging.getLogger("duecredit.collector")
 if TYPE_CHECKING:
     from typing_extensions import Self
 
-CitationKey = namedtuple("CitationKey", ["path", "entry_key"])
+
+class CitationKey(NamedTuple):
+    path: str
+    entry_key: str
 
 
 class Citation:
