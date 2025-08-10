@@ -61,6 +61,7 @@ extend-select = [
     "ARG",
     "FLY",
     "I",
+    "PERF",
     "W",
 ]
 ignore = [
