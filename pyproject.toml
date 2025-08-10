@@ -63,6 +63,7 @@ extend-select = [
     "I",
     "PERF",
     "W",
+    "PGH",
 ]
 ignore = [
     "C408",   # Unnecessary `dict()` call
