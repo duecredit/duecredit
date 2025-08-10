@@ -152,19 +152,18 @@ def setup_parser() -> argparse.ArgumentParser:
         cmd_short_description.append((cmd_name, sdescr))
 
     # create command summary
-    cmd_summary = []
-    for cd in cmd_short_description:
-        cmd_summary.append(
-            "{}\n{}\n\n".format(
-                cd[0],
-                textwrap.fill(
-                    cd[1],
-                    75,
-                    initial_indent=" " * 4,
-                    subsequent_indent=" " * 4,
-                ),
-            )
+    cmd_summary = [
+        "{}\n{}\n\n".format(
+            cd[0],
+            textwrap.fill(
+                cd[1],
+                75,
+                initial_indent=" " * 4,
+                subsequent_indent=" " * 4,
+            ),
         )
+        for cd in cmd_short_description
+    ]
     parser.description = "{}\n{}\n\n{}".format(
         parser.description,
         "\n".join(cmd_summary),
