@@ -7,6 +7,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Automatic injection of bibliography entries for pandas module"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

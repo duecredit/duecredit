@@ -7,6 +7,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Importer which would also call decoration on a module upon import"""
+
 from __future__ import annotations
 
 __docformat__ = "restructuredtext"
@@ -104,9 +105,9 @@ class DueCreditInjector:
             collector = due
         self._collector = collector
         self._delayed_injections: dict[str, str] = {}
-        self._entry_records: dict[str, dict[str | None, Any]] = (
-            {}
-        )  # dict:  modulename: {object: [('entry', cite kwargs)]}
+        self._entry_records: dict[
+            str, dict[str | None, Any]
+        ] = {}  # dict:  modulename: {object: [('entry', cite kwargs)]}
         self._processed_modules: set[str] = set()
         # We need to process modules only after we are done with all nested imports, otherwise we
         # might be trying to process them too early -- whenever they are not yet linked to their

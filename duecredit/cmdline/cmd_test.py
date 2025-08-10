@@ -7,6 +7,7 @@
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Run internal DueCredit (unit)tests to verify correct operation on the system"""
+
 from __future__ import annotations
 
 __docformat__ = "restructuredtext"
