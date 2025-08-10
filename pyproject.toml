@@ -59,6 +59,7 @@ extend-select = [
     "ISC",
     "PYI",
     "ARG",
+    "FLY",
     "I",
     "W",
 ]
