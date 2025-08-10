@@ -150,10 +150,10 @@ class Output:
             if (
                 all_
                 or any(
-                    filter(lambda x: x.cite_module, package_citations)  # type: ignore
+                    filter(lambda x: x.cite_module, package_citations)  # type: ignore[attr-defined,arg-type]
                 )
                 or any(
-                    filter(lambda x: _is_contained(package, x), cited_modobj)  # type: ignore
+                    filter(lambda x: _is_contained(package, x), cited_modobj)  # type: ignore[arg-type]
                 )
             ):
                 continue
@@ -236,7 +236,7 @@ class TextOutput(Output):
             for path in paths:
                 for cit in pmo[path]:
                     # 'import Citation / assert type(cit) is Citation' would pollute environment
-                    ek = cit.entry.key  # type: ignore
+                    ek = cit.entry.key
                     if ek not in printed_keys:
                         self.fd.write(f"\n[{citation_nr[ek]}] ")
                         self.fd.write(get_text_rendering(cit.entry, style=self.style))

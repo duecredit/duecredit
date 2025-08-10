@@ -69,8 +69,8 @@ except Exception as e:
 
         logging.getLogger("duecredit").error(f"Failed to import duecredit due to {e}")
     # Initiate due stub
-    due = InactiveDueCreditCollector()  # type: ignore
-    BibTeX = Doi = Url = Text = _donothing_func  # type: ignore
+    due = InactiveDueCreditCollector()  # type: ignore[assignment]
+    BibTeX = Doi = Url = Text = _donothing_func  # type: ignore[assignment, misc]
 
 # Emacs mode definitions
 # Local Variables:

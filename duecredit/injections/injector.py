@@ -454,6 +454,6 @@ class DueCreditInjector:
         except:  # noqa: E722
             pass
         try:
-            super(self.__class__, self).__del__()  # type: ignore
+            super(self.__class__, self).__del__()  # type: ignore[misc]
         except:  # noqa: E722
             pass

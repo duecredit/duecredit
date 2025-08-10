@@ -120,7 +120,7 @@ def test_dcite_method() -> None:
             return "load"
 
         class SomeClass:
-            @due.dcite("XXX0", path="someclass:method")  # type: ignore
+            @due.dcite("XXX0", path="someclass:method")  # type: ignore[attr-defined]
             def method(self, arg1: str, kwarg2: str = "blah") -> str:
                 """docstring"""
                 assert arg1 == "magical"
@@ -161,7 +161,7 @@ def test_dcite_method() -> None:
 
         class SomeClass2:
             # Used to test for classes that are not instantiated
-            @due.dcite("XXX0", path="some.module.without.method")  # type: ignore
+            @due.dcite("XXX0", path="some.module.without.method")  # type: ignore[attr-defined]
             def method2(self, arg1, kwarg2="blah"):
                 assert arg1 == "magical"
                 return "load"
