@@ -8,6 +8,8 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 from __future__ import annotations
 
+import functools
+import operator
 import os
 from typing import TYPE_CHECKING, Any
 
@@ -313,9 +315,11 @@ def test_get_output_handler_method(tmpdir: py.path.local, monkeypatch) -> None:
 
 def test_collectors_uniform_api() -> None:
     def get_api(objs) -> list[str]:
-        return [
+        return [  # type: ignore[var-annotated]
             x
-            for x in sorted(sum((dir(obj) for obj in objs), []))
+            for x in sorted(
+                functools.reduce(operator.iadd, (dir(obj) for obj in objs), [])
+            )
             if not x.startswith("_") or x in "__call__"
         ]
 
