@@ -32,7 +32,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "citeproc-py>=0.4",
+    "citeproc-py>=0.5",
     "looseversion",
     "packaging",
     "requests",
