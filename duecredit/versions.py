@@ -28,7 +28,7 @@ class UnknownVersion:
     def __str__(self) -> str:
         return "UNKNOWN"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if other is self:
             return True
         raise TypeError("UNKNOWN version is not comparable")
