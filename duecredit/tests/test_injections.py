@@ -96,8 +96,7 @@ class TestActiveInjector:
         assert len(self.due._entries) == 1
         assert len(self.due.citations) == 1
 
-        # TODO: there must be a cleaner way to get first value
-        citation = list(self.due.citations.values())[0]
+        citation = next(iter(self.due.citations.values()))
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version
@@ -153,8 +152,7 @@ class TestActiveInjector:
         assert len(self.due._entries) == 2
         assert len(self.due.citations) == 2
 
-        # TODO: there must be a cleaner way to get first value
-        citation = list(self.due.citations.values())[0]
+        citation = next(iter(self.due.citations.values()))
         # TODO: ATM we don't allow versioning of the submodules -- we should
         # assert_equal(citation.version, '0.5')
         # ATM it will be the duecredit's version
@@ -304,8 +302,8 @@ def test_injector_del() -> None:
         assert __builtin__.__import__ is not orig__import__
         assert inj._orig_import is not None
         del inj  # delete active but not used
-        inj = None  # type: ignore  # noqa: F841
-        __builtin__.__import__ = None  # type: ignore
+        inj = None  # type: ignore[assignment]  # noqa: F841
+        __builtin__.__import__ = None  # type: ignore[assignment]
         # /\ We need to do that since otherwise gc will not pick up inj
         gc.collect()  # To cause __del__
         assert __builtin__.__import__ is orig__import__
@@ -336,8 +334,8 @@ def test_injector_delayed_del() -> None:
         inj2.activate(retrospect=False)
         assert __builtin__.__import__ is not orig__import__
         assert inj2._orig_import is not None
-        del inj  # type: ignore
-        inj = None  # type: ignore  # noqa: F841
+        del inj
+        inj = None  # type: ignore[assignment]  # noqa: F841
         gc.collect()  # To cause __del__
         assert (
             __builtin__.__import__ is not orig__import__

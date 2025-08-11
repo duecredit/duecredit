@@ -84,7 +84,7 @@ def test_pickleoutput(tmpdir) -> None:
     for collector in collectors:
         pickler = PickleOutput(collector, fn=tempfile)
         assert pickler.fn == tempfile
-        assert pickler.dump() is None  # type: ignore
+        assert pickler.dump() is None  # type: ignore[func-returns-value]
 
         with open(tempfile, "rb") as f:
             collector_loaded = pickle.load(f)

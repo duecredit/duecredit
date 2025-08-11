@@ -191,7 +191,7 @@ class DueCreditInjector:
         except Exception as e:
             if os.environ.get("DUECREDIT_ALLOW_FAIL", None):
                 raise
-            raise RuntimeError(f"Failed to import {inj_mod_name}: {e!r}")
+            raise RuntimeError(f"Failed to import {inj_mod_name}: {e!r}") from e
         # TODO: process min/max_versions etc
         assert hasattr(inj_mod, "inject")
         lgr.log(3, "Calling injector of %s", inj_mod_name_full)
@@ -454,6 +454,6 @@ class DueCreditInjector:
         except:  # noqa: E722
             pass
         try:
-            super(self.__class__, self).__del__()  # type: ignore
+            super(self.__class__, self).__del__()  # type: ignore[misc]
         except:  # noqa: E722
             pass
