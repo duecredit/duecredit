@@ -48,7 +48,7 @@ jobs:
             extra-pip: numpy scipy scikit-learn statsmodels pandas matplotlib
     steps:
     - name: Set up environment
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         # Fetch all commits so that versioneer will return something compatible
         # with semantic-version
