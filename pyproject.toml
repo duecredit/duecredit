@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69.5", "setuptools-scm"]
+requires = ["setuptools>=77.0", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Publications (and donations) tracer"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = "BSD-2-Clause"
 license-files = ["LICENSE"]
 keywords= ["citation tracing"]
