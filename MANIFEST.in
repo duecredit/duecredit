@@ -2,3 +2,5 @@ exclude .autorc .codespellrc .github_changelog_generator .gitignore .mailmap .pr
 prune .github
 prune examples
 include examples/example_scipy.py
+include duecredit/schema/*.yaml
+include duecredit/schema/*.jsonld

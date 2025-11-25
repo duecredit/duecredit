@@ -42,6 +42,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 tests = ["pytest", "pytest-cov", "vcrpy"]
+schema = ["linkml-runtime"]
 
 [project.urls]
 Homepage = "https://github.com/duecredit/duecredit"
