@@ -1,3 +1,15 @@
+# 0.11.1 (Tue Nov 25 2025)
+
+#### 🏠 Internal
+
+- Add "released" auto plugin to annotate issues and PRs [#257](https://github.com/duecredit/duecredit/pull/257) ([@yarikoptic](https://github.com/yarikoptic))
+
+#### Authors: 1
+
+- Yaroslav Halchenko ([@yarikoptic](https://github.com/yarikoptic))
+
+---
+
 # 0.10.2 (Tue Jun 04 2024)
 
 #### 🐛 Bug Fix
