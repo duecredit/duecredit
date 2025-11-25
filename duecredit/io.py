@@ -289,7 +289,25 @@ def condition_bibtex(bibtex: str) -> bytes:
     return bibtex.encode("utf-8")
 
 
-def format_bibtex(bibtex_entry: BibTeX, style: str = "harvard1") -> str:
+def format_bibtex(
+    bibtex_entry: BibTeX, style: str = "harvard1", formatter: str = "plain"
+) -> str:
+    """Format a BibTeX entry as a citation string.
+
+    Parameters
+    ----------
+    bibtex_entry : BibTeX
+        The BibTeX entry to format.
+    style : str, optional
+        Citation style (default: "harvard1").
+    formatter : str, optional
+        Output format: "plain" (default), "html", or "rst".
+
+    Returns
+    -------
+    str
+        Formatted citation string.
+    """
     try:
         import citeproc as cp
         from citeproc.source.bibtex import BibTeX as cpBibTeX
@@ -340,9 +358,18 @@ def format_bibtex(bibtex_entry: BibTeX, style: str = "harvard1") -> str:
             # return warnings back
             warnings.filters = old_filters
         bib_style = cp.CitationStylesStyle(style, validate=False)
-        # TODO: specify which tags of formatter we want
+        formatters = {
+            "plain": cp.formatter.plain,
+            "html": cp.formatter.html,
+            "rst": cp.formatter.rst,
+        }
+        if formatter not in formatters:
+            raise ValueError(
+                f"Unknown formatter {formatter!r}. "
+                f"Valid options: {', '.join(formatters.keys())}"
+            )
         bibliography = cp.CitationStylesBibliography(
-            bib_style, bib_source, cp.formatter.plain
+            bib_style, bib_source, formatters[formatter]
         )
         citation = cp.Citation([cp.CitationItem(key)])
         bibliography.register(citation)
