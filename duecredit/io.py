@@ -359,9 +359,9 @@ def format_bibtex(
             warnings.filters = old_filters
         bib_style = cp.CitationStylesStyle(style, validate=False)
         formatters = {
-            "plain": cp.formatter.plain,
-            "html": cp.formatter.html,
-            "rst": cp.formatter.rst,
+            f: getattr(cp.formatter, f)
+            for f in dir(cp.formatter)
+            if not f.startswith("_")
         }
         if formatter not in formatters:
             raise ValueError(
