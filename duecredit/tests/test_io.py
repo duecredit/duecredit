@@ -637,6 +637,42 @@ def test_format_bibtex_with_utf_characters() -> None:
     )
 
 
+def test_format_bibtex_html_formatter() -> None:
+    """Test that html formatter produces HTML tags for styled text."""
+    bibtex_article = (
+        "@article{Test_2020,\n"
+        "title={Test Title},\n"
+        "journal={Nature Methods},\n"
+        "author={Smith, John},\n"
+        "year={2020}\n}"
+    )
+    result = format_bibtex(BibTeX(bibtex_article), formatter="html")
+    # Journal name should be italicized with <i> tags
+    assert "<i>" in result
+    assert "Nature Methods" in result
+
+
+def test_format_bibtex_rst_formatter() -> None:
+    """Test that rst formatter produces RST markup for styled text."""
+    bibtex_article = (
+        "@article{Test_2020,\n"
+        "title={Test Title},\n"
+        "journal={Nature Methods},\n"
+        "author={Smith, John},\n"
+        "year={2020}\n}"
+    )
+    result = format_bibtex(BibTeX(bibtex_article), formatter="rst")
+    # Journal name should use RST emphasis
+    assert ":emphasis:" in result
+
+
+def test_format_bibtex_invalid_formatter() -> None:
+    """Test that invalid formatter raises ValueError."""
+    bibtex = "@misc{test, title={Test}, author={Test}, year={2020}}"
+    with pytest.raises(ValueError, match="Unknown formatter"):
+        format_bibtex(BibTeX(bibtex), formatter="invalid")
+
+
 def test_is_contained() -> None:
     toppath = "package"
     assert _is_contained(toppath, "package.module")
