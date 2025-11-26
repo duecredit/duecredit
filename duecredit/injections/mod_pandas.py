@@ -33,9 +33,10 @@ def inject(injector: DueCreditInjector) -> None:
           author    = { McKinney, Wes },
           title     = { Data Structures for Statistical Computing in Python },
           booktitle = { Proceedings of the 9th Python in Science Conference },
-          pages     = { 51 -- 56 },
+          pages     = { 56 -- 61 },
           year      = { 2010 },
-          editor    = { van der Walt, St\'efan and Millman, Jarrod }
+          editor    = { van der Walt, St\'efan and Millman, Jarrod },
+          doi       = { 10.25080/Majora-92bf1922-00a }
         }
     """
         ),

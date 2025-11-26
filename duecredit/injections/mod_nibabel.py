@@ -27,8 +27,8 @@ def inject(injector: DueCreditInjector) -> None:
     injector.add(
         "nibabel",
         None,
-        Doi("10.5281/zenodo.60847"),
+        Doi("10.5281/zenodo.591597"),
         cite_module=True,
-        description="I/O library to access to common neuroimaging file formats",
+        description="I/O library to access common neuroimaging file formats",
         tags=["implementation"],
     )
