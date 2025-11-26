@@ -198,7 +198,9 @@ def bibtex_to_codemeta(entry: BibTeX) -> dict[str, Any]:
     doi = parse_bibtex_field(bibtex, "doi")
     if doi:
         result["@id"] = f"https://doi.org/{doi}"
-        result["identifier"] = [{"@type": "PropertyValue", "propertyID": "doi", "value": doi}]
+        result["identifier"] = [
+            {"@type": "PropertyValue", "propertyID": "doi", "value": doi}
+        ]
 
     url = parse_bibtex_field(bibtex, "url")
     if url:
@@ -212,11 +214,17 @@ def bibtex_to_codemeta(entry: BibTeX) -> dict[str, Any]:
     if journal:
         issue_info: dict[str, Any] = {"@type": "Periodical", "name": journal}
         if volume:
-            volume_info: dict[str, Any] = {"@type": "PublicationVolume", "volumeNumber": volume}
+            volume_info: dict[str, Any] = {
+                "@type": "PublicationVolume",
+                "volumeNumber": volume,
+            }
             volume_info["isPartOf"] = issue_info
             issue_info = volume_info
         if number:
-            issue_num: dict[str, Any] = {"@type": "PublicationIssue", "issueNumber": number}
+            issue_num: dict[str, Any] = {
+                "@type": "PublicationIssue",
+                "issueNumber": number,
+            }
             issue_num["isPartOf"] = issue_info
             issue_info = issue_num
         result["isPartOf"] = issue_info
@@ -251,7 +259,9 @@ def doi_to_codemeta(entry: Doi) -> dict[str, Any]:
     return {
         "@type": "CreativeWork",
         "@id": f"https://doi.org/{entry.doi}",
-        "identifier": [{"@type": "PropertyValue", "propertyID": "doi", "value": entry.doi}],
+        "identifier": [
+            {"@type": "PropertyValue", "propertyID": "doi", "value": entry.doi}
+        ],
     }
 
 
@@ -374,9 +384,7 @@ def collector_to_codemeta(
                 "identifier": path,
                 "name": path,
                 "version": (
-                    citations[0].version
-                    if citations and citations[0].version
-                    else None
+                    citations[0].version if citations and citations[0].version else None
                 ),
             }
             for path, citations in packages.items()
