@@ -1,3 +1,17 @@
+# 0.11.2 (Wed Nov 26 2025)
+
+#### 🐛 Bug Fix
+
+- Update SciPy injection to 2020 Nature Methods paper [#258](https://github.com/duecredit/duecredit/pull/258) ([@Copilot](https://github.com/Copilot))
+- Choose formatter [#260](https://github.com/duecredit/duecredit/pull/260) ([@asmacdo](https://github.com/asmacdo))
+
+#### Authors: 2
+
+- [@Copilot](https://github.com/Copilot)
+- Austin Macdonald ([@asmacdo](https://github.com/asmacdo))
+
+---
+
 # 0.11.1 (Tue Nov 25 2025)
 
 #### 🏠 Internal
