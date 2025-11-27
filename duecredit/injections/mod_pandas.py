@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..entries import BibTeX
+from ..entries import BibTeX, Doi
 
 # If defined, would determine from which to which version of the corresponding
 # module to care about
@@ -41,4 +41,12 @@ def inject(injector: DueCreditInjector) -> None:
     """
         ),
         description="Data analysis library for tabular data",
+    )
+
+    injector.add(
+        "pandas",
+        None,
+        Doi("10.5281/zenodo.3509134"),
+        description="pandas-dev/pandas: Pandas",
+        tags=["implementation"],
     )
