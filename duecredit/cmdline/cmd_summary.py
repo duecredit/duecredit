@@ -14,6 +14,7 @@ import argparse
 import os
 import sys
 
+from ..codemeta import CodeMetaOutput
 from ..config import DUECREDIT_FILE
 from ..io import BibTeXOutput, TextOutput
 from ..log import lgr
@@ -41,9 +42,9 @@ def setup_parser(parser: argparse.ArgumentParser) -> None:
 
     parser.add_argument(
         "--format",
-        choices=("text", "bibtex"),
+        choices=("text", "bibtex", "codemeta"),
         default="text",
-        help="Way to present the summary",
+        help="Way to present the summary (text, bibtex, or codemeta JSON-LD)",
     )
 
 
@@ -57,11 +58,13 @@ def run(args: argparse.Namespace) -> int:
     due = PickleOutput.load(args.filename)
     # CollectorSummary(due).dump()
 
-    out: TextOutput | BibTeXOutput
+    out: TextOutput | BibTeXOutput | CodeMetaOutput
     if args.format == "text":
         out = TextOutput(sys.stdout, due, args.style)
     elif args.format == "bibtex":
         out = BibTeXOutput(sys.stdout, due)
+    elif args.format == "codemeta":
+        out = CodeMetaOutput(sys.stdout, due)
     else:
         raise ValueError(f"unknown to treat {args.format}")
     out.dump()
