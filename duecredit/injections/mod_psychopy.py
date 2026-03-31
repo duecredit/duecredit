@@ -29,9 +29,17 @@ def inject(injector: DueCreditInjector) -> None:
     injector.add(
         "psychopy",
         None,
-        Doi("doi:10.1016/j.jneumeth.2006.11.017"),
-        description="PsychoPy -- Psychophysics software in Python.",
+        Doi("10.3758/s13428-018-01193-y"),
+        description="PsychoPy2: Experiments in behavior made easy.",
         tags=["implementation"],
+    )
+
+    injector.add(
+        "psychopy",
+        None,
+        Doi("10.1016/j.jneumeth.2006.11.017"),
+        description="PsychoPy -- Psychophysics software in Python.",
+        tags=["reference"],
     )
 
     injector.add(
@@ -39,5 +47,5 @@ def inject(injector: DueCreditInjector) -> None:
         None,
         Doi("10.3389/neuro.11.010.2008"),
         description="Generating stimuli for neuroscience using PsychoPy.",
-        tags=["implementation"],
+        tags=["reference"],
     )

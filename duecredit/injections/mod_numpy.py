@@ -29,16 +29,25 @@ def inject(injector: DueCreditInjector) -> None:
         None,
         BibTeX(
             r"""
-    @article{van2011numpy,
-        title={The NumPy array: a structure for efficient numerical computation},
-        author={Van Der Walt, Stefan and Colbert, S Chris and Varoquaux, Gael},
-        journal={Computing in Science \& Engineering},
-        volume={13},
-        number={2},
-        pages={22--30},
-        year={2011},
-        publisher={AIP Publishing},
-        doi={10.1109/MCSE.2011.37}
+    @article{harris2020array,
+        title={Array programming with {NumPy}},
+        author={Harris, Charles R. and Millman, K. Jarrod and
+            van der Walt, St{\'e}fan J and Gommers, Ralf and
+            Virtanen, Pauli and Cournapeau, David and
+            Wieser, Eric and Taylor, Julian and Berg, Sebastian and
+            Smith, Nathaniel J. and Kern, Robert and Picus, Matti and
+            Hoyer, Stephan and van Kerkwijk, Marten H. and
+            Brett, Matthew and Haldane, Allan and
+            Fern{\'a}ndez del R{\'i}o, Jaime and Wiebe, Mark and
+            Peterson, Pearu and G{\'e}rard-Marchant, Pierre and
+            Sheppard, Kevin and Reddy, Tyler and Weckesser, Warren and
+            Abbasi, Hameer and Gohlke, Christoph and
+            Oliphant, Travis E.},
+        journal={Nature},
+        volume={585},
+        pages={357--362},
+        year={2020},
+        doi={10.1038/s41586-020-2649-2}
         }
     """
         ),
