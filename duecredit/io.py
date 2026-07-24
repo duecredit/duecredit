@@ -272,10 +272,10 @@ def condition_bibtex(bibtex: str) -> bytes:
     Primarily a set of workarounds for either non-standard BibTeX entries
     or citeproc bugs
     """
-    # XXX: workaround atm to fix zenodo bibtexs, convert @data to @misc
+    # XXX: workaround atm to fix zenodo/github bibtexs, convert @data/@software to @misc
     # and also ; into and
-    if bibtex.startswith("@data"):
-        bibtex = bibtex.replace("@data", "@misc", 1)
+    bibtex, n_subs = re.subn(r"^(\s*)@(data|software)\b", r"\1@misc", bibtex, count=1)
+    if n_subs:
         bibtex = bibtex.replace(";", " and")
     bibtex = bibtex.replace("\u2013", "--") + "\n"
     # workaround for citeproc 0.3.0 failing to parse a single page pages field

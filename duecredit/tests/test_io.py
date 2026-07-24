@@ -685,6 +685,25 @@ def test_format_bibtex_zenodo_doi() -> None:
     )
 
 
+def test_format_bibtex_github_software() -> None:
+    """
+    test that we can correctly parse bibtex software entries obtained from GitHub citation exporter (CITATION.cff)
+    """
+    bibtex_software = """
+    @software{The_pandas_development_team_pandas-dev_pandas_Pandas,
+    author = {{The pandas development team}},
+    doi = {10.5281/zenodo.3509134},
+    license = {BSD-3-Clause},
+    title = {{pandas-dev/pandas: Pandas}},
+    url = {https://github.com/pandas-dev/pandas}
+    }
+    """
+    assert (
+        format_bibtex(BibTeX(bibtex_software))
+        == "The pandas development team, pandas-dev/pandas: Pandas."
+    )
+
+
 def test_format_bibtex_with_utf_characters() -> None:
     """
     test that we can correctly parse bibtex entry if it contains utf-8 characters
