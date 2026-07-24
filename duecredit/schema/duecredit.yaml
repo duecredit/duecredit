@@ -1,0 +1,287 @@
+id: https://github.com/duecredit/duecredit/schema
+name: duecredit
+title: DueCredit Schema
+description: |
+  A LinkML schema for DueCredit citation tracking data structures.
+  This schema provides a standardized data model that is compatible with
+  CodeMeta (https://codemeta.github.io/) and other software citation schemas.
+license: BSD-2-Clause
+version: 1.0.0
+
+prefixes:
+  duecredit: https://github.com/duecredit/duecredit/schema/
+  linkml: https://w3id.org/linkml/
+  schema: http://schema.org/
+  codemeta: https://codemeta.github.io/terms/
+  dc: http://purl.org/dc/terms/
+
+default_prefix: duecredit
+default_range: string
+
+imports:
+  - linkml:types
+
+
+# =============================================================================
+# Enums
+# =============================================================================
+enums:
+  EntryType:
+    description: The type of citation entry
+    permissible_values:
+      bibtex:
+        description: A BibTeX formatted citation
+      doi:
+        description: A Digital Object Identifier
+      url:
+        description: A URL reference
+      text:
+        description: Free-form text citation
+
+  CitationTag:
+    description: |
+      Tags that describe the relationship between code and the referenced work.
+      See https://github.com/duecredit/duecredit/#tags
+    permissible_values:
+      implementation:
+        description: An implementation of the cited method (default)
+      reference-implementation:
+        description: The original implementation by the authors of the paper
+      another-implementation:
+        description: Some other implementation of the method
+      use:
+        description: Publications demonstrating a worthwhile noting use of the method
+      edu:
+        description: Tutorials, textbooks and other educational materials
+      donate:
+        description: URLs describing how to contribute funds to the project
+      funding:
+        description: Sources of funding for the implementation
+      dataset:
+        description: References to datasets
+
+
+# =============================================================================
+# Classes
+# =============================================================================
+classes:
+  # ---------------------------------------------------------------------------
+  # Person/Author information
+  # ---------------------------------------------------------------------------
+  Person:
+    description: A person who contributed to a work
+    class_uri: schema:Person
+    attributes:
+      given_name:
+        description: First/given name
+        slot_uri: schema:givenName
+      family_name:
+        description: Last/family name
+        slot_uri: schema:familyName
+      name:
+        description: Full name if not split into given/family
+        slot_uri: schema:name
+      email:
+        description: Email address
+        slot_uri: schema:email
+      orcid:
+        description: ORCID identifier
+        slot_uri: schema:identifier
+      affiliation:
+        description: Affiliation/organization
+        slot_uri: schema:affiliation
+
+  # ---------------------------------------------------------------------------
+  # Entry classes - different types of citation references
+  # ---------------------------------------------------------------------------
+  Entry:
+    description: |
+      Base class for citation entries. Maps to schema:CreativeWork in CodeMeta.
+    class_uri: schema:CreativeWork
+    abstract: true
+    attributes:
+      key:
+        description: Unique identifier/key for this entry
+        identifier: true
+        required: true
+      entry_type:
+        description: The type of entry
+        range: EntryType
+        required: true
+      raw_entry:
+        description: The raw/original entry content
+
+  BibTeXEntry:
+    description: A BibTeX formatted citation entry
+    is_a: Entry
+    class_uri: schema:ScholarlyArticle
+    attributes:
+      bibtex_type:
+        description: BibTeX entry type (article, book, inproceedings, etc.)
+      title:
+        description: Title of the work
+        slot_uri: schema:name
+      authors:
+        description: Authors of the work
+        range: Person
+        multivalued: true
+        slot_uri: schema:author
+      year:
+        description: Year of publication
+        slot_uri: schema:datePublished
+      journal:
+        description: Journal name for articles
+        slot_uri: schema:isPartOf
+      volume:
+        description: Volume number
+      number:
+        description: Issue number
+      pages:
+        description: Page range
+        slot_uri: schema:pagination
+      publisher:
+        description: Publisher name
+        slot_uri: schema:publisher
+      doi:
+        description: DOI if available
+        slot_uri: schema:identifier
+      url:
+        description: URL if available
+        slot_uri: schema:url
+      abstract:
+        description: Abstract if available
+        slot_uri: schema:abstract
+
+  DoiEntry:
+    description: A DOI reference entry
+    is_a: Entry
+    class_uri: schema:CreativeWork
+    attributes:
+      doi:
+        description: The DOI value
+        required: true
+        slot_uri: schema:identifier
+
+  UrlEntry:
+    description: A URL reference entry
+    is_a: Entry
+    class_uri: schema:WebPage
+    attributes:
+      url:
+        description: The URL value
+        required: true
+        slot_uri: schema:url
+
+  TextEntry:
+    description: A free-form text citation entry
+    is_a: Entry
+    class_uri: schema:CreativeWork
+    attributes:
+      text:
+        description: The text content
+        required: true
+
+  # ---------------------------------------------------------------------------
+  # Citation - links entries to code paths
+  # ---------------------------------------------------------------------------
+  Citation:
+    description: |
+      Associates a reference entry with a specific code path, providing context
+      about how the reference relates to the code.
+    attributes:
+      entry_key:
+        description: Reference to the entry being cited
+        required: true
+      path:
+        description: |
+          Path to the code object. Format is "module[.submodules][:[class.]method]"
+        required: true
+        slot_uri: codemeta:targetProduct
+      description:
+        description: Description of what this functionality provides
+        slot_uri: schema:description
+      version:
+        description: Version of the software where applicable
+        slot_uri: schema:softwareVersion
+      tags:
+        description: Tags describing the relationship between code and reference
+        range: CitationTag
+        multivalued: true
+      cite_module:
+        description: Whether this citation should be shown even without method calls
+        range: boolean
+      count:
+        description: Number of times this citation was triggered
+        range: integer
+
+  # ---------------------------------------------------------------------------
+  # SoftwareComponent - represents a module/function/class being cited
+  # ---------------------------------------------------------------------------
+  SoftwareComponent:
+    description: A software component (package, module, or function)
+    class_uri: schema:SoftwareSourceCode
+    attributes:
+      path:
+        description: The full path to this component
+        identifier: true
+        required: true
+        slot_uri: schema:identifier
+      name:
+        description: Display name
+        slot_uri: schema:name
+      description:
+        description: Description of the component
+        slot_uri: schema:description
+      version:
+        description: Version of the component
+        slot_uri: schema:softwareVersion
+      citations:
+        description: Citations associated with this component
+        range: Citation
+        multivalued: true
+        inlined_as_list: true
+
+  # ---------------------------------------------------------------------------
+  # DueCreditReport - top-level container
+  # ---------------------------------------------------------------------------
+  DueCreditReport:
+    description: |
+      Top-level container for all DueCredit data. This maps to a CodeMeta
+      SoftwareSourceCode with associated citations.
+    tree_root: true
+    class_uri: schema:SoftwareSourceCode
+    attributes:
+      name:
+        description: Name of the software project
+        slot_uri: schema:name
+      version:
+        description: Version of the software
+        slot_uri: schema:softwareVersion
+      description:
+        description: Description of the software
+        slot_uri: schema:description
+      entries:
+        description: All citation entries (references)
+        range: Entry
+        multivalued: true
+        inlined_as_list: true
+      citations:
+        description: All citations linking entries to code paths
+        range: Citation
+        multivalued: true
+        inlined_as_list: true
+      packages:
+        description: Top-level packages cited
+        range: SoftwareComponent
+        multivalued: true
+        inlined_as_list: true
+      modules:
+        description: Modules cited
+        range: SoftwareComponent
+        multivalued: true
+        inlined_as_list: true
+      functions:
+        description: Functions/methods cited
+        range: SoftwareComponent
+        multivalued: true
+        inlined_as_list: true
