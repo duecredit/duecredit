@@ -183,6 +183,49 @@ ready for reuse, e.g.:
             publisher={Br Computer Soc}
         }
 
+### CodeMeta Export
+
+You can also export citations in [CodeMeta](https://codemeta.github.io/) format,
+which provides a standardized JSON-LD schema for software metadata that enables
+interoperability with other software citation tools and metadata registries:
+
+    $> duecredit summary --format=codemeta
+    {
+      "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+      "@type": "SoftwareSourceCode",
+      "citation": [
+        {
+          "@type": "ScholarlyArticle",
+          "name": "The NumPy array: a structure for efficient numerical computation",
+          "author": [
+            {
+              "@type": "Person",
+              "familyName": "Van Der Walt",
+              "givenName": "Stefan"
+            }
+          ],
+          "datePublished": "2011"
+        }
+      ]
+    }
+
+The CodeMeta format is compatible with schema.org and provides crosswalks to other
+metadata schemas used in software citation. For more information, see the
+[CodeMeta documentation](https://codemeta.github.io/).
+
+#### LinkML Schema
+
+DueCredit's internal data model is formalized using [LinkML](https://linkml.io/), a
+linked data modeling language. The schema files are located in `duecredit/schema/`:
+
+- `duecredit.yaml` - The LinkML schema definition
+- `model.py` - Generated Python dataclasses
+- `duecredit.context.jsonld` - JSON-LD context for semantic interoperability
+
+To use the LinkML schema tools, install the optional dependency:
+
+    pip install duecredit[schema]
+
 
 and if by default only references for "implementation" are listed, we
 can enable listing of references for other tags as well (e.g. "edu"
@@ -318,6 +361,15 @@ provide similar functionality (since we are collecting such
 information as well) or just interface/report to sempervirens.
 
 [citepy](https://github.com/clbarnes/citepy) -- Easily cite software libraries using information from automatically gathered from their package repository.
+
+[CodeMeta](https://codemeta.github.io/) -- A concept vocabulary for
+exchanging software metadata across different registries, repositories,
+and other software collections. DueCredit can export citations in CodeMeta
+format using `duecredit summary --format=codemeta`.
+
+[SciCodes Consortium](https://github.com/SciCodes/best-practices-preprint) --
+Best practices for software citation and metadata, which DueCredit aims to
+support through standardized formats like CodeMeta.
 
 ## Currently used by
 
