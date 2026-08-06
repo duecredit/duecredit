@@ -246,7 +246,7 @@ classes:
   # ---------------------------------------------------------------------------
   DueCreditReport:
     description: |
-      Top-level container for all DueCredit data. This maps to a CodeMeta 
+      Top-level container for all DueCredit data. This maps to a CodeMeta
       SoftwareSourceCode with associated citations.
     tree_root: true
     class_uri: schema:SoftwareSourceCode
