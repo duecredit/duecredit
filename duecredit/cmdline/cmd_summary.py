@@ -16,7 +16,7 @@ import sys
 
 from ..codemeta import CodeMetaOutput
 from ..config import DUECREDIT_FILE
-from ..io import BibTeXOutput, TextOutput
+from ..io import BibTeXOutput, Output, TextOutput
 from ..log import lgr
 
 __docformat__ = "restructuredtext"
@@ -58,7 +58,7 @@ def run(args: argparse.Namespace) -> int:
     due = PickleOutput.load(args.filename)
     # CollectorSummary(due).dump()
 
-    out: TextOutput | BibTeXOutput | CodeMetaOutput
+    out: Output
     if args.format == "text":
         out = TextOutput(sys.stdout, due, args.style)
     elif args.format == "bibtex":

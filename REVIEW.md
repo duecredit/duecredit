@@ -396,5 +396,47 @@ This PR is ready to merge. The suggested improvements can be addressed in follow
 
 ---
 
+## Round 2: Refactoring Applied on This Branch
+
+The PR code was merged into this branch and the following review findings were
+addressed directly (all 29 tests pass, ruff lint/format clean):
+
+### `duecredit/codemeta.py`
+1. **BibTeX field parsing rewritten** — now explicitly handles the three BibTeX
+   value forms (`{braced}` with one level of nested braces, `"quoted"`, and
+   bare words), normalizes whitespace in multi-line values, escapes the field
+   name, and no longer lets e.g. `booktitle` shadow `title`. Fixes truncation
+   of titles containing braces (`Let{'}s` previously cut the title short).
+2. **`softwareRequirements` built correctly** — replaced the
+   create-`None`-then-delete pattern with a `_software_requirement()` helper
+   that only sets `version` when present.
+3. **Deduplicated DOI handling** — `_doi_refs()` helper shared by
+   `bibtex_to_codemeta` and `doi_to_codemeta`.
+4. **Table-driven conversion** — module-level `BIBTEX_TYPE_MAPPING`,
+   `_BIBTEX_FIELD_MAPPING` (simple 1:1 field copies), and `_ENTRY_CONVERTERS`
+   dispatch table replace repeated inline code; adding a field or entry type
+   is now a one-line change.
+5. **Simplified journal nesting** — issue/volume/periodical nesting built by
+   successive wrapping instead of three temporary variables.
+6. **Citation dedup as a dict comprehension**; `CODEMETA_CONTEXT` constant
+   replaces the repeated context URL literal.
+7. **Trimmed boilerplate docstrings** on trivial one-expression converters
+   (~90 lines shorter overall while adding capability).
+
+### `duecredit/cmdline/cmd_summary.py`
+8. Annotated `out` with the `Output` base class instead of a union that must
+   grow with every new format.
+
+### `duecredit/tests/test_codemeta.py`
+9. Added regression tests for nested-brace/multi-line values, quoted and bare
+   values, and `booktitle` non-shadowing; strengthened the title assertion in
+   `test_bibtex_entry`.
+
+**Deferred (follow-up material):** proper BibTeX parser library, LinkML schema
+usage clarification, richer CodeMeta fields, author suffix/corporate-name
+handling.
+
+---
+
 **Reviewed by:** Claude Code
-**Date:** 2025-12-25
+**Date:** 2026-08-06

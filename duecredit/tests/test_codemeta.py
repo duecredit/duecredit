@@ -83,6 +83,24 @@ class TestParseBibtex:
         result = parse_bibtex_field(_sample_bibtex, "nonexistent")
         assert result is None
 
+    def test_parse_bibtex_field_nested_braces_multiline(self) -> None:
+        # Multi-line value with one level of nested braces is captured fully,
+        # with whitespace normalized
+        result = parse_bibtex_field(_sample_bibtex, "title")
+        assert result == (
+            "Open is not enough. Let{'}s take the next step: An integrated, "
+            "community-driven computing platform for neuroscience"
+        )
+
+    def test_parse_bibtex_field_quoted_and_bare(self) -> None:
+        bibtex = '@article{x, year = 2012, publisher = "Frontiers Media",}'
+        assert parse_bibtex_field(bibtex, "year") == "2012"
+        assert parse_bibtex_field(bibtex, "publisher") == "Frontiers Media"
+
+    def test_parse_bibtex_field_not_shadowed_by_booktitle(self) -> None:
+        bibtex = "@inproceedings{x, booktitle = {Proc. Conf.}, title = {Real Title}}"
+        assert parse_bibtex_field(bibtex, "title") == "Real Title"
+
 
 class TestParseAuthors:
     """Tests for author string parsing."""
@@ -119,7 +137,8 @@ class TestEntryToCodemeta:
         result = entry_to_codemeta(entry)
 
         assert result["@type"] == "ScholarlyArticle"
-        assert "name" in result  # title
+        # title with protection braces stripped
+        assert result["name"].startswith("Open is not enough. Let's take")
         assert "author" in result
         assert len(result["author"]) == 2
         assert result["datePublished"] == "2012"
